@@ -12,14 +12,17 @@ async function decomposeTask(input, taskId, ledger, config, llm) {
         // LLM-based intelligent decomposition
         try {
             subtaskStrings = await llm.decompose(input);
+            console.log(`[DEBUG] LLM returned ${subtaskStrings.length} subtasks`);
             ledger.append((0, evidence_1.createEvidence)(taskId, 'llm_decompose', {
                 input,
                 subtasks: subtaskStrings,
+                count: subtaskStrings.length,
                 model: 'claude-3-5-sonnet'
             }));
         }
         catch (error) {
             // Fallback to heuristic on LLM failure
+            console.error('[DEBUG] LLM failed:', error instanceof Error ? error.message : error);
             ledger.append((0, evidence_1.createEvidence)(taskId, 'llm_decompose', {
                 error: error instanceof Error ? error.message : 'Unknown error',
                 fallback: 'heuristic'
