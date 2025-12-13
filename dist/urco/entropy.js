@@ -50,8 +50,8 @@ function computeUnknowns(data) {
  */
 function computeAmbiguity(data) {
     const text = data.text;
-    // Vague terms dictionary
-    const vagueTerms = ['better', 'optimize', 'handle', 'manage', 'robust', 'scalable', 'real', 'correct', 'fast', 'easy', 'good', 'improve'];
+    // Vague terms dictionary (expanded)
+    const vagueTerms = ['better', 'optimize', 'handle', 'manage', 'robust', 'scalable', 'real', 'correct', 'fast', 'easy', 'good', 'improve', 'thing', 'stuff', 'something', 'it', 'nice', 'well'];
     let vagueCount = 0;
     for (const term of vagueTerms) {
         const regex = new RegExp(`\\b${term}\\b`, 'gi');
@@ -59,12 +59,16 @@ function computeAmbiguity(data) {
         if (matches)
             vagueCount += matches.length;
     }
-    let score = clamp01(vagueCount / 6);
+    let score = clamp01(vagueCount / 3); // More sensitive threshold
     // Unclear pronouns
-    const pronounRegex = /\b(it|this|that)\b/gi;
+    const pronounRegex = /\b(it|this|that|them|those)\b/gi;
     const pronounMatches = text.match(pronounRegex);
-    if (pronounMatches && pronounMatches.length > 2) {
-        score += 0.15;
+    if (pronounMatches && pronounMatches.length > 1) { // Lower threshold
+        score += 0.2;
+    }
+    // Very short text is inherently ambiguous
+    if (text.length < 30) {
+        score += 0.3;
     }
     return clamp01(score);
 }

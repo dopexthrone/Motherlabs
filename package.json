@@ -6,7 +6,10 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/cli.js",
-    "test": "npm run build && node tests/urco.test.js",
+    "test": "npm run build && npx tsx tests/urco.test.ts && npx tsx tests/urco-failures.test.ts && npx tsx tests/llm-deterministic.test.ts",
+    "test:urco": "npm run build && npx tsx tests/urco.test.ts",
+    "test:failures": "npm run build && npx tsx tests/urco-failures.test.ts",
+    "test:deterministic": "npm run build && npx tsx tests/llm-deterministic.test.ts",
     "benchmark": "npm run build && node dist/benchmark/cli.js",
     "benchmark:warmup": "npm run benchmark -- --warmup",
     "benchmark:full": "npm run benchmark -- --full",

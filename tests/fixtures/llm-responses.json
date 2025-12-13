@@ -1,0 +1,45 @@
+{
+  "decompose_simple_api": {
+    "input": "Build a REST API for todos",
+    "model": "claude-sonnet-4-5-20250929",
+    "temperature": 0.3,
+    "response": [
+      "Set up Express.js project with TypeScript configuration",
+      "Create database schema for todos table",
+      "Implement CRUD endpoints (GET, POST, PUT, DELETE)",
+      "Add input validation and error handling",
+      "Write integration tests for all endpoints"
+    ],
+    "recorded_at": "2025-12-12T17:00:00Z"
+  },
+
+  "decompose_complex_distributed": {
+    "input": "Implement distributed caching with consistency",
+    "model": "claude-sonnet-4-5-20250929",
+    "temperature": 0.3,
+    "response": [
+      "Design cache node architecture with leader election",
+      "Implement gossip protocol for cache invalidation",
+      "Add vector clocks for causality tracking",
+      "Build partition detection and healing logic",
+      "Create configurable consistency levels (strong, eventual, causal)",
+      "Implement monitoring and metrics collection",
+      "Add integration tests for partition scenarios"
+    ],
+    "recorded_at": "2025-12-12T17:01:00Z"
+  },
+
+  "decompose_with_contradiction": {
+    "input": "Build deterministic system with random selection",
+    "model": "claude-sonnet-4-5-20250929",
+    "temperature": 0.3,
+    "response": [
+      "Define system requirements and constraints",
+      "Implement deterministic core logic",
+      "Add random selection algorithm with seed-based reproducibility",
+      "Create configuration for randomization parameters"
+    ],
+    "recorded_at": "2025-12-12T17:02:00Z",
+    "note": "LLM tries to resolve contradiction, but URCO should still detect it"
+  }
+}

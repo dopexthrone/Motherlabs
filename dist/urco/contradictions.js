@@ -20,16 +20,28 @@ function detectContradictions(text) {
         });
     }
     for (const match of text.matchAll(positiveRegex)) {
-        positives.push({
-            text: match[2],
-            span: [match.index, match.index + match[0].length]
-        });
+        const matchStart = match.index;
+        const matchEnd = matchStart + match[0].length;
+        // Skip if this match is inside a negation span
+        const insideNegation = negations.some(neg => matchStart >= neg.span[0] && matchEnd <= neg.span[1]);
+        if (!insideNegation) {
+            positives.push({
+                text: match[2],
+                span: [matchStart, matchEnd]
+            });
+        }
     }
     // Check for overlap
     for (const neg of negations) {
         for (const pos of positives) {
             const overlap = (0, extractor_1.tokenOverlap)(neg.text, pos.text);
-            if (overlap >= 0.7) {
+            // Only flag if high overlap AND not explicitly contrasting (X vs Y pattern)
+            // "Do not use X. Use Y" is legitimate if X ≠ Y
+            const negNorm = (0, extractor_1.normalize)(neg.text);
+            const posNorm = (0, extractor_1.normalize)(pos.text);
+            // Check for explicit contrast markers
+            const hasContrast = /\b(instead|alternative|modern|new|different)\b/.test(posNorm);
+            if (overlap >= 0.7 && !hasContrast) {
                 contradictions.push({
                     type: 'negation_clash',
                     leftSpan: neg.span,
