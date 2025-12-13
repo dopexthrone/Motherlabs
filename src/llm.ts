@@ -2,6 +2,10 @@
 
 import Anthropic from '@anthropic-ai/sdk'
 import { Evidence } from './types'
+import { sanitizeInput, validateSanitized } from './core/sanitize'
+import { Result, Ok, Err, createError } from './core/result'
+
+const LLM_TIMEOUT_MS = 30_000  // 30 second timeout
 
 export class LLMAdapter {
   private client: Anthropic | null = null
@@ -12,12 +16,27 @@ export class LLMAdapter {
     }
   }
 
-  async decompose(input: string): Promise<string[]> {
+  async decompose(input: string): Promise<Result<string[], Error>> {
     if (!this.client) {
-      throw new Error('LLM adapter not configured (no API key)')
+      return Err(new Error('LLM adapter not configured (no API key)'))
     }
 
-    const message = await this.client.messages.create({
+    // FIXED: Sanitize input to prevent injection/DoS
+    try {
+      const sanitizeResult = sanitizeInput(input)
+      validateSanitized(sanitizeResult)
+
+      if (sanitizeResult.warnings.length > 0) {
+        console.warn('[LLM] Input sanitization warnings:', sanitizeResult.warnings)
+      }
+
+      // FIXED: Add timeout to prevent hanging
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('LLM timeout')), LLM_TIMEOUT_MS)
+      })
+
+      const message = await Promise.race([
+        this.client.messages.create({
       model: 'claude-sonnet-4-5-20250929',
       max_tokens: 2048,
       temperature: 0.3,  // Low temp for consistency
@@ -25,7 +44,7 @@ export class LLMAdapter {
         role: 'user',
         content: `Break this task into 5-8 concrete, actionable subtasks.
 
-Task: "${input}"
+Task: "${sanitizeResult.sanitized}"
 
 Requirements:
 - Each subtask should be specific and implementable
@@ -34,10 +53,12 @@ Requirements:
 - No markdown, no explanations
 
 Format: ["subtask 1", "subtask 2", "subtask 3", ...]`
-      }]
-    })
+        }]
+      }),
+      timeoutPromise
+    ])
 
-    const text = message.content[0].type === 'text' ? message.content[0].text : ''
+    const text = message.content[0]?.type === 'text' ? message.content[0].text : ''
 
     // Try to extract JSON array - be flexible with whitespace
     let parsed: string[]
@@ -48,16 +69,25 @@ Format: ["subtask 1", "subtask 2", "subtask 3", ...]`
       // Second try: extract array from text
       const match = text.match(/\[[\s\S]*\]/)
       if (!match) {
-        throw new Error(`LLM did not return valid JSON array. Got: ${text.substring(0, 100)}`)
+        return Err(new Error(`LLM did not return valid JSON array. Got: ${text.substring(0, 100)}`))
       }
-      parsed = JSON.parse(match[0])
+      try {
+        parsed = JSON.parse(match[0])
+      } catch (parseErr) {
+        return Err(new Error('Failed to parse JSON from LLM response'))
+      }
     }
 
     if (!Array.isArray(parsed) || parsed.length === 0) {
-      throw new Error('LLM returned empty or invalid array')
+      return Err(new Error('LLM returned empty or invalid array'))
     }
 
-    return parsed.filter(item => typeof item === 'string' && item.trim().length > 0)
+    const filtered = parsed.filter(item => typeof item === 'string' && item.trim().length > 0)
+    return Ok(filtered)
+
+    } catch (error) {
+      return Err(error instanceof Error ? error : new Error(String(error)))
+    }
   }
 
   async generateCode(task: string, context?: string): Promise<string> {

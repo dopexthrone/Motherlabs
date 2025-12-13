@@ -13,16 +13,16 @@ class FixtureLLMAdapter {
     this.fixtures = JSON.parse(fs.readFileSync(fixturesPath, 'utf-8'))
   }
 
-  async decompose(input: string): Promise<string[]> {
+  async decompose(input: string): Promise<any> {
     // Find matching fixture by input
     for (const [key, fixture] of Object.entries(this.fixtures)) {
       if (input.includes(fixture.input) || fixture.input.includes(input.substring(0, 30))) {
         console.log(`  Using fixture: ${key}`)
-        return fixture.response
+        return { ok: true, value: fixture.response }
       }
     }
 
-    throw new Error(`No fixture found for input: ${input.substring(0, 50)}`)
+    return { ok: false, error: new Error(`No fixture found for input: ${input.substring(0, 50)}`) }
   }
 
   async generateCode(): Promise<string> {

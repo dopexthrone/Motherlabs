@@ -1,26 +1,39 @@
 // Evidence Ledger - Append-only truth substrate
 
 import { Evidence } from './types'
+import { globalIdGenerator, globalTimeProvider } from './core/ids'
+
+const MAX_LEDGER_SIZE = 10_000  // Prevent memory exhaustion
 
 export class Ledger {
   private records: Evidence[] = []
+  private maxSize: number
+
+  constructor(maxSize: number = MAX_LEDGER_SIZE) {
+    this.maxSize = maxSize
+  }
 
   append(evidence: Evidence): void {
+    // FIXED: Enforce size limit to prevent memory exhaustion
+    if (this.records.length >= this.maxSize) {
+      throw new Error(`Ledger size limit reached (${this.maxSize}). Consider archiving old records.`)
+    }
+
     // Deep freeze the record for true immutability
     const frozenEvidence = deepFreeze(evidence)
     this.records.push(frozenEvidence)
   }
 
   query(taskId: string): Evidence[] {
-    // Return defensive copy to prevent external mutation
+    // FIXED: Deep copy to prevent mutation of nested data
     return this.records
       .filter(r => r.taskId === taskId)
-      .map(r => ({ ...r }))
+      .map(r => JSON.parse(JSON.stringify(r)))
   }
 
   all(): readonly Evidence[] {
-    // Return defensive copy
-    return [...this.records]
+    // FIXED: Deep copy to prevent mutation
+    return this.records.map(r => JSON.parse(JSON.stringify(r)))
   }
 
   count(): number {
@@ -56,11 +69,12 @@ export function createEvidence(
   type: Evidence['type'],
   data: unknown
 ): Evidence {
+  // FIXED: Use monotonic ID generator instead of Date.now() for determinism
   return {
-    id: `${taskId}-${type}-${Date.now()}`,
+    id: globalIdGenerator.evidenceId(taskId, type),
     taskId,
     type,
-    timestamp: Date.now(),
+    timestamp: globalTimeProvider.now(),
     data
   }
 }

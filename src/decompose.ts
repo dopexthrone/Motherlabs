@@ -19,21 +19,23 @@ export async function decomposeTask(
 
   if (llm) {
     // LLM-based intelligent decomposition
-    try {
-      subtaskStrings = await llm.decompose(input)
-      console.log(`[DEBUG] LLM returned ${subtaskStrings.length} subtasks`)
+    const result = await llm.decompose(input)
+
+    if (result.ok) {
+      subtaskStrings = result.value
       ledger.append(createEvidence(taskId, 'llm_decompose', {
         input,
         subtasks: subtaskStrings,
         count: subtaskStrings.length,
-        model: 'claude-3-5-sonnet'
+        model: 'claude-sonnet-4-5',
+        success: true
       }))
-    } catch (error) {
-      // Fallback to heuristic on LLM failure
-      console.error('[DEBUG] LLM failed:', error instanceof Error ? error.message : error)
+    } else {
+      // FIXED: Structured error handling instead of swallowing
       ledger.append(createEvidence(taskId, 'llm_decompose', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        fallback: 'heuristic'
+        error: result.error.message,
+        fallback: 'heuristic',
+        success: false
       }))
       subtaskStrings = heuristicDecompose(input)
     }
