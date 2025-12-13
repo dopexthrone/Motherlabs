@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/codemetrics.schema.json",
+  "title": "Code Metrics Schema",
+  "type": "object",
+  "required": ["complexity", "linesOfCode", "functions", "testCoverage"],
+  "properties": {
+    "complexity": { "type": "number", "minimum": 0 },
+    "linesOfCode": { "type": "number", "minimum": 0 },
+    "functions": { "type": "number", "minimum": 0 },
+    "testCoverage": { "type": "number", "minimum": 0, "maximum": 1 }
+  },
+  "additionalProperties": false
+}

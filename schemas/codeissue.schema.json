@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/codeissue.schema.json",
+  "title": "Code Issue Schema",
+  "type": "object",
+  "required": ["type", "severity", "line", "message", "fixable"],
+  "properties": {
+    "type": { "type": "string", "enum": ["NO_TESTS", "HIGH_COMPLEXITY", "DUPLICATE_CODE", "NO_ERROR_HANDLING", "MISSING_TYPES"] },
+    "severity": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+    "line": { "type": "number", "minimum": 1 },
+    "message": { "type": "string" },
+    "fixable": { "type": "boolean" }
+  },
+  "additionalProperties": false
+}
