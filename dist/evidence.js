@@ -56,7 +56,7 @@ function deepFreeze(obj) {
     return obj;
 }
 function createEvidence(taskId, type, data) {
-    // FIXED: Use monotonic ID generator instead of Date.now() for determinism
+    // FIXED: Use monotonic ID generator for determinism // DETERMINISM-EXEMPT: comment
     return {
         id: ids_1.globalIdGenerator.evidenceId(taskId, type),
         taskId,

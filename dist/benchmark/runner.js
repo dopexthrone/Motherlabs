@@ -73,7 +73,7 @@ exports.LANES = [
  * Run task in Lane A or C (raw model, no Motherlabs)
  */
 async function runRawLane(task, lane, client) {
-    const startTime = Date.now();
+    const startTime = Date.now(); // DETERMINISM-EXEMPT: Measuring real performance
     const message = await client.messages.create({
         model: lane.model,
         max_tokens: 4096,
@@ -88,7 +88,7 @@ Break this down into specific, actionable subtasks. Return ONLY a JSON array of 
 No explanations. Just the JSON array.`
             }]
     });
-    const endTime = Date.now();
+    const endTime = Date.now(); // DETERMINISM-EXEMPT: Measuring real performance
     const rawOutput = message.content[0].type === 'text' ? message.content[0].text : '';
     // Try to parse JSON
     let parsedOutput;
@@ -108,7 +108,7 @@ No explanations. Just the JSON array.`
     return {
         taskId: task.id,
         laneId: lane.id,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date().toISOString(), // DETERMINISM-EXEMPT: Timestamp metadata
         rawOutput,
         outputTokens: rawOutput.length,
         parsedOutput,
@@ -129,7 +129,7 @@ No explanations. Just the JSON array.`
  * Run task in Lane B (Motherlabs)
  */
 async function runMotherlabsLane(task, lane, apiKey) {
-    const startTime = Date.now();
+    const startTime = Date.now(); // DETERMINISM-EXEMPT: Measuring real performance
     const ledger = new evidence_1.Ledger();
     const llm = new llm_1.LLMAdapter(apiKey);
     const config = {
@@ -139,7 +139,7 @@ async function runMotherlabsLane(task, lane, apiKey) {
         maxSubtasks: 10
     };
     const result = await (0, decompose_1.decomposeTask)(task.input, task.id, ledger, config, llm);
-    const endTime = Date.now();
+    const endTime = Date.now(); // DETERMINISM-EXEMPT: Measuring real performance
     // Convert to JSON output
     const subtasks = result.subtasks.map(st => st.input);
     const rawOutput = JSON.stringify(subtasks, null, 2);
@@ -148,7 +148,7 @@ async function runMotherlabsLane(task, lane, apiKey) {
     return {
         taskId: task.id,
         laneId: lane.id,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date().toISOString(), // DETERMINISM-EXEMPT: Timestamp metadata
         rawOutput,
         outputTokens: rawOutput.length,
         parsedOutput: subtasks,
@@ -278,7 +278,7 @@ async function runBenchmark(apiKey, tasks = tasks_1.WARMUP_TASKS, outputPath) {
             s.avgEntropyReduction * 0.2)
     };
     const report = {
-        timestamp: new Date().toISOString(),
+        timestamp: new Date().toISOString(), // DETERMINISM-EXEMPT: Timestamp metadata
         lanes: exports.LANES,
         tasks,
         results,

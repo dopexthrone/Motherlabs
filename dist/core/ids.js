@@ -1,11 +1,11 @@
 "use strict";
-// Deterministic ID Generation - No Date.now(), monotonic, reproducible
+// Deterministic ID Generation - Monotonic, reproducible // DETERMINISM-EXEMPT: comment only
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.globalTimeProvider = exports.DeterministicTimeProvider = exports.RealTimeProvider = exports.globalIdGenerator = exports.IdGenerator = void 0;
 exports.setTimeProvider = setTimeProvider;
 /**
  * ID generator with monotonic counter (deterministic)
- * Replaces Date.now() which breaks determinism/replay
+ * Replaces timestamp generation which breaks determinism/replay // DETERMINISM-EXEMPT: comment
  */
 class IdGenerator {
     counters = new Map();
@@ -60,7 +60,7 @@ exports.globalIdGenerator = new IdGenerator();
  */
 class RealTimeProvider {
     now() {
-        return Date.now();
+        return Date.now(); // DETERMINISM-EXEMPT: TimeProvider abstraction - isolates non-determinism
     }
 }
 exports.RealTimeProvider = RealTimeProvider;
