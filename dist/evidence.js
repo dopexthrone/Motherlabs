@@ -33,6 +33,11 @@ function deepFreeze(obj) {
     Object.freeze(obj);
     // Recursively freeze all properties
     Object.getOwnPropertyNames(obj).forEach(prop => {
+        // SAFETY: Using 'as any' here is safe because:
+        // - We're only reading properties (no mutation)
+        // - We type-check the value before recursion (typeof check)
+        // - This is bounded to object property iteration only
+        // - Alternative would be Record<string, unknown> but loses type info
         const value = obj[prop];
         if (value && typeof value === 'object' && !Object.isFrozen(value)) {
             deepFreeze(value);

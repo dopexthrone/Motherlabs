@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/cli.js",
-    "test": "npm run build && npx tsx tests/urco.test.ts && npx tsx tests/urco-failures.test.ts && npx tsx tests/llm-deterministic.test.ts && npx tsx tests/state-corruption.test.ts",
+    "test": "npm run build && npx tsx tests/urco.test.ts && npx tsx tests/urco-failures.test.ts && npx tsx tests/llm-deterministic.test.ts && npx tsx tests/state-corruption.test.ts && npx tsx tests/serialization.test.ts",
     "test:urco": "npm run build && npx tsx tests/urco.test.ts",
     "test:failures": "npm run build && npx tsx tests/urco-failures.test.ts",
     "test:deterministic": "npm run build && npx tsx tests/llm-deterministic.test.ts",
