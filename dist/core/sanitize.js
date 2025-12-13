@@ -47,7 +47,12 @@ function sanitizeInput(input) {
         /^\s*ASSISTANT\s*:/gmi,
         /;\s*console\./gi, // JavaScript injection attempt
         /<script/gi, // HTML injection
-        /\$\{.*\}/g // Template injection
+        /\$\{.*\}/g, // Template injection
+        /DROP\s+TABLE/gi, // SQL injection
+        /DELETE\s+FROM/gi, // SQL injection
+        /INSERT\s+INTO/gi, // SQL injection
+        /exec\s*\(/gi, // Command injection
+        /eval\s*\(/gi // Code injection
     ];
     for (const pattern of suspiciousPatterns) {
         if (pattern.test(sanitized)) {
