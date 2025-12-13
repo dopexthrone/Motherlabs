@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/executionplan.schema.json",
+  "title": "Execution Plan Schema",
+  "type": "object",
+  "required": ["id", "type", "code", "timeout", "sandbox"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["typescript", "javascript", "shell"]
+    },
+    "code": {
+      "type": "string",
+      "minLength": 1
+    },
+    "timeout": {
+      "type": "number",
+      "minimum": 1000,
+      "maximum": 300000
+    },
+    "sandbox": {
+      "type": "boolean"
+    },
+    "dependencies": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": false
+}

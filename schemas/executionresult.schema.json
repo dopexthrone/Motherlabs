@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/executionresult.schema.json",
+  "title": "Execution Result Schema",
+  "type": "object",
+  "required": ["planId", "success", "startTime", "endTime", "exitCode"],
+  "properties": {
+    "planId": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "success": {
+      "type": "boolean"
+    },
+    "startTime": {
+      "type": "number"
+    },
+    "endTime": {
+      "type": "number"
+    },
+    "exitCode": {
+      "type": "number"
+    },
+    "stdout": {
+      "type": "string"
+    },
+    "stderr": {
+      "type": "string"
+    },
+    "error": {
+      "type": "string"
+    },
+    "evidence": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}
