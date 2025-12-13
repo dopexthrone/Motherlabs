@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/proposal.schema.json",
+  "title": "Proposal Schema",
+  "type": "object",
+  "required": [
+    "id",
+    "content",
+    "source",
+    "timestamp"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "content": {},
+    "source": {
+      "type": "string",
+      "enum": [
+        "human",
+        "ai",
+        "deterministic",
+        "heuristic"
+      ]
+    },
+    "timestamp": {
+      "type": "number"
+    },
+    "metadata": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}

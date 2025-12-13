@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/constraint.schema.json",
+  "title": "Constraint Schema",
+  "type": "object",
+  "required": [
+    "name",
+    "required"
+  ],
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "required": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/ledgerentry.schema.json",
+  "title": "Ledgerentry Schema",
+  "type": "object",
+  "required": [
+    "id",
+    "timestamp",
+    "type",
+    "data",
+    "hash"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "number"
+    },
+    "type": {
+      "type": "string"
+    },
+    "data": {},
+    "hash": {
+      "type": "string"
+    },
+    "previousHash": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

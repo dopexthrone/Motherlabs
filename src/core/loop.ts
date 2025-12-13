@@ -174,7 +174,7 @@ export const CODE_CONSTRAINTS: Constraint<string>[] = [
   {
     name: 'syntax_valid',
     required: true,
-    check: async (code) => await validateSyntax(code)
+    check: (code) => validateSyntax(code)
   },
   {
     name: 'variables_defined',
@@ -184,7 +184,7 @@ export const CODE_CONSTRAINTS: Constraint<string>[] = [
   {
     name: 'tests_pass',
     required: true,
-    check: async (code) => await runTests(code)
+    check: (code) => runTests(code)
   },
   {
     name: 'urco_entropy_low',
@@ -198,33 +198,28 @@ export const CODE_CONSTRAINTS: Constraint<string>[] = [
   }
 ]
 
-// Placeholder validators (to be implemented)
-function validateSchema(code: string): Result<void, StructuredError> {
-  // TODO: Implement when code generation added
-  return Ok(void 0)
+// UNIMPLEMENTED: Code validators (Week 2 work)
+// These throw if called - prevents accidental use before implementation
+function validateSchema(_code: string): Result<void, StructuredError> {
+  throw new Error('UNIMPLEMENTED: validateSchema - implement in Week 2')
 }
 
-async function validateSyntax(code: string): Promise<Result<void, StructuredError>> {
-  // TODO: Implement when code generation added
-  return Ok(void 0)
+function validateSyntax(_code: string): Result<void, StructuredError> {
+  throw new Error('UNIMPLEMENTED: validateSyntax - implement in Week 2')
 }
 
-function validateVariables(code: string): Result<void, StructuredError> {
-  // TODO: Implement when code generation added
-  return Ok(void 0)
+function validateVariables(_code: string): Result<void, StructuredError> {
+  throw new Error('UNIMPLEMENTED: validateVariables - implement in Week 2')
 }
 
-async function runTests(code: string): Promise<Result<void, StructuredError>> {
-  // TODO: Implement when code generation added
-  return Ok(void 0)
+function runTests(_code: string): Result<void, StructuredError> {
+  throw new Error('UNIMPLEMENTED: runTests - implement in Week 2')
 }
 
-function checkEntropy(code: string): Result<void, StructuredError> {
-  // TODO: Implement when code generation added
-  return Ok(void 0)
+function checkEntropy(_code: string): Result<void, StructuredError> {
+  throw new Error('UNIMPLEMENTED: checkEntropy - implement in Week 2')
 }
 
-function checkGovernance(code: string): Result<void, StructuredError> {
-  // TODO: Implement when code generation added
-  return Ok(void 0)
+function checkGovernance(_code: string): Result<void, StructuredError> {
+  throw new Error('UNIMPLEMENTED: checkGovernance - implement in Week 2')
 }

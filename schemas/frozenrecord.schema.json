@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/frozenrecord.schema.json",
+  "title": "Frozenrecord Schema",
+  "type": "object",
+  "required": [
+    "id",
+    "content",
+    "verificationProof",
+    "recordedAt",
+    "hash"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "content": {},
+    "verificationProof": {},
+    "recordedAt": {
+      "type": "number"
+    },
+    "hash": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/verificationresult.schema.json",
+  "title": "Verification Result Schema",
+  "type": "object",
+  "required": ["valid", "constraints", "timestamp"],
+  "properties": {
+    "valid": { "type": "boolean" },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "passed"],
+        "properties": {
+          "name": { "type": "string" },
+          "passed": { "type": "boolean" },
+          "error": { "type": "object" }
+        }
+      }
+    },
+    "timestamp": { "type": "number" }
+  },
+  "additionalProperties": false
+}

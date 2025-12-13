@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/ledger-entry.schema.json",
+  "title": "Persistent Ledger Entry Schema",
+  "type": "object",
+  "required": ["id", "timestamp", "type", "data", "hash"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "minLength": 3
+    },
+    "timestamp": {
+      "type": "number",
+      "minimum": 0
+    },
+    "type": {
+      "type": "string",
+      "enum": ["task_created", "llm_decompose", "urco_applied", "code_generated", "test_executed", "improvement_applied"]
+    },
+    "data": {
+      "type": "object"
+    },
+    "hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "previousHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  },
+  "additionalProperties": false
+}
