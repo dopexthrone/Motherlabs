@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/gatetype.schema.json",
+  "title": "Gate Type Schema",
+  "type": "string",
+  "enum": [
+    "schema_validation",
+    "syntax_validation",
+    "variable_resolution",
+    "test_execution",
+    "urco_entropy",
+    "governance_check",
+    "determinism_check",
+    "mock_bias_check"
+  ]
+}

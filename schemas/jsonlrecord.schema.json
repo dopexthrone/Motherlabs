@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/jsonlrecord.schema.json",
+  "title": "JSONL Record Schema",
+  "type": "object",
+  "required": ["record_type", "seq", "timestamp", "prev_hash", "record", "record_hash"],
+  "properties": {
+    "record_type": { "type": "string" },
+    "seq": { "type": "number", "minimum": 0 },
+    "timestamp": { "type": "number" },
+    "prev_hash": { "type": "string" },
+    "record": {},
+    "record_hash": { "type": "string" }
+  },
+  "additionalProperties": false
+}

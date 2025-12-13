@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/gatedecision.schema.json",
+  "title": "Gate Decision Schema",
+  "type": "object",
+  "required": ["gate_type", "decision", "target", "timestamp", "reason"],
+  "properties": {
+    "gate_type": { "$ref": "gatetype.schema.json" },
+    "decision": { "type": "string", "enum": ["ALLOW", "DENY"] },
+    "target": { "type": "object" },
+    "timestamp": { "type": "number" },
+    "reason": { "type": "string" },
+    "details": { "type": "object" }
+  },
+  "additionalProperties": false
+}
