@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/cli.js",
-    "test": "echo \"No tests yet\" && exit 0"
+    "test": "npm run build && node tests/urco.test.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1"
