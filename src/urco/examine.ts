@@ -187,7 +187,8 @@ export function examineCandidates(
   candidates: Candidate[],
   parentInvariants: string[] = []
 ): ScoredCandidate[] {
-  return candidates.map((c, index) => {
+  // Return frozen array to prevent external mutation
+  const scored = candidates.map((c, index) => {
     const existingCandidates = candidates.slice(0, index)
 
     const E = scoreExecutability(c)
@@ -219,4 +220,5 @@ export function examineCandidates(
       }
     }
   })
+  return Object.freeze(scored) as ScoredCandidate[]
 }

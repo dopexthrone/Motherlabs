@@ -155,5 +155,6 @@ function detectContradictions(text) {
             confidence: 'high'
         });
     }
-    return contradictions;
+    // Return frozen array to prevent external mutation
+    return Object.freeze(contradictions);
 }

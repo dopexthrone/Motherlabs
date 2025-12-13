@@ -152,7 +152,8 @@ function scoreEvidenceAlignment(c) {
  * S(c) = wE·E + wC·C + wN·N + wK·K + wR·RP + wA·A
  */
 function examineCandidates(candidates, parentInvariants = []) {
-    return candidates.map((c, index) => {
+    // Return frozen array to prevent external mutation
+    const scored = candidates.map((c, index) => {
         const existingCandidates = candidates.slice(0, index);
         const E = scoreExecutability(c);
         const C = scoreCoverage(c, existingCandidates);
@@ -180,4 +181,5 @@ function examineCandidates(candidates, parentInvariants = []) {
             }
         };
     });
+    return Object.freeze(scored);
 }

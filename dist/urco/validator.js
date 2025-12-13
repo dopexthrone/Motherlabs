@@ -144,8 +144,9 @@ function validateEvidencePlan(plan) {
             });
         }
     }
+    // Return frozen errors array to prevent mutation
     return {
         valid: errors.length === 0,
-        errors
+        errors: Object.freeze(errors)
     };
 }

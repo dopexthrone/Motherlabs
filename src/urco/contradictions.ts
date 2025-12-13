@@ -190,5 +190,6 @@ export function detectContradictions(text: string): Contradiction[] {
     })
   }
 
-  return contradictions
+  // Return frozen array to prevent external mutation
+  return Object.freeze(contradictions) as Contradiction[]
 }

@@ -74,7 +74,8 @@ function extractEntities(text) {
             });
         }
     }
-    return entities;
+    // Return frozen array to prevent external mutation
+    return Object.freeze(entities);
 }
 /**
  * Extract actions from text using deterministic patterns.
@@ -106,7 +107,8 @@ function extractActions(text) {
             });
         }
     }
-    return actions;
+    // Return frozen array to prevent external mutation
+    return Object.freeze(actions);
 }
 /**
  * Normalize text for comparison (deterministic)

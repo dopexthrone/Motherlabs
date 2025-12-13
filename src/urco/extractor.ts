@@ -79,7 +79,8 @@ export function extractEntities(text: string): Entity[] {
     }
   }
 
-  return entities
+  // Return frozen array to prevent external mutation
+  return Object.freeze(entities) as Entity[]
 }
 
 /**
@@ -116,7 +117,8 @@ export function extractActions(text: string): Action[] {
     }
   }
 
-  return actions
+  // Return frozen array to prevent external mutation
+  return Object.freeze(actions) as Action[]
 }
 
 /**

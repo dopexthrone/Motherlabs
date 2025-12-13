@@ -208,10 +208,12 @@ function detectMissingVars(text, providedVars, entities, actions) {
     }
     // Deduplicate by key
     const seen = new Set();
-    return missing.filter(m => {
+    // Return frozen array to prevent external mutation
+    const deduped = missing.filter(m => {
         if (seen.has(m.key))
             return false;
         seen.add(m.key);
         return true;
     });
+    return Object.freeze(deduped);
 }

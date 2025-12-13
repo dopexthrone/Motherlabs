@@ -167,8 +167,9 @@ export function validateEvidencePlan(plan: unknown): ValidationResult {
     }
   }
 
+  // Return frozen errors array to prevent mutation
   return {
     valid: errors.length === 0,
-    errors
+    errors: Object.freeze(errors) as ValidationError[]
   }
 }
