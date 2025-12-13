@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/entropybreakdown.schema.json",
+  "title": "Entropybreakdown Schema",
+  "type": "object",
+  "required": [
+    "unknowns",
+    "ambiguity",
+    "contradiction",
+    "specificityDeficit",
+    "dependencyUncertainty",
+    "verifiabilityDeficit"
+  ],
+  "additionalProperties": false
+}

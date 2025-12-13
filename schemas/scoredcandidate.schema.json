@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/scoredcandidate.schema.json",
+  "title": "Scoredcandidate Schema",
+  "type": "object",
+  "required": [
+    "candidate",
+    "score",
+    "breakdown"
+  ],
+  "additionalProperties": false
+}

@@ -43,7 +43,7 @@ async function runRawLane(
   lane: LaneConfig,
   client: Anthropic
 ): Promise<TaskResult> {
-  const startTime = Date.now()
+  const startTime = Date.now()  // DETERMINISM-EXEMPT: Measuring real performance
 
   const message = await client.messages.create({
     model: lane.model,
@@ -60,7 +60,7 @@ No explanations. Just the JSON array.`
     }]
   })
 
-  const endTime = Date.now()
+  const endTime = Date.now()  // DETERMINISM-EXEMPT: Measuring real performance
   const rawOutput = message.content[0].type === 'text' ? message.content[0].text : ''
 
   // Try to parse JSON
@@ -82,7 +82,7 @@ No explanations. Just the JSON array.`
   return {
     taskId: task.id,
     laneId: lane.id,
-    timestamp: new Date().toISOString(),
+    timestamp: new Date().toISOString(),  // DETERMINISM-EXEMPT: Timestamp metadata
     rawOutput,
     outputTokens: rawOutput.length,
     parsedOutput,
@@ -110,7 +110,7 @@ async function runMotherlabsLane(
   lane: LaneConfig,
   apiKey: string
 ): Promise<TaskResult> {
-  const startTime = Date.now()
+  const startTime = Date.now()  // DETERMINISM-EXEMPT: Measuring real performance
 
   const ledger = new Ledger()
   const llm = new LLMAdapter(apiKey)
@@ -123,7 +123,7 @@ async function runMotherlabsLane(
 
   const result = await decomposeTask(task.input, task.id, ledger, config, llm)
 
-  const endTime = Date.now()
+  const endTime = Date.now()  // DETERMINISM-EXEMPT: Measuring real performance
 
   // Convert to JSON output
   const subtasks = result.subtasks.map(st => st.input)
@@ -135,7 +135,7 @@ async function runMotherlabsLane(
   return {
     taskId: task.id,
     laneId: lane.id,
-    timestamp: new Date().toISOString(),
+    timestamp: new Date().toISOString(),  // DETERMINISM-EXEMPT: Timestamp metadata
     rawOutput,
     outputTokens: rawOutput.length,
     parsedOutput: subtasks,
@@ -296,7 +296,7 @@ export async function runBenchmark(
   }
 
   const report: BenchmarkReport = {
-    timestamp: new Date().toISOString(),
+    timestamp: new Date().toISOString(),  // DETERMINISM-EXEMPT: Timestamp metadata
     lanes: LANES,
     tasks,
     results,

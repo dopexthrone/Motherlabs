@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/traptype.schema.json",
+  "title": "Traptype Schema",
+  "type": "string",
+  "enum": [
+    "contradiction",
+    "deprecated_lib",
+    "security_violation",
+    "missing_critical_var",
+    "unpinned_deps",
+    "no_evidence",
+    "unsafe_operation"
+  ],
+  "additionalProperties": false
+}

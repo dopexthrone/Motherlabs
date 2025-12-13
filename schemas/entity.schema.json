@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/entity.schema.json",
+  "title": "Entity Schema",
+  "type": "object",
+  "required": [
+    "raw",
+    "kind",
+    "span"
+  ],
+  "additionalProperties": false
+}

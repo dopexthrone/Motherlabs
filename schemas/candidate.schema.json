@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/candidate.schema.json",
+  "title": "URCO Candidate Schema",
+  "type": "object",
+  "required": ["id", "type", "parentId", "statement", "requiredInputs", "expectedOutputs", "invariants"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "type": {
+      "type": "string",
+      "enum": ["AND_SPLIT", "OR_SPLIT", "SEQ_SPLIT", "CLARIFICATION", "HYPOTHESIS", "RETRIEVAL"]
+    },
+    "parentId": { "type": "string", "minLength": 1 },
+    "statement": { "type": "string", "minLength": 1 },
+    "requiredInputs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "expectedOutputs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "invariants": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "evidencePlan": { "$ref": "evidenceplan.schema.json" }
+  },
+  "additionalProperties": false
+}

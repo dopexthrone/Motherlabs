@@ -69,7 +69,7 @@ export function createEvidence(
   type: Evidence['type'],
   data: unknown
 ): Evidence {
-  // FIXED: Use monotonic ID generator instead of Date.now() for determinism
+  // FIXED: Use monotonic ID generator for determinism // DETERMINISM-EXEMPT: comment
   return {
     id: globalIdGenerator.evidenceId(taskId, type),
     taskId,

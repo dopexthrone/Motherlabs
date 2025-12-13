@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/timeprovider.schema.json",
+  "title": "Timeprovider Schema",
+  "type": "object",
+  "additionalProperties": true
+}

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/laneconfig.schema.json",
+  "title": "Laneconfig Schema",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "model",
+    "useMotherlabs",
+    "description"
+  ],
+  "additionalProperties": false
+}

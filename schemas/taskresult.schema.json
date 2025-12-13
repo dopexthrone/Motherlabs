@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/taskresult.schema.json",
+  "title": "Taskresult Schema",
+  "type": "object",
+  "required": [
+    "taskId",
+    "laneId",
+    "timestamp",
+    "rawOutput",
+    "outputTokens",
+    "metrics",
+    "evidence"
+  ],
+  "additionalProperties": false
+}

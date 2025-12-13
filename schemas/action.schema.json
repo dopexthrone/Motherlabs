@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/action.schema.json",
+  "title": "Action Schema",
+  "type": "object",
+  "required": [
+    "verb",
+    "span",
+    "source"
+  ],
+  "additionalProperties": false
+}

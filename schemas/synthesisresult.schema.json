@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/synthesisresult.schema.json",
+  "title": "Synthesisresult Schema",
+  "type": "object",
+  "required": [
+    "representation",
+    "keptCount",
+    "removedCount",
+    "lossEstimate",
+    "mergeStrategy"
+  ],
+  "additionalProperties": false
+}

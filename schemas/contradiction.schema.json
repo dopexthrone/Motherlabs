@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/contradiction.schema.json",
+  "title": "Contradiction Schema",
+  "type": "object",
+  "required": [
+    "type",
+    "leftSpan",
+    "rightSpan",
+    "explanation",
+    "confidence"
+  ],
+  "additionalProperties": false
+}

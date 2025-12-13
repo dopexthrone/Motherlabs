@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/candidatetype.schema.json",
+  "title": "Candidatetype Schema",
+  "type": "string",
+  "enum": [
+    "AND_SPLIT",
+    "OR_SPLIT",
+    "SEQ_SPLIT",
+    "CLARIFICATION",
+    "HYPOTHESIS",
+    "RETRIEVAL"
+  ],
+  "additionalProperties": false
+}

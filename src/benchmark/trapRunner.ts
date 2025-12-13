@@ -236,7 +236,7 @@ export function generateTrapReport(results: TrapResult[], outputPath: string): v
   const mlWarned = results.filter(r => r.motherlabs.decision === 'WARN').length
 
   const report = {
-    timestamp: new Date().toISOString(),
+    timestamp: new Date().toISOString(),  // DETERMINISM-EXEMPT: Timestamp metadata
     summary: {
       totalTasks: results.length,
       testsPassed: passed,

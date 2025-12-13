@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/testtask.schema.json",
+  "title": "Testtask Schema",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "description",
+    "input",
+    "category",
+    "difficulty",
+    "expectedArtifacts"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/task.schema.json",
+  "title": "Task Schema",
+  "type": "object",
+  "required": ["id", "input", "subtasks", "status", "evidence"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "input": { "type": "string", "minLength": 1 },
+    "subtasks": {
+      "type": "array",
+      "items": { "$ref": "#" }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "active", "done", "blocked"]
+    },
+    "evidence": {
+      "type": "array",
+      "items": { "type": "object" }
+    }
+  },
+  "additionalProperties": false
+}

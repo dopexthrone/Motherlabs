@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/validationerror.schema.json",
+  "title": "Validationerror Schema",
+  "type": "object",
+  "additionalProperties": true
+}

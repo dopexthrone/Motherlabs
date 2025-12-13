@@ -1,8 +1,8 @@
-// Deterministic ID Generation - No Date.now(), monotonic, reproducible
+// Deterministic ID Generation - Monotonic, reproducible // DETERMINISM-EXEMPT: comment only
 
 /**
  * ID generator with monotonic counter (deterministic)
- * Replaces Date.now() which breaks determinism/replay
+ * Replaces timestamp generation which breaks determinism/replay // DETERMINISM-EXEMPT: comment
  */
 export class IdGenerator {
   private counters: Map<string, number> = new Map()
@@ -72,7 +72,7 @@ export interface TimeProvider {
  */
 export class RealTimeProvider implements TimeProvider {
   now(): number {
-    return Date.now()
+    return Date.now()  // DETERMINISM-EXEMPT: TimeProvider abstraction - isolates non-determinism
   }
 }
 

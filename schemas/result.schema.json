@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/result.schema.json",
+  "title": "Result Type Schema",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["ok", "value"],
+      "properties": {
+        "ok": { "type": "boolean", "const": true },
+        "value": {}
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": ["ok", "error"],
+      "properties": {
+        "ok": { "type": "boolean", "const": false },
+        "error": {}
+      },
+      "additionalProperties": false
+    }
+  ]
+}

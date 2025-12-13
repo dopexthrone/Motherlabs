@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/traptask.schema.json",
+  "title": "Traptask Schema",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "description",
+    "input",
+    "category",
+    "difficulty",
+    "expectedArtifacts",
+    "trapType",
+    "expectedBehavior",
+    "trapDescription"
+  ],
+  "additionalProperties": false
+}
