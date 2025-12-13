@@ -70,7 +70,15 @@ class JSONLLedger {
             },
             record_hash: '' // Computed below
         };
-        genesis.record_hash = (0, contentAddress_1.contentAddress)(genesis);
+        // Compute hash WITHOUT record_hash field (same as append)
+        const genesisForHash = {
+            record_type: genesis.record_type,
+            seq: genesis.seq,
+            timestamp: genesis.timestamp,
+            prev_hash: genesis.prev_hash,
+            record: genesis.record
+        };
+        genesis.record_hash = (0, contentAddress_1.contentAddress)(genesisForHash);
         // Write genesis
         fs.writeFileSync(this.filepath, (0, contentAddress_1.canonicalJSON)(genesis) + '\n', 'utf-8');
         this.lastHash = genesis.record_hash;
@@ -106,7 +114,15 @@ class JSONLLedger {
                 record,
                 record_hash: '' // Computed below
             };
-            entry.record_hash = (0, contentAddress_1.contentAddress)(entry);
+            // Compute hash of entry WITHOUT record_hash field
+            const entryForHash = {
+                record_type: entry.record_type,
+                seq: entry.seq,
+                timestamp: entry.timestamp,
+                prev_hash: entry.prev_hash,
+                record: entry.record
+            };
+            entry.record_hash = (0, contentAddress_1.contentAddress)(entryForHash);
             // Append to file (atomic line write)
             const line = (0, contentAddress_1.canonicalJSON)(entry) + '\n';
             fs.appendFileSync(this.filepath, line, 'utf-8');
@@ -159,16 +175,27 @@ class JSONLLedger {
         const all = this.readAll();
         if (!all.ok)
             return (0, result_1.Err)(all.error);
+        if (all.value.length === 0) {
+            return (0, result_1.Err)(new Error('Ledger is empty'));
+        }
         let expectedPrev = 'genesis';
         for (const record of all.value) {
             // Verify prev_hash
             if (record.prev_hash !== expectedPrev) {
-                return (0, result_1.Err)(new Error(`Hash chain break at seq ${record.seq}`));
+                return (0, result_1.Err)(new Error(`Hash chain break at seq ${record.seq}: expected prev=${expectedPrev}, got=${record.prev_hash}`));
             }
-            // Verify record_hash
-            const computed = (0, contentAddress_1.contentAddress)(record);
+            // Verify record_hash by recomputing
+            // Need to compute hash of record WITHOUT record_hash field
+            const recordForHash = {
+                record_type: record.record_type,
+                seq: record.seq,
+                timestamp: record.timestamp,
+                prev_hash: record.prev_hash,
+                record: record.record
+            };
+            const computed = (0, contentAddress_1.contentAddress)(recordForHash);
             if (computed !== record.record_hash) {
-                return (0, result_1.Err)(new Error(`Hash mismatch at seq ${record.seq}`));
+                return (0, result_1.Err)(new Error(`Hash mismatch at seq ${record.seq}: expected=${record.record_hash}, computed=${computed}`));
             }
             expectedPrev = record.record_hash;
         }
