@@ -9,7 +9,8 @@
     "test": "npm run build && node tests/urco.test.js",
     "benchmark": "npm run build && node dist/benchmark/cli.js",
     "benchmark:warmup": "npm run benchmark -- --warmup",
-    "benchmark:full": "npm run benchmark -- --full"
+    "benchmark:full": "npm run benchmark -- --full",
+    "benchmark:traps": "npm run build && node dist/benchmark/trap-cli.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1"
