@@ -6,7 +6,10 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/cli.js",
-    "test": "npm run build && node tests/urco.test.js"
+    "test": "npm run build && node tests/urco.test.js",
+    "benchmark": "npm run build && node dist/benchmark/cli.js",
+    "benchmark:warmup": "npm run benchmark -- --warmup",
+    "benchmark:full": "npm run benchmark -- --full"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1"
