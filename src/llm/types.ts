@@ -11,4 +11,4 @@ export type LLMProvider = {
   decompose?(input: string): Promise<Result<string[], Error>>
 }
 
-export type LLMProviderType = 'anthropic' | 'openai'
+export type LLMProviderType = 'anthropic' | 'openai' | 'ollama'

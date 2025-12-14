@@ -1,10 +1,11 @@
 "use strict";
 // Constrained LLM - All code generation passes through 6 gates
 // NO CODE ESCAPES WITHOUT VERIFICATION
-// Supports both Anthropic and OpenAI providers
+// Supports Anthropic, OpenAI, and Ollama (local) providers
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConstrainedLLM = void 0;
 const openaiAdapter_1 = require("../adapters/openaiAdapter");
+const ollamaAdapter_1 = require("../adapters/ollamaAdapter");
 const sixGates_1 = require("../validation/sixGates");
 const result_1 = require("../core/result");
 const jsonlLedger_1 = require("../persistence/jsonlLedger");
@@ -19,7 +20,7 @@ class ConstrainedLLM {
     ledger;
     constructor(llm, ledgerPath = 'evidence/llm-generations.jsonl') {
         this.llm = llm;
-        this.providerType = llm instanceof openaiAdapter_1.OpenAIAdapter ? 'openai' : 'anthropic';
+        this.providerType = llm instanceof ollamaAdapter_1.OllamaAdapter ? 'ollama' : llm instanceof openaiAdapter_1.OpenAIAdapter ? 'openai' : 'anthropic';
         this.validator = new sixGates_1.SixGateValidator();
         this.ledger = new jsonlLedger_1.JSONLLedger(ledgerPath);
     }

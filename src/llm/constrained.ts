@@ -1,10 +1,11 @@
 // Constrained LLM - All code generation passes through 6 gates
 // NO CODE ESCAPES WITHOUT VERIFICATION
-// Supports both Anthropic and OpenAI providers
+// Supports Anthropic, OpenAI, and Ollama (local) providers
 
 import { LLMAdapter } from '../llm'
 import { OpenAIAdapter } from '../adapters/openaiAdapter'
 import { AnthropicAdapter } from '../adapters/anthropicAdapter'
+import { OllamaAdapter } from '../adapters/ollamaAdapter'
 import { SixGateValidator, CodeValidationContext, CodeValidationResult } from '../validation/sixGates'
 import { Result, Ok, Err } from '../core/result'
 import { JSONLLedger } from '../persistence/jsonlLedger'
@@ -37,9 +38,9 @@ export class ConstrainedLLM {
   private validator: SixGateValidator
   private ledger: JSONLLedger
 
-  constructor(llm: LLMAdapter | OpenAIAdapter | AnthropicAdapter, ledgerPath: string = 'evidence/llm-generations.jsonl') {
+  constructor(llm: LLMAdapter | OpenAIAdapter | AnthropicAdapter | OllamaAdapter, ledgerPath: string = 'evidence/llm-generations.jsonl') {
     this.llm = llm
-    this.providerType = llm instanceof OpenAIAdapter ? 'openai' : 'anthropic'
+    this.providerType = llm instanceof OllamaAdapter ? 'ollama' : llm instanceof OpenAIAdapter ? 'openai' : 'anthropic'
     this.validator = new SixGateValidator()
     this.ledger = new JSONLLedger(ledgerPath)
   }

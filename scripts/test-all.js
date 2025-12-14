@@ -14,6 +14,7 @@ const { detectHollowPatterns, passesHollowDetection, formatHollowResult } = requ
 const { EvidenceQuery, formatEvidenceEntry } = require('../dist/persistence/evidenceQuery');
 const { JSONLLedger } = require('../dist/persistence/jsonlLedger');
 const { simulateAlternative, compareDecisions, formatSimulationResult } = require('../dist/analysis/decisionDiff');
+const { OllamaAdapter, createCodeLlamaAdapter, createDeepSeekCoderAdapter, createQwenCoderAdapter, detectBestCodeModel } = require('../dist/adapters/ollamaAdapter');
 const { randomBytes } = require('crypto');
 const fs = require('fs');
 const path = require('path');
@@ -679,6 +680,79 @@ export function stub() {
     check('Diff: format includes sections',
           formatted.includes('DECISION SIMULATION') && formatted.includes('IMPACT ASSESSMENT'));
   }
+
+  // ═══════════════════════════════════════════════════════════
+  console.log('');
+  console.log('=== OLLAMA ADAPTER TESTS ===');
+  console.log('');
+
+  // Test adapter creation with defaults
+  const ollamaDefault = new OllamaAdapter();
+  check('Ollama: default model is codellama:13b', ollamaDefault.getModel() === 'codellama:13b');
+  check('Ollama: default URL is localhost:11434', ollamaDefault.getBaseUrl() === 'http://localhost:11434');
+
+  // Test custom config
+  const ollamaCustom = new OllamaAdapter({
+    model: 'qwen2.5-coder:14b',
+    baseUrl: 'http://192.168.1.100:11434'
+  });
+  check('Ollama: custom model is set', ollamaCustom.getModel() === 'qwen2.5-coder:14b');
+  check('Ollama: custom URL is set', ollamaCustom.getBaseUrl() === 'http://192.168.1.100:11434');
+
+  // Test model setter
+  ollamaDefault.setModel('deepseek-coder:6.7b');
+  check('Ollama: model can be changed', ollamaDefault.getModel() === 'deepseek-coder:6.7b');
+
+  // Test factory functions
+  const codellama7b = createCodeLlamaAdapter('7b');
+  check('Ollama: CodeLlama 7b factory works', codellama7b.getModel() === 'codellama:7b');
+
+  const codellama13b = createCodeLlamaAdapter('13b');
+  check('Ollama: CodeLlama 13b factory works', codellama13b.getModel() === 'codellama:13b');
+
+  const codellama34b = createCodeLlamaAdapter('34b');
+  check('Ollama: CodeLlama 34b factory works', codellama34b.getModel() === 'codellama:34b');
+
+  const deepseek13b = createDeepSeekCoderAdapter('1.3b');
+  check('Ollama: DeepSeek 1.3b factory works', deepseek13b.getModel() === 'deepseek-coder:1.3b');
+
+  const deepseek6b = createDeepSeekCoderAdapter('6.7b');
+  check('Ollama: DeepSeek 6.7b factory works', deepseek6b.getModel() === 'deepseek-coder:6.7b');
+
+  const qwen7b = createQwenCoderAdapter('7b');
+  check('Ollama: Qwen 7b factory works', qwen7b.getModel() === 'qwen2.5-coder:7b');
+
+  const qwen14b = createQwenCoderAdapter('14b');
+  check('Ollama: Qwen 14b factory works', qwen14b.getModel() === 'qwen2.5-coder:14b');
+
+  const qwen32b = createQwenCoderAdapter('32b');
+  check('Ollama: Qwen 32b factory works', qwen32b.getModel() === 'qwen2.5-coder:32b');
+
+  // Test LLMProvider interface compliance
+  const testAdapter = new OllamaAdapter();
+  check('Ollama: has generateCode method', typeof testAdapter.generateCode === 'function');
+  check('Ollama: has generate method', typeof testAdapter.generate === 'function');
+  check('Ollama: has decompose method', typeof testAdapter.decompose === 'function');
+  check('Ollama: has isAvailable method', typeof testAdapter.isAvailable === 'function');
+  check('Ollama: has listModels method', typeof testAdapter.listModels === 'function');
+  check('Ollama: has hasModel method', typeof testAdapter.hasModel === 'function');
+
+  // Test isAvailable returns Result (should return ok even if Ollama not running)
+  const availResult = await testAdapter.isAvailable();
+  check('Ollama: isAvailable returns Result', 'ok' in availResult);
+
+  // Test factory defaults
+  const defaultCodellama = createCodeLlamaAdapter();
+  check('Ollama: CodeLlama default is 13b', defaultCodellama.getModel() === 'codellama:13b');
+
+  const defaultDeepseek = createDeepSeekCoderAdapter();
+  check('Ollama: DeepSeek default is 6.7b', defaultDeepseek.getModel() === 'deepseek-coder:6.7b');
+
+  const defaultQwen = createQwenCoderAdapter();
+  check('Ollama: Qwen default is 7b', defaultQwen.getModel() === 'qwen2.5-coder:7b');
+
+  // Test that adapter is instance of OllamaAdapter
+  check('Ollama: factory returns OllamaAdapter', defaultCodellama instanceof OllamaAdapter);
 
   // ═══════════════════════════════════════════════════════════
   console.log('');
