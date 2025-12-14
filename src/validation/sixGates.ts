@@ -89,7 +89,7 @@ export class SixGateValidator {
     // ═══════════════════════════════════════════════════════════
     // GATE 4: Test Execution (kernel-grade sandbox)
     // ═══════════════════════════════════════════════════════════
-    const g4 = await this.gate4_testExecution(code)
+    const g4 = await this.gate4_testExecution(code, context)
     gateResults.push(g4)
     await this.recordGateDecision(g4, codeId, code, context)
 
@@ -578,28 +578,20 @@ export class SixGateValidator {
    * - Timeout enforcement (10s default)
    * - Output limits per sandbox config
    *
-   * NOTE: Code with local imports (./  ../) cannot be executed in isolation.
-   * For such code, this gate is advisory (required: false) and passes with a note.
-   * The full test suite validates code when actually applied.
+   * For code with local imports (./  ../):
+   * - Runs TypeScript compilation check against the project
+   * - Verifies types, import resolution, and catches real errors
+   * - This is a REQUIRED gate (no longer advisory/skipped)
    */
-  private async gate4_testExecution(code: string): Promise<GateResult> {
+  private async gate4_testExecution(code: string, context: CodeValidationContext): Promise<GateResult> {
     try {
       // Check for local imports that can't be resolved in sandbox
       const hasLocalImports = /import\s+.*from\s+['"]\.\.?\//.test(code)
 
       if (hasLocalImports) {
-        // Code has local imports - can't execute in isolation
-        // Make gate advisory and pass (actual validation happens via test suite on apply)
-        return {
-          gateName: 'test_execution',
-          passed: true,
-          required: false,  // Advisory for code with local imports
-          details: {
-            skipped: true,
-            reason: 'Code has local imports - deferred to test suite',
-            hasLocalImports: true
-          }
-        }
+        // Code has local imports - run TypeScript compilation check
+        // This verifies types, import resolution, and catches real errors
+        return await this.runTypeScriptCompilationCheck(code, context.targetFile)
       }
 
       // Create a temporary file for the code
@@ -706,6 +698,98 @@ export class SixGateValidator {
         required: true,
         error: error instanceof Error ? error.message : String(error)
       }
+    }
+  }
+
+  /**
+   * Run TypeScript compilation check for code with local imports
+   * This provides real verification instead of skipping
+   */
+  private async runTypeScriptCompilationCheck(code: string, targetFile?: string): Promise<GateResult> {
+    const attemptId = randomBytes(8).toString('hex')
+
+    // Determine temp file location based on target file
+    // Place temp file in same directory as target so relative imports resolve
+    let tempFile: string
+    if (targetFile) {
+      const targetDir = path.dirname(targetFile)
+      tempFile = path.join(process.cwd(), targetDir, `.gate4-check-${attemptId}.ts`)
+    } else {
+      // Fallback: use src/validation/ as a reasonable default for most imports
+      tempFile = path.join(process.cwd(), 'src', 'validation', `.gate4-check-${attemptId}.ts`)
+    }
+
+    try {
+      // Write code to temp file so imports resolve relative to target location
+      fs.writeFileSync(tempFile, code)
+
+      // Use ts-morph to check only THIS file, not transitive dependencies
+      try {
+        // First try to parse/check with ts-morph which is already available
+        const project = new Project({
+          useInMemoryFileSystem: false,
+          compilerOptions: {
+            strict: true,
+            noEmit: true,
+            skipLibCheck: true,
+            esModuleInterop: true,
+            module: 99, // ESNext
+            target: 99, // ESNext
+            moduleResolution: 2 // Node
+          }
+        })
+
+        const sourceFile = project.addSourceFileAtPath(tempFile)
+        const diagnostics = sourceFile.getPreEmitDiagnostics()
+
+        // Filter to only errors from THIS file
+        const fileErrors = diagnostics.filter(d => {
+          const file = d.getSourceFile()
+          return file && file.getFilePath() === tempFile
+        })
+
+        if (fileErrors.length > 0) {
+          const firstError = fileErrors[0]
+          const message = firstError.getMessageText()
+          const errorText = typeof message === 'string' ? message : message.getMessageText()
+          throw new Error(errorText)
+        }
+
+        // Compilation succeeded
+        return {
+          gateName: 'test_execution',
+          passed: true,
+          required: true,
+          details: {
+            method: 'typescript_compilation',
+            hasLocalImports: true,
+            verified: true
+          }
+        }
+      } catch (compileError: unknown) {
+        // Compilation failed - extract error message
+        const error = compileError as Error
+        const errorMessage = error.message || 'TypeScript compilation failed'
+
+        return {
+          gateName: 'test_execution',
+          passed: false,
+          required: true,
+          error: errorMessage.slice(0, 200),
+          details: {
+            method: 'typescript_compilation',
+            hasLocalImports: true,
+            verified: false
+          }
+        }
+      }
+    } finally {
+      // Always cleanup temp file
+      try {
+        if (fs.existsSync(tempFile)) {
+          fs.unlinkSync(tempFile)
+        }
+      } catch { /* ignore cleanup errors */ }
     }
   }
 
