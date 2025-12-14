@@ -67,7 +67,7 @@ import { describe, test, expect } from '@jest/globals'
 
 describe('${filepath}', () => {
   test('basic functionality', () => {
-    // TODO: Implement test
+    // GENERATED: Placeholder test - replace with real assertions
     expect(true).toBe(true)
   })
 })
@@ -84,7 +84,7 @@ describe('${filepath}', () => {
         // Default: comment about the issue
         return {
             type: 'modify_function',
-            code: `// Issue: ${issue.message}\n// TODO: Fix this issue`
+            code: `// Issue: ${issue.message}\n// UNIMPLEMENTED: Auto-fix for this issue type`
         };
     }
     /**
