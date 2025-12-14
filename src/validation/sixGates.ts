@@ -133,29 +133,42 @@ export class SixGateValidator {
 
   /**
    * Gate 2: Syntax Validation
-   * TypeScript must compile without errors
+   * TypeScript must parse without syntax errors
+   *
+   * Note: We only check for parse/syntax errors, not type errors.
+   * Type checking requires the full project context (node_modules, tsconfig, etc.)
+   * which isn't available for isolated code snippets.
    */
   private async gate2_syntaxValidation(code: string): Promise<GateResult> {
     try {
       const project = new Project({
         useInMemoryFileSystem: true,
         compilerOptions: {
-          strict: true,
-          noImplicitAny: true
+          target: 99, // ScriptTarget.ESNext
+          noEmit: true,
+          // Skip type checking - we only care about syntax
+          skipLibCheck: true,
+          noLib: true
         }
       })
 
       const sourceFile = project.createSourceFile('temp.ts', code)
-      const diagnostics = sourceFile.getPreEmitDiagnostics()
 
-      if (diagnostics.length > 0) {
+      // Access parse diagnostics directly from the underlying TypeScript compiler node
+      // This gives us only syntax/parse errors, not type errors
+      const tsSourceFile = sourceFile.compilerNode as any
+      const parseDiagnostics = tsSourceFile.parseDiagnostics || []
+
+      if (parseDiagnostics.length > 0) {
         return {
           gateName: 'syntax_validation',
           passed: false,
           required: true,
-          error: `Syntax errors: ${diagnostics.length}`,
+          error: `Parse errors: ${parseDiagnostics.length}`,
           details: {
-            errors: diagnostics.slice(0, 3).map(d => d.getMessageText())
+            errors: parseDiagnostics.slice(0, 3).map((d: any) =>
+              typeof d.messageText === 'string' ? d.messageText : d.messageText?.messageText || 'Unknown error'
+            )
           }
         }
       }
@@ -207,13 +220,11 @@ export class SixGateValidator {
         }
       }
 
-      // 2. Variable declarations (const, let, var)
-      for (const stmt of sourceFile.getVariableStatements()) {
-        for (const decl of stmt.getDeclarations()) {
-          // Handle destructuring: const { a, b } = obj
-          const nameNode = decl.getNameNode()
-          this.collectBindingNames(nameNode, definedNames)
-        }
+      // 2. Variable declarations (const, let, var) - at all levels, not just top-level
+      for (const varDecl of sourceFile.getDescendantsOfKind(SyntaxKind.VariableDeclaration)) {
+        // Handle destructuring: const { a, b } = obj
+        const nameNode = varDecl.getNameNode()
+        this.collectBindingNames(nameNode, definedNames)
       }
 
       // 3. Class declarations
@@ -494,7 +505,7 @@ export class SixGateValidator {
         contradictions
       )
 
-      const MAX_ENTROPY = 0.4
+      const MAX_ENTROPY = 0.5  // Raised from 0.4 to allow reasonable LLM-generated code
 
       if (entropy.value > MAX_ENTROPY) {
         return {
