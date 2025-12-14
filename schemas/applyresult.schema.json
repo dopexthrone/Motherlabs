@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/applyresult.schema.json",
+  "title": "Apply Result Schema",
+  "type": "object",
+  "required": ["success", "proposalId", "beforeCommit", "timestamp"],
+  "properties": {
+    "success": {
+      "type": "boolean"
+    },
+    "proposalId": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "beforeCommit": {
+      "type": "string",
+      "description": "Git commit hash before applying change"
+    },
+    "afterCommit": {
+      "type": "string",
+      "description": "Git commit hash after applying change (if success)"
+    },
+    "timestamp": {
+      "type": "number"
+    },
+    "rolledBack": {
+      "type": "boolean",
+      "description": "True if change was rolled back due to test failure"
+    },
+    "testResults": {
+      "type": "object",
+      "properties": {
+        "passed": { "type": "number" },
+        "failed": { "type": "number" },
+        "allPass": { "type": "boolean" }
+      }
+    },
+    "error": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}
