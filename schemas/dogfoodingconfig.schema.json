@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/dogfoodingconfig.schema.json",
+  "title": "Dogfooding Config Schema",
+  "type": "object",
+  "required": ["cycleInterval", "requireHumanApproval", "maxImprovementsPerCycle", "ledgerPath"],
+  "properties": {
+    "cycleInterval": {
+      "type": "number",
+      "minimum": 60000,
+      "description": "Milliseconds between improvement cycles (min 1 minute)"
+    },
+    "requireHumanApproval": {
+      "type": "boolean"
+    },
+    "maxImprovementsPerCycle": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 10
+    },
+    "ledgerPath": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false
+}
