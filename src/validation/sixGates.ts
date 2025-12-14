@@ -11,6 +11,7 @@ import { detectMissingVars } from '../urco/missingVars'
 import { detectContradictions } from '../urco/contradictions'
 import { runTestExec, verifyEvidence, cleanupRunDir } from '../sandbox/runner'
 import { scanForVulnerabilities, getVulnerabilitySummary } from './securityScanner'
+import { detectHollowPatterns, passesHollowDetection } from './hollowDetector'
 import type { TestExecRequest } from '../sandbox/types'
 import * as os from 'os'
 import * as fs from 'fs'
@@ -710,6 +711,20 @@ export class SixGateValidator {
         }
       }
 
+      // 3. Hollow Code Detection (AST-based, multi-line)
+      const hollowResult = detectHollowPatterns(code)
+      let hollowScore = 100
+      if (hollowResult.ok) {
+        hollowScore = hollowResult.value.hollowScore
+        // Add critical/high hollow patterns as violations
+        for (const pattern of hollowResult.value.patterns) {
+          if (pattern.severity === 'critical' || pattern.severity === 'high') {
+            const name = pattern.nodeName ? ` (${pattern.nodeName})` : ''
+            violations.push(`[HOLLOW:${pattern.severity.toUpperCase()}] ${pattern.type}${name}: ${pattern.message}`)
+          }
+        }
+      }
+
       if (violations.length > 0) {
         return {
           gateName: 'governance_check',
@@ -719,19 +734,23 @@ export class SixGateValidator {
           details: {
             violations,
             securityScore: securityScan.score,
-            securitySummary: getVulnerabilitySummary(securityScan)
+            securitySummary: getVulnerabilitySummary(securityScan),
+            hollowScore,
+            hollowPatterns: hollowResult.ok ? hollowResult.value.patterns.length : 0
           }
         }
       }
 
-      // Include security info even on pass
+      // Include security and hollow info even on pass
       return {
         gateName: 'governance_check',
         passed: true,
         required: true,
         details: {
           securityScore: securityScan.score,
-          securityVulnerabilities: securityScan.vulnerabilities.length
+          securityVulnerabilities: securityScan.vulnerabilities.length,
+          hollowScore,
+          hollowPatterns: hollowResult.ok ? hollowResult.value.patterns.length : 0
         }
       }
 

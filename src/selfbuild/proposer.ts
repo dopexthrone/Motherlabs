@@ -11,6 +11,11 @@ import { ConstrainedLLM } from '../llm/constrained'
 import { contentAddress } from '../core/contentAddress'
 import { Result, Ok, Err } from '../core/result'
 import { globalTimeProvider } from '../core/ids'
+import { classifyDecision, DecisionClassification, getRequiredGates } from '../core/decisionClassifier'
+import { generateConsequenceSurface, ConsequenceAnalysis } from '../analysis/consequenceSurface'
+import { generateAlternatives, ProposalWithAlternatives } from '../core/proposal'
+import { checkPrematurity, PrematurityCheck } from '../validation/prematurityChecker'
+import { determineGateRequirements, GateElevation } from '../validation/gateElevation'
 import type { CodeIssue } from '../analysis/codeAnalyzer'
 
 export type ImprovementProposal = {
@@ -29,6 +34,20 @@ export type ImprovementProposal = {
     gateResults: Array<{ gateName: string; passed: boolean; error?: string }>
   }
   source: 'llm' | 'deterministic'
+  // Decision classification (Step 1 of ROADMAP)
+  classification?: DecisionClassification
+  gateRequirements?: {
+    gates: string[]
+    humanApprovalRequired: boolean
+  }
+  // Consequence surface (Step 2 of ROADMAP)
+  consequenceAnalysis?: ConsequenceAnalysis
+  // Alternative tracking (Step 3 of ROADMAP)
+  alternativeAnalysis?: ProposalWithAlternatives
+  // Prematurity check (Step 5 of ROADMAP)
+  prematurityCheck?: PrematurityCheck
+  // Gate elevation (Step 9 of ROADMAP)
+  gateElevation?: GateElevation
 }
 
 export class SelfImprovementProposer {
@@ -122,6 +141,60 @@ export class SelfImprovementProposer {
         timestamp: globalTimeProvider.now(),
         gateValidation,
         source: 'llm'  // Always 'llm' - we refuse rather than generate hollow placeholders
+      }
+
+      // 7. Classify the decision (Step 1 of ROADMAP - Decision Classification Gate)
+      const classificationResult = classifyDecision(improvementProposal)
+      if (classificationResult.ok) {
+        improvementProposal.classification = classificationResult.value
+        improvementProposal.gateRequirements = getRequiredGates(classificationResult.value)
+      }
+
+      // 8. Generate consequence surface (Step 2 of ROADMAP - Consequence Surface)
+      // Only for irreversible decisions - makes closed doors visible
+      if (improvementProposal.classification?.type === 'irreversible') {
+        const consequenceResult = generateConsequenceSurface(improvementProposal)
+        if (consequenceResult.ok) {
+          improvementProposal.consequenceAnalysis = consequenceResult.value
+        }
+
+        // 9. Generate alternatives (Step 3 of ROADMAP - Alternative Tracking)
+        // For irreversible decisions, document paths NOT taken
+        const alternativeResult = generateAlternatives(improvementProposal)
+        if (alternativeResult.ok) {
+          improvementProposal.alternativeAnalysis = alternativeResult.value
+        }
+      }
+
+      // 10. Check for prematurity (Step 5 of ROADMAP - Prematurity Detection)
+      // Uses sophisticated signal-based detection
+      const prematurityResult = checkPrematurity(
+        improvementProposal,
+        improvementProposal.alternativeAnalysis
+      )
+      if (prematurityResult.ok) {
+        improvementProposal.prematurityCheck = prematurityResult.value
+
+        // AXIOM 5 REFUSAL: Premature decisions with high confidence should be refused
+        if (prematurityResult.value.premature && prematurityResult.value.confidence === 'high') {
+          return Err(new Error(
+            `AXIOM 5 REFUSAL: ${prematurityResult.value.reason} ` +
+            `Recommendation: ${prematurityResult.value.deferralRecommendation}`
+          ))
+        }
+      }
+
+      // 11. Determine gate elevation (Step 9 of ROADMAP - Gate Elevation Protocol)
+      // Gate strictness matches decision weight
+      if (improvementProposal.classification) {
+        const elevationResult = determineGateRequirements(
+          improvementProposal,
+          improvementProposal.classification.type,
+          improvementProposal.prematurityCheck
+        )
+        if (elevationResult.ok) {
+          improvementProposal.gateElevation = elevationResult.value
+        }
       }
 
       return Ok(improvementProposal)
