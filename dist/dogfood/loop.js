@@ -1,10 +1,13 @@
 "use strict";
 // Dogfooding Loop - Motherlabs continuously improves itself
+// Uses ConstrainedLLM for real code generation when API key available
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DogfoodingLoop = void 0;
 const codeAnalyzer_1 = require("../analysis/codeAnalyzer");
 const proposer_1 = require("../selfbuild/proposer");
 const applier_1 = require("../selfbuild/applier");
+const constrained_1 = require("../llm/constrained");
+const llm_1 = require("../llm");
 const jsonlLedger_1 = require("../persistence/jsonlLedger");
 const ids_1 = require("../core/ids");
 class DogfoodingLoop {
@@ -13,21 +16,45 @@ class DogfoodingLoop {
     ledger;
     config;
     running = false;
+    hasLLM = false;
     constructor(config) {
         this.config = config;
-        this.proposer = new proposer_1.SelfImprovementProposer();
-        this.applier = new applier_1.AutoApplier();
         this.ledger = new jsonlLedger_1.JSONLLedger(config.ledgerPath);
+        this.applier = new applier_1.AutoApplier();
+        // Initialize with ConstrainedLLM if API key provided
+        if (config.anthropicApiKey) {
+            const llmAdapter = new llm_1.LLMAdapter(config.anthropicApiKey);
+            const constrainedLLM = new constrained_1.ConstrainedLLM(llmAdapter, 'evidence/llm-generations.jsonl');
+            this.proposer = new proposer_1.SelfImprovementProposer(constrainedLLM);
+            this.hasLLM = true;
+        }
+        else {
+            this.proposer = new proposer_1.SelfImprovementProposer();
+            this.hasLLM = false;
+        }
     }
     /**
      * Start continuous self-improvement loop
      */
     async start() {
         this.running = true;
-        console.log('🔄 Dogfooding loop started');
-        console.log(`   Interval: ${this.config.cycleInterval / 1000}s`);
-        console.log(`   Human approval: ${this.config.requireHumanApproval}`);
+        console.log('═══════════════════════════════════════');
+        console.log('  MOTHERLABS DOGFOODING LOOP');
+        console.log('═══════════════════════════════════════');
         console.log('');
+        console.log(`  Interval: ${this.config.cycleInterval / 1000}s`);
+        console.log(`  Human approval: ${this.config.requireHumanApproval}`);
+        console.log(`  LLM enabled: ${this.hasLLM}`);
+        console.log('');
+        // Log startup
+        await this.ledger.append('loop_started', {
+            config: {
+                cycleInterval: this.config.cycleInterval,
+                requireHumanApproval: this.config.requireHumanApproval,
+                hasLLM: this.hasLLM
+            },
+            timestamp: ids_1.globalTimeProvider.now()
+        });
         while (this.running) {
             await this.runCycle();
             await this.sleep(this.config.cycleInterval);
@@ -38,82 +65,120 @@ class DogfoodingLoop {
      */
     stop() {
         this.running = false;
+        console.log('Loop stopping...');
+    }
+    /**
+     * Run single cycle (for testing)
+     */
+    async runOnce() {
+        try {
+            const result = await this.runCycleInternal();
+            return result;
+        }
+        catch (error) {
+            return { success: false, error: error instanceof Error ? error.message : String(error) };
+        }
     }
     /**
      * Run one improvement cycle
      */
     async runCycle() {
+        const result = await this.runCycleInternal();
+        if (!result.success && result.error) {
+            console.error('Cycle failed:', result.error);
+        }
+    }
+    /**
+     * Internal cycle implementation
+     */
+    async runCycleInternal() {
         try {
+            console.log('');
             console.log('═══ Improvement Cycle ═══');
             console.log('');
             // 1. ANALYZE SELF (deterministic)
             console.log('[1/6] Analyzing source code...');
             const analysis = (0, codeAnalyzer_1.analyzeDirectory)('src/');
             if (!analysis.ok) {
-                console.error('Analysis failed:', analysis.error.message);
-                await this.logFailure('analysis_failed', analysis.error.message);
-                return;
+                const error = `Analysis failed: ${analysis.error.message}`;
+                await this.logFailure('analysis_failed', error);
+                return { success: false, error };
             }
             // Find all issues
             const allIssues = analysis.value.flatMap(a => a.issues);
             if (allIssues.length === 0) {
                 console.log('✓ No issues found - system is optimal');
                 await this.logEvent('no_issues_found');
-                return;
+                return { success: true };
             }
-            console.log(`Found ${allIssues.length} issues`);
+            console.log(`  Found ${allIssues.length} issues across ${analysis.value.length} files`);
             // 2. PROPOSE FIX (for highest priority issue)
             console.log('[2/6] Proposing improvement...');
             // Get file with highest priority issue
             const fileWithIssues = analysis.value.find(a => a.issues.length > 0);
             if (!fileWithIssues) {
-                return;
+                return { success: true };
             }
             const proposal = await this.proposer.proposeImprovement(fileWithIssues.filepath);
             if (!proposal.ok) {
-                console.log('No improvement possible');
-                await this.logEvent('no_improvement_possible');
-                return;
+                const error = `No improvement possible: ${proposal.error.message}`;
+                await this.logEvent('no_improvement_possible', { reason: proposal.error.message });
+                return { success: false, error };
             }
-            console.log(`Proposed: ${proposal.value.issue.type} fix`);
+            console.log(`  Issue: ${proposal.value.issue.type}`);
+            console.log(`  Source: ${proposal.value.source}`);
+            console.log(`  File: ${proposal.value.targetFile}`);
             // 3. VALIDATE (6 gates already checked in proposer)
             console.log('[3/6] Validating proposal...');
             if (!proposal.value.gateValidation?.valid) {
-                console.log('✗ Proposal failed gates - rejected');
+                console.log('  ✗ Proposal failed gates - rejected');
                 await this.logRejection(proposal.value, 'gate_validation_failed');
-                return;
+                return { success: false, error: 'Gate validation failed', proposal: proposal.value };
             }
-            console.log('✓ Passed all 6 gates');
+            const passedGates = proposal.value.gateValidation.gateResults.filter(g => g.passed).length;
+            const totalGates = proposal.value.gateValidation.gateResults.length;
+            console.log(`  ✓ Passed ${passedGates}/${totalGates} gates`);
             // 4. HUMAN APPROVAL (if required)
             if (this.config.requireHumanApproval) {
-                console.log('[4/6] Waiting for human approval...');
-                console.log('   UNIMPLEMENTED: Approval workflow');
-                console.log('   Skipping for now (will implement interactive approval)');
-                return;
+                console.log('[4/6] Human approval required');
+                console.log('  Proposal ready for review:');
+                console.log(`  - Issue: ${proposal.value.issue.type}`);
+                console.log(`  - File: ${proposal.value.targetFile}`);
+                console.log(`  - Code length: ${proposal.value.proposedChange.code.length} chars`);
+                console.log('');
+                console.log('  (Approval workflow not yet implemented)');
+                await this.logEvent('awaiting_approval', { proposalId: proposal.value.id });
+                return { success: true, proposal: proposal.value };
             }
             // 5. APPLY WITH ROLLBACK
             console.log('[5/6] Applying change...');
             const applyResult = await this.applier.apply(proposal.value);
             if (!applyResult.ok) {
-                console.error('Apply failed:', applyResult.error.message);
-                await this.logFailure('apply_failed', applyResult.error.message);
-                return;
+                const error = `Apply failed: ${applyResult.error.message}`;
+                await this.logFailure('apply_failed', error);
+                return { success: false, error, proposal: proposal.value };
             }
             if (!applyResult.value.success) {
-                console.log('✗ Applied but tests failed - rolled back');
+                console.log('  ✗ Applied but tests failed - rolled back');
                 await this.logRollback(proposal.value, applyResult.value);
-                return;
+                return {
+                    success: false,
+                    error: 'Tests failed after apply - rolled back',
+                    proposal: proposal.value
+                };
             }
             // 6. VERIFY IMPROVEMENT
             console.log('[6/6] Verifying improvement...');
             await this.logSuccess(proposal.value, applyResult.value);
-            console.log('✓ Improvement applied successfully');
-            console.log(`   Commit: ${applyResult.value.afterCommit}`);
+            console.log('  ✓ Improvement applied successfully');
+            console.log(`  Commit: ${applyResult.value.afterCommit?.slice(0, 8)}`);
             console.log('');
+            return { success: true, proposal: proposal.value };
         }
         catch (error) {
-            console.error('Cycle error:', error instanceof Error ? error.message : error);
-            await this.logFailure('cycle_error', error instanceof Error ? error.message : String(error));
+            const errorMsg = error instanceof Error ? error.message : String(error);
+            await this.logFailure('cycle_error', errorMsg);
+            return { success: false, error: errorMsg };
         }
     }
     /**
@@ -130,24 +195,30 @@ class DogfoodingLoop {
         await this.ledger.append('improvement_applied', {
             proposalId: proposal.id,
             issue: proposal.issue.type,
+            source: proposal.source,
             beforeCommit: result.beforeCommit,
             afterCommit: result.afterCommit,
-            testResults: result.testResults
+            testResults: result.testResults,
+            timestamp: ids_1.globalTimeProvider.now()
         });
     }
     async logRejection(proposal, reason) {
         await this.ledger.append('proposal_rejected', {
             proposalId: proposal.id,
             issue: proposal.issue.type,
-            reason
+            source: proposal.source,
+            reason,
+            timestamp: ids_1.globalTimeProvider.now()
         });
     }
     async logRollback(proposal, result) {
         await this.ledger.append('improvement_rolled_back', {
             proposalId: proposal.id,
             issue: proposal.issue.type,
+            source: proposal.source,
             reason: 'Tests failed',
-            testResults: result.testResults
+            testResults: result.testResults,
+            timestamp: ids_1.globalTimeProvider.now()
         });
     }
     async logFailure(type, message) {

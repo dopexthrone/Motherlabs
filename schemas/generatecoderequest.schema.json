@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "generatecoderequest.schema.json",
+  "title": "GenerateCodeRequest",
+  "description": "Request to generate code via constrained LLM",
+  "type": "object",
+  "properties": {
+    "issue": {
+      "$ref": "codeissue.schema.json"
+    },
+    "filepath": {
+      "type": "string",
+      "description": "Path to the file being fixed"
+    },
+    "existingCode": {
+      "type": "string",
+      "description": "Current code content"
+    },
+    "context": {
+      "$ref": "codevalidationcontext.schema.json"
+    }
+  },
+  "required": ["issue", "filepath", "existingCode", "context"],
+  "additionalProperties": false
+}
