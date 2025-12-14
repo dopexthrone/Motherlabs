@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/codevalidationrequest.schema.json",
+  "title": "Code Validation Request Schema",
+  "type": "object",
+  "required": ["code", "targetSchema", "context"],
+  "properties": {
+    "code": {
+      "type": "string",
+      "minLength": 1,
+      "description": "TypeScript code to validate"
+    },
+    "targetSchema": {
+      "type": "string",
+      "description": "Schema the code should conform to"
+    },
+    "context": {
+      "type": "object",
+      "required": ["existingImports", "existingTypes"],
+      "properties": {
+        "existingImports": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "existingTypes": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "governanceRules": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

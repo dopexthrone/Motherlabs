@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/codevalidationresult.schema.json",
+  "title": "Code Validation Result Schema",
+  "type": "object",
+  "required": ["valid", "gateResults"],
+  "properties": {
+    "valid": {
+      "type": "boolean",
+      "description": "True only if ALL required gates passed"
+    },
+    "gateResults": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["gateName", "passed", "required"],
+        "properties": {
+          "gateName": {
+            "type": "string",
+            "enum": [
+              "schema_validation",
+              "syntax_validation",
+              "variable_resolution",
+              "test_execution",
+              "urco_entropy",
+              "governance_check"
+            ]
+          },
+          "passed": {
+            "type": "boolean"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "error": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "rejectedAt": {
+      "type": "string",
+      "description": "Which gate blocked (if any)"
+    }
+  },
+  "additionalProperties": false
+}
