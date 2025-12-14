@@ -1,3 +1,7 @@
 Stress test started at 2025-12-14T20:48:21.254Z
 [0h 0m 0s] Stress test started - 2 hour duration
 [0h 1m 22s] OK Cycle 1: Improved src/cli.ts
+[0h 3m 51s] OK Cycle 2: Improved src/cli.ts
+[0h 4m 15s] REFUSED Cycle 2: Gates protected
+[0h 6m 45s] REFUSED Cycle 3: Gates protected
+[0h 6m 45s] REFUSED Cycle 3: Gates protected
