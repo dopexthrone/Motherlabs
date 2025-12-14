@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/improvementproposal.schema.json",
+  "title": "Improvement Proposal Schema",
+  "type": "object",
+  "required": ["id", "targetFile", "issue", "proposedChange", "rationale", "timestamp"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "targetFile": {
+      "type": "string",
+      "minLength": 1,
+      "description": "File to be improved"
+    },
+    "issue": {
+      "type": "object",
+      "required": ["type", "severity", "description"],
+      "properties": {
+        "type": { "type": "string" },
+        "severity": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+        "description": { "type": "string" }
+      }
+    },
+    "proposedChange": {
+      "type": "object",
+      "required": ["type", "code"],
+      "properties": {
+        "type": { "type": "string", "enum": ["add_function", "modify_function", "add_test", "refactor"] },
+        "code": { "type": "string" },
+        "diff": { "type": "string" }
+      }
+    },
+    "rationale": {
+      "type": "string",
+      "minLength": 10,
+      "description": "Why this change improves the system"
+    },
+    "timestamp": {
+      "type": "number"
+    },
+    "gateValidation": {
+      "$ref": "codevalidationresult.schema.json"
+    }
+  },
+  "additionalProperties": false
+}

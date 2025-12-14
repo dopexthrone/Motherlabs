@@ -248,13 +248,13 @@ class SixGateValidator {
             const violations = [];
             for (const rule of rules) {
                 if (rule === 'no_date_now' && /Date\.now\(\)/.test(code)) {
-                    violations.push('Uses Date.now() (violates determinism)');
+                    violations.push('Uses Date.now() (violates determinism)'); // DETERMINISM-EXEMPT: Pattern check only
                 }
                 if (rule === 'determinism_required' && /Math\.random\(\)/.test(code)) {
-                    violations.push('Uses Math.random() (violates determinism)');
+                    violations.push('Uses Math.random() (violates determinism)'); // DETERMINISM-EXEMPT: Pattern check only
                 }
                 if (rule === 'no_console' && /console\.(log|error|warn)/.test(code)) {
-                    violations.push('Uses console.* (violates no logging policy)');
+                    violations.push('Uses console.* (violates no logging policy)'); // DETERMINISM-EXEMPT: Pattern check only
                 }
             }
             if (violations.length > 0) {

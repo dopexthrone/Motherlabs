@@ -211,7 +211,7 @@ export class SixGateValidator {
           gateName: 'variable_resolution',
           passed: false,
           required: true,
-          error: `Undefined: ${uniqueUndefined.join(', ') // DETERMINISM-EXEMPT: Pattern check only}`,
+          error: `Undefined: ${uniqueUndefined.join(', ')}`,
           details: { undefined: uniqueUndefined }
         }
       }
@@ -328,7 +328,7 @@ export class SixGateValidator {
           gateName: 'governance_check',
           passed: false,
           required: true,
-          error: `Policy violations: ${violations.join('; ') // DETERMINISM-EXEMPT: Pattern check only}`,
+          error: `Policy violations: ${violations.join('; ')}`,
           details: { violations }
         }
       }
