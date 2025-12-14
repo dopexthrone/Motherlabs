@@ -7,6 +7,7 @@ import { extractEntities, extractActions } from '../urco/extractor'
 import { detectMissingVars } from '../urco/missingVars'
 import { detectContradictions } from '../urco/contradictions'
 import { runTestExec, verifyEvidence, cleanupRunDir } from '../sandbox/runner'
+import { scanForVulnerabilities, getVulnerabilitySummary } from './securityScanner'
 import type { TestExecRequest } from '../sandbox/types'
 import * as os from 'os'
 import * as fs from 'fs'
@@ -670,13 +671,18 @@ export class SixGateValidator {
 
   /**
    * Gate 6: Governance Check
-   * Code must not violate policies
+   * Code must not violate policies and must be free of security vulnerabilities
+   *
+   * Includes:
+   * - Policy rule enforcement (determinism, logging, etc.)
+   * - Security vulnerability scanning (command injection, XSS, etc.)
    */
   private gate6_governanceCheck(code: string, context: CodeValidationContext): GateResult {
     try {
       const rules = context.governanceRules || []
       const violations: string[] = []
 
+      // 1. Policy Rules Check
       for (const rule of rules) {
         if (rule === 'no_date_now' && /Date\.now\(\)/.test(code)) {
           violations.push('Uses Date.now() (violates determinism)') // DETERMINISM-EXEMPT: Pattern check only
@@ -691,20 +697,39 @@ export class SixGateValidator {
         }
       }
 
+      // 2. Security Vulnerability Scan
+      const securityScan = scanForVulnerabilities(code)
+
+      // Add critical/high security vulnerabilities as violations
+      for (const vuln of securityScan.vulnerabilities) {
+        if (vuln.severity === 'critical' || vuln.severity === 'high') {
+          violations.push(`[SECURITY:${vuln.severity.toUpperCase()}] ${vuln.message}${vuln.line ? ` (line ${vuln.line})` : ''}`)
+        }
+      }
+
       if (violations.length > 0) {
         return {
           gateName: 'governance_check',
           passed: false,
           required: true,
-          error: `Policy violations: ${violations.join('; ')}`,
-          details: { violations }
+          error: violations.length === 1 ? violations[0] : `${violations.length} violations found`,
+          details: {
+            violations,
+            securityScore: securityScan.score,
+            securitySummary: getVulnerabilitySummary(securityScan)
+          }
         }
       }
 
+      // Include security info even on pass
       return {
         gateName: 'governance_check',
         passed: true,
-        required: true
+        required: true,
+        details: {
+          securityScore: securityScan.score,
+          securityVulnerabilities: securityScan.vulnerabilities.length
+        }
       }
 
     } catch (error) {

@@ -42,6 +42,7 @@ const extractor_1 = require("../urco/extractor");
 const missingVars_1 = require("../urco/missingVars");
 const contradictions_1 = require("../urco/contradictions");
 const runner_1 = require("../sandbox/runner");
+const securityScanner_1 = require("./securityScanner");
 const os = __importStar(require("os"));
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
@@ -614,12 +615,17 @@ class SixGateValidator {
     }
     /**
      * Gate 6: Governance Check
-     * Code must not violate policies
+     * Code must not violate policies and must be free of security vulnerabilities
+     *
+     * Includes:
+     * - Policy rule enforcement (determinism, logging, etc.)
+     * - Security vulnerability scanning (command injection, XSS, etc.)
      */
     gate6_governanceCheck(code, context) {
         try {
             const rules = context.governanceRules || [];
             const violations = [];
+            // 1. Policy Rules Check
             for (const rule of rules) {
                 if (rule === 'no_date_now' && /Date\.now\(\)/.test(code)) {
                     violations.push('Uses Date.now() (violates determinism)'); // DETERMINISM-EXEMPT: Pattern check only
@@ -631,19 +637,36 @@ class SixGateValidator {
                     violations.push('Uses console.* (violates no logging policy)'); // DETERMINISM-EXEMPT: Pattern check only
                 }
             }
+            // 2. Security Vulnerability Scan
+            const securityScan = (0, securityScanner_1.scanForVulnerabilities)(code);
+            // Add critical/high security vulnerabilities as violations
+            for (const vuln of securityScan.vulnerabilities) {
+                if (vuln.severity === 'critical' || vuln.severity === 'high') {
+                    violations.push(`[SECURITY:${vuln.severity.toUpperCase()}] ${vuln.message}${vuln.line ? ` (line ${vuln.line})` : ''}`);
+                }
+            }
             if (violations.length > 0) {
                 return {
                     gateName: 'governance_check',
                     passed: false,
                     required: true,
-                    error: `Policy violations: ${violations.join('; ')}`,
-                    details: { violations }
+                    error: violations.length === 1 ? violations[0] : `${violations.length} violations found`,
+                    details: {
+                        violations,
+                        securityScore: securityScan.score,
+                        securitySummary: (0, securityScanner_1.getVulnerabilitySummary)(securityScan)
+                    }
                 };
             }
+            // Include security info even on pass
             return {
                 gateName: 'governance_check',
                 passed: true,
-                required: true
+                required: true,
+                details: {
+                    securityScore: securityScan.score,
+                    securityVulnerabilities: securityScan.vulnerabilities.length
+                }
             };
         }
         catch (error) {
