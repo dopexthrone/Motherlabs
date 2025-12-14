@@ -19,24 +19,34 @@ A Kernel Freeze is the act of producing a reference-grade, reproducible, auditab
 ### TCB (Must be frozen and high-bar gated)
 
 ```
-src/validation/         # Gate implementations (AUTHORITY)
-src/sandbox/            # Execution isolation (AUTHORITY)
-src/persistence/        # Evidence storage (AUTHORITY)
-src/core/               # Fundamental types (AUTHORITY)
-src/selfbuild/          # Self-improvement (GOVERNED)
+src/                    # All source code (interdependent)
+  src/validation/       # Gate implementations (AUTHORITY)
+  src/sandbox/          # Execution isolation (AUTHORITY)
+  src/persistence/      # Evidence storage (AUTHORITY)
+  src/core/             # Fundamental types (AUTHORITY)
+  src/selfbuild/        # Self-improvement (GOVERNED)
+  src/adapters/         # LLM adapters (NON-AUTHORITATIVE but required)
+  src/urco/             # Intent analysis (ADVISORY but required)
+  src/llm/              # LLM interaction (required)
+  src/analysis/         # Code analysis (required)
+  src/dogfood/          # Self-improvement loop (required)
+  src/execution/        # Execution engine (required)
+  src/benchmark/        # Benchmarking tools (required)
 schemas/                # Schema validators
 docs/                   # Constitution and specs that define authority
 scripts/test-all.js     # Verification script
 ```
 
+NOTE: All src/ directories are included because TypeScript imports create
+hard dependencies. Authority classification within src/ is documented in
+source file headers.
+
 ### Non-TCB (May evolve; not part of freeze guarantee)
 
 ```
-src/adapters/           # LLM adapters (NON-AUTHORITATIVE)
-src/benchmark/          # Benchmarking tools
-src/llm/                # LLM interaction helpers
-src/urco/               # Intent analysis (ADVISORY)
 evidence/               # Runtime evidence (not frozen)
+dist/                   # Compiled output (regenerated from src/)
+node_modules/           # Dependencies (installed from lockfile)
 ```
 
 ---

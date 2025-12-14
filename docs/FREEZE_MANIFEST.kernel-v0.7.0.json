@@ -1,7 +1,7 @@
 {
   "version": "kernel-v0.7.0",
   "timestamp": "2025-12-14T02:30:00Z",
-  "git_commit": "90b0f16ca9e6604327fed182f6926849615a3d37",
+  "git_commit": "5db7e2d2146bfa3f084cd82d67b5e6b58d34a905",
   "git_branch": "master",
   "environment": {
     "node_version": "v24.11.1",
@@ -54,10 +54,17 @@
     "hollow_code_detection": "enabled",
     "axiom_5_refusal": "enforced"
   },
+  "package": {
+    "filename": "motherlabs-kernel-v0.7.0-tcb.tar.gz",
+    "sha256": "066698f24d24c582887248991031faa4c9e194e1b6991e6745364e5287011908",
+    "contents": "src/ schemas/ docs/ scripts/test-all.js package.json package-lock.json tsconfig.json",
+    "clean_room_replay": "PASS (18/18 tests)"
+  },
   "notes": [
     "Constitutional documentation created and tied to implementation",
     "Hollow code detection added to Gate 6",
     "Proposer now refuses per AXIOM 5 instead of generating placeholders",
-    "All TCB files have constitutional reference headers"
+    "All TCB files have constitutional reference headers",
+    "TCB scope includes all src/ due to TypeScript import dependencies"
   ]
 }
