@@ -9,6 +9,13 @@
 
 If a behavior contradicts this definition, it is out of scope for Motherlabs.
 
+### The Deeper Purpose
+
+> **Motherlabs is not designed to help you choose the right option.**
+> **It is designed to prevent you from committing when the cost of being wrong is unknowable.**
+
+See [DECISION_PHILOSOPHY.md](./DECISION_PHILOSOPHY.md) for the foundational rationale.
+
 ---
 
 ## 2. Authority Model
@@ -44,6 +51,7 @@ All irreversible effects MUST be mechanically verified before execution.
 
 ### AXIOM 5: Refusal Is First-Class
 "Cannot proceed" is a correct terminal outcome.
+Refusal protects from premature commitment when the cost of being wrong is unknowable.
 > **Enforced by:** `src/selfbuild/proposer.ts:82-85` - Explicit AXIOM 5 REFUSAL
 
 ### AXIOM 6: No Silent State Mutation
