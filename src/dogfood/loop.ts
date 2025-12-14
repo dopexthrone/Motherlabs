@@ -1,6 +1,7 @@
 // Dogfooding Loop - Motherlabs continuously improves itself
 // Uses ConstrainedLLM for real code generation when API key available
-// Supports both Anthropic and OpenAI providers
+// Supports Anthropic, OpenAI, and Ollama (local) providers
+// Step 10 of ROADMAP_NEXT_10.md: Self-Improvement Validation Loop
 
 import { analyzeDirectory } from '../analysis/codeAnalyzer'
 import { SelfImprovementProposer, ImprovementProposal } from '../selfbuild/proposer'
@@ -8,6 +9,7 @@ import { AutoApplier, ApplyResult } from '../selfbuild/applier'
 import { ConstrainedLLM } from '../llm/constrained'
 import { OpenAIAdapter, OpenAIModel } from '../adapters/openaiAdapter'
 import { AnthropicAdapter, AnthropicModel } from '../adapters/anthropicAdapter'
+import { OllamaAdapter, OllamaConfig, detectBestCodeModel } from '../adapters/ollamaAdapter'
 import { JSONLLedger } from '../persistence/jsonlLedger'
 import { globalTimeProvider } from '../core/ids'
 import type { LLMProviderType } from '../llm/types'
@@ -21,6 +23,8 @@ export type DogfoodingConfig = {
   anthropicModel?: AnthropicModel // Optional - defaults to claude-sonnet-4-5-20250929
   openaiApiKey?: string       // Optional - enables OpenAI LLM
   openaiModel?: OpenAIModel   // Optional - defaults to gpt-4o
+  ollamaEnabled?: boolean     // Optional - enables local Ollama LLM
+  ollamaConfig?: Partial<OllamaConfig>  // Optional - Ollama configuration
 }
 
 export class DogfoodingLoop {
@@ -31,19 +35,21 @@ export class DogfoodingLoop {
   private running: boolean = false
   private hasLLM: boolean = false
   private llmProvider: LLMProviderType | null = null
+  private llmModel: string | null = null
 
   constructor(config: DogfoodingConfig) {
     this.config = config
     this.ledger = new JSONLLedger(config.ledgerPath)
     this.applier = new AutoApplier()
 
-    // Initialize with ConstrainedLLM - prefer OpenAI if both provided
+    // Initialize with ConstrainedLLM - prefer OpenAI if multiple provided
     if (config.openaiApiKey) {
       const openaiAdapter = new OpenAIAdapter(config.openaiApiKey, config.openaiModel || 'gpt-4o')
       const constrainedLLM = new ConstrainedLLM(openaiAdapter, 'evidence/llm-generations.jsonl')
       this.proposer = new SelfImprovementProposer(constrainedLLM)
       this.hasLLM = true
       this.llmProvider = 'openai'
+      this.llmModel = config.openaiModel || 'gpt-4o'
     } else if (config.anthropicApiKey) {
       const anthropicAdapter = new AnthropicAdapter(
         config.anthropicApiKey,
@@ -53,6 +59,16 @@ export class DogfoodingLoop {
       this.proposer = new SelfImprovementProposer(constrainedLLM)
       this.hasLLM = true
       this.llmProvider = 'anthropic'
+      this.llmModel = config.anthropicModel || 'claude-sonnet-4-5-20250929'
+    } else if (config.ollamaEnabled) {
+      // Local LLM via Ollama - Step 8 of ROADMAP
+      // Offline-first: No external API dependency
+      const ollamaAdapter = new OllamaAdapter(config.ollamaConfig)
+      const constrainedLLM = new ConstrainedLLM(ollamaAdapter, 'evidence/llm-generations.jsonl')
+      this.proposer = new SelfImprovementProposer(constrainedLLM)
+      this.hasLLM = true
+      this.llmProvider = 'ollama'
+      this.llmModel = config.ollamaConfig?.model || 'codellama:13b'
     } else {
       this.proposer = new SelfImprovementProposer()
       this.hasLLM = false
@@ -67,6 +83,7 @@ export class DogfoodingLoop {
 
     console.log('═══════════════════════════════════════')
     console.log('  MOTHERLABS DOGFOODING LOOP')
+    console.log('  Step 10: Self-Improvement Validation')
     console.log('═══════════════════════════════════════')
     console.log('')
     console.log(`  Interval: ${this.config.cycleInterval / 1000}s`)
@@ -74,11 +91,7 @@ export class DogfoodingLoop {
     console.log(`  LLM enabled: ${this.hasLLM}`)
     if (this.llmProvider) {
       console.log(`  LLM provider: ${this.llmProvider}`)
-      if (this.llmProvider === 'openai') {
-        console.log(`  Model: ${this.config.openaiModel || 'gpt-4o'}`)
-      } else if (this.llmProvider === 'anthropic') {
-        console.log(`  Model: ${this.config.anthropicModel || 'claude-sonnet-4-5-20250929'}`)
-      }
+      console.log(`  Model: ${this.llmModel}`)
     }
     console.log('')
 

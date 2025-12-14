@@ -15,6 +15,9 @@ const { EvidenceQuery, formatEvidenceEntry } = require('../dist/persistence/evid
 const { JSONLLedger } = require('../dist/persistence/jsonlLedger');
 const { simulateAlternative, compareDecisions, formatSimulationResult } = require('../dist/analysis/decisionDiff');
 const { OllamaAdapter, createCodeLlamaAdapter, createDeepSeekCoderAdapter, createQwenCoderAdapter, detectBestCodeModel } = require('../dist/adapters/ollamaAdapter');
+const { DogfoodingLoop } = require('../dist/dogfood/loop');
+const { SelfImprovementProposer } = require('../dist/selfbuild/proposer');
+const { ConstrainedLLM } = require('../dist/llm/constrained');
 const { randomBytes } = require('crypto');
 const fs = require('fs');
 const path = require('path');
@@ -753,6 +756,65 @@ export function stub() {
 
   // Test that adapter is instance of OllamaAdapter
   check('Ollama: factory returns OllamaAdapter', defaultCodellama instanceof OllamaAdapter);
+
+  // ═══════════════════════════════════════════════════════════
+  console.log('');
+  console.log('=== SELF-IMPROVEMENT LOOP TESTS ===');
+  console.log('');
+
+  // Create temp directory for test ledger
+  const selfImproveTempDir = path.join(os.tmpdir(), `self-improve-${randomBytes(4).toString('hex')}`);
+  fs.mkdirSync(selfImproveTempDir, { recursive: true });
+  const selfImproveLedgerPath = path.join(selfImproveTempDir, 'test-ledger.jsonl');
+
+  // Test DogfoodingLoop creation without LLM
+  const noLlmLoop = new DogfoodingLoop({
+    cycleInterval: 1000,
+    requireHumanApproval: true,
+    maxImprovementsPerCycle: 1,
+    ledgerPath: selfImproveLedgerPath
+  });
+  check('Self-Improve: loop creates without LLM', noLlmLoop !== null);
+
+  // Test DogfoodingLoop with Ollama config
+  const ollamaLoop = new DogfoodingLoop({
+    cycleInterval: 1000,
+    requireHumanApproval: true,
+    maxImprovementsPerCycle: 1,
+    ledgerPath: selfImproveLedgerPath,
+    ollamaEnabled: true,
+    ollamaConfig: { model: 'codellama:13b' }
+  });
+  check('Self-Improve: loop creates with Ollama config', ollamaLoop !== null);
+
+  // Test runOnce returns result structure
+  const runResult = await noLlmLoop.runOnce();
+  check('Self-Improve: runOnce returns success boolean', typeof runResult.success === 'boolean');
+  // Without LLM, should fail with AXIOM 5 refusal or no issues
+  check('Self-Improve: fails without LLM (AXIOM 5)', !runResult.success);
+
+  // Test SelfImprovementProposer creation
+  const proposer = new SelfImprovementProposer();
+  check('Self-Improve: proposer creates without LLM', proposer !== null);
+
+  // Test proposer refuses without LLM
+  const proposeResult = await proposer.proposeImprovement('src/cli.ts');
+  check('Self-Improve: proposer refuses without LLM (AXIOM 5)', !proposeResult.ok);
+  if (!proposeResult.ok) {
+    check('Self-Improve: error mentions AXIOM 5',
+          proposeResult.error.message.includes('AXIOM 5'));
+  }
+
+  // Test ConstrainedLLM wraps Ollama
+  const testOllamaAdapter = new OllamaAdapter();
+  const constrainedLlm = new ConstrainedLLM(testOllamaAdapter, path.join(selfImproveTempDir, 'constrained.jsonl'));
+  check('Self-Improve: ConstrainedLLM wraps Ollama', constrainedLlm !== null);
+
+  // Test loop stop method exists
+  check('Self-Improve: loop has stop method', typeof noLlmLoop.stop === 'function');
+
+  // Cleanup
+  fs.rmSync(selfImproveTempDir, { recursive: true, force: true });
 
   // ═══════════════════════════════════════════════════════════
   console.log('');

@@ -1,7 +1,8 @@
 "use strict";
 // Dogfooding Loop - Motherlabs continuously improves itself
 // Uses ConstrainedLLM for real code generation when API key available
-// Supports both Anthropic and OpenAI providers
+// Supports Anthropic, OpenAI, and Ollama (local) providers
+// Step 10 of ROADMAP_NEXT_10.md: Self-Improvement Validation Loop
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DogfoodingLoop = void 0;
 const codeAnalyzer_1 = require("../analysis/codeAnalyzer");
@@ -10,6 +11,7 @@ const applier_1 = require("../selfbuild/applier");
 const constrained_1 = require("../llm/constrained");
 const openaiAdapter_1 = require("../adapters/openaiAdapter");
 const anthropicAdapter_1 = require("../adapters/anthropicAdapter");
+const ollamaAdapter_1 = require("../adapters/ollamaAdapter");
 const jsonlLedger_1 = require("../persistence/jsonlLedger");
 const ids_1 = require("../core/ids");
 class DogfoodingLoop {
@@ -20,17 +22,19 @@ class DogfoodingLoop {
     running = false;
     hasLLM = false;
     llmProvider = null;
+    llmModel = null;
     constructor(config) {
         this.config = config;
         this.ledger = new jsonlLedger_1.JSONLLedger(config.ledgerPath);
         this.applier = new applier_1.AutoApplier();
-        // Initialize with ConstrainedLLM - prefer OpenAI if both provided
+        // Initialize with ConstrainedLLM - prefer OpenAI if multiple provided
         if (config.openaiApiKey) {
             const openaiAdapter = new openaiAdapter_1.OpenAIAdapter(config.openaiApiKey, config.openaiModel || 'gpt-4o');
             const constrainedLLM = new constrained_1.ConstrainedLLM(openaiAdapter, 'evidence/llm-generations.jsonl');
             this.proposer = new proposer_1.SelfImprovementProposer(constrainedLLM);
             this.hasLLM = true;
             this.llmProvider = 'openai';
+            this.llmModel = config.openaiModel || 'gpt-4o';
         }
         else if (config.anthropicApiKey) {
             const anthropicAdapter = new anthropicAdapter_1.AnthropicAdapter(config.anthropicApiKey, config.anthropicModel || 'claude-sonnet-4-5-20250929');
@@ -38,6 +42,17 @@ class DogfoodingLoop {
             this.proposer = new proposer_1.SelfImprovementProposer(constrainedLLM);
             this.hasLLM = true;
             this.llmProvider = 'anthropic';
+            this.llmModel = config.anthropicModel || 'claude-sonnet-4-5-20250929';
+        }
+        else if (config.ollamaEnabled) {
+            // Local LLM via Ollama - Step 8 of ROADMAP
+            // Offline-first: No external API dependency
+            const ollamaAdapter = new ollamaAdapter_1.OllamaAdapter(config.ollamaConfig);
+            const constrainedLLM = new constrained_1.ConstrainedLLM(ollamaAdapter, 'evidence/llm-generations.jsonl');
+            this.proposer = new proposer_1.SelfImprovementProposer(constrainedLLM);
+            this.hasLLM = true;
+            this.llmProvider = 'ollama';
+            this.llmModel = config.ollamaConfig?.model || 'codellama:13b';
         }
         else {
             this.proposer = new proposer_1.SelfImprovementProposer();
@@ -51,6 +66,7 @@ class DogfoodingLoop {
         this.running = true;
         console.log('═══════════════════════════════════════');
         console.log('  MOTHERLABS DOGFOODING LOOP');
+        console.log('  Step 10: Self-Improvement Validation');
         console.log('═══════════════════════════════════════');
         console.log('');
         console.log(`  Interval: ${this.config.cycleInterval / 1000}s`);
@@ -58,12 +74,7 @@ class DogfoodingLoop {
         console.log(`  LLM enabled: ${this.hasLLM}`);
         if (this.llmProvider) {
             console.log(`  LLM provider: ${this.llmProvider}`);
-            if (this.llmProvider === 'openai') {
-                console.log(`  Model: ${this.config.openaiModel || 'gpt-4o'}`);
-            }
-            else if (this.llmProvider === 'anthropic') {
-                console.log(`  Model: ${this.config.anthropicModel || 'claude-sonnet-4-5-20250929'}`);
-            }
+            console.log(`  Model: ${this.llmModel}`);
         }
         console.log('');
         // Log startup
