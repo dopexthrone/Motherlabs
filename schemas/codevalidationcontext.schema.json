@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "motherlabs://schemas/codevalidationcontext.schema.json",
+  "title": "Code Validation Context Schema",
+  "type": "object",
+  "required": ["existingImports", "existingTypes"],
+  "properties": {
+    "existingImports": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "existingTypes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "governanceRules": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": false
+}
