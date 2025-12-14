@@ -1,0 +1,8 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "llmprovidertype.schema.json",
+  "title": "LLMProviderType",
+  "description": "Type of LLM provider",
+  "type": "string",
+  "enum": ["anthropic", "openai"]
+}

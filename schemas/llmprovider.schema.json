@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "llmprovider.schema.json",
+  "title": "LLMProvider",
+  "description": "Common interface for LLM adapters - both Anthropic and OpenAI implement this",
+  "type": "object",
+  "properties": {
+    "generateCode": {
+      "description": "Generate code from a prompt",
+      "type": "object"
+    },
+    "decompose": {
+      "description": "Decompose task into subtasks (optional)",
+      "type": "object"
+    }
+  },
+  "required": ["generateCode"],
+  "additionalProperties": true
+}
