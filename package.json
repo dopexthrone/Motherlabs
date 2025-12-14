@@ -16,7 +16,8 @@
     "benchmark:traps": "npm run build && node dist/benchmark/trap-cli.js"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.32.1"
+    "@anthropic-ai/sdk": "^0.32.1",
+    "openai": "^6.10.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

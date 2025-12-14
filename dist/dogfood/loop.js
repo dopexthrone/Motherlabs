@@ -1,6 +1,7 @@
 "use strict";
 // Dogfooding Loop - Motherlabs continuously improves itself
 // Uses ConstrainedLLM for real code generation when API key available
+// Supports both Anthropic and OpenAI providers
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DogfoodingLoop = void 0;
 const codeAnalyzer_1 = require("../analysis/codeAnalyzer");
@@ -8,6 +9,7 @@ const proposer_1 = require("../selfbuild/proposer");
 const applier_1 = require("../selfbuild/applier");
 const constrained_1 = require("../llm/constrained");
 const llm_1 = require("../llm");
+const openaiAdapter_1 = require("../adapters/openaiAdapter");
 const jsonlLedger_1 = require("../persistence/jsonlLedger");
 const ids_1 = require("../core/ids");
 class DogfoodingLoop {
@@ -17,16 +19,25 @@ class DogfoodingLoop {
     config;
     running = false;
     hasLLM = false;
+    llmProvider = null;
     constructor(config) {
         this.config = config;
         this.ledger = new jsonlLedger_1.JSONLLedger(config.ledgerPath);
         this.applier = new applier_1.AutoApplier();
-        // Initialize with ConstrainedLLM if API key provided
-        if (config.anthropicApiKey) {
+        // Initialize with ConstrainedLLM - prefer OpenAI if both provided
+        if (config.openaiApiKey) {
+            const openaiAdapter = new openaiAdapter_1.OpenAIAdapter(config.openaiApiKey, config.openaiModel || 'gpt-4o');
+            const constrainedLLM = new constrained_1.ConstrainedLLM(openaiAdapter, 'evidence/llm-generations.jsonl');
+            this.proposer = new proposer_1.SelfImprovementProposer(constrainedLLM);
+            this.hasLLM = true;
+            this.llmProvider = 'openai';
+        }
+        else if (config.anthropicApiKey) {
             const llmAdapter = new llm_1.LLMAdapter(config.anthropicApiKey);
             const constrainedLLM = new constrained_1.ConstrainedLLM(llmAdapter, 'evidence/llm-generations.jsonl');
             this.proposer = new proposer_1.SelfImprovementProposer(constrainedLLM);
             this.hasLLM = true;
+            this.llmProvider = 'anthropic';
         }
         else {
             this.proposer = new proposer_1.SelfImprovementProposer();
@@ -45,13 +56,20 @@ class DogfoodingLoop {
         console.log(`  Interval: ${this.config.cycleInterval / 1000}s`);
         console.log(`  Human approval: ${this.config.requireHumanApproval}`);
         console.log(`  LLM enabled: ${this.hasLLM}`);
+        if (this.llmProvider) {
+            console.log(`  LLM provider: ${this.llmProvider}`);
+            if (this.llmProvider === 'openai' && this.config.openaiModel) {
+                console.log(`  OpenAI model: ${this.config.openaiModel}`);
+            }
+        }
         console.log('');
         // Log startup
         await this.ledger.append('loop_started', {
             config: {
                 cycleInterval: this.config.cycleInterval,
                 requireHumanApproval: this.config.requireHumanApproval,
-                hasLLM: this.hasLLM
+                hasLLM: this.hasLLM,
+                llmProvider: this.llmProvider
             },
             timestamp: ids_1.globalTimeProvider.now()
         });

@@ -1,13 +1,16 @@
 // Constrained LLM - All code generation passes through 6 gates
 // NO CODE ESCAPES WITHOUT VERIFICATION
+// Supports both Anthropic and OpenAI providers
 
 import { LLMAdapter } from '../llm'
+import { OpenAIAdapter } from '../adapters/openaiAdapter'
 import { SixGateValidator, CodeValidationContext, CodeValidationResult } from '../validation/sixGates'
 import { Result, Ok, Err } from '../core/result'
 import { JSONLLedger } from '../persistence/jsonlLedger'
 import { globalTimeProvider } from '../core/ids'
 import { sanitizeInput, validateSanitized } from '../core/sanitize'
 import type { CodeIssue } from '../analysis/codeAnalyzer'
+import type { LLMProvider, LLMProviderType } from './types'
 
 export type GenerateCodeRequest = {
   issue: CodeIssue
@@ -21,18 +24,21 @@ export type GenerateCodeResult = {
   validation: CodeValidationResult
   attempts: number
   evidenceId: string
+  provider: LLMProviderType
 }
 
 const MAX_ATTEMPTS = 3
 const LLM_TIMEOUT_MS = 60_000
 
 export class ConstrainedLLM {
-  private llm: LLMAdapter
+  private llm: LLMProvider
+  private providerType: LLMProviderType
   private validator: SixGateValidator
   private ledger: JSONLLedger
 
-  constructor(llm: LLMAdapter, ledgerPath: string = 'evidence/llm-generations.jsonl') {
+  constructor(llm: LLMAdapter | OpenAIAdapter, ledgerPath: string = 'evidence/llm-generations.jsonl') {
     this.llm = llm
+    this.providerType = llm instanceof OpenAIAdapter ? 'openai' : 'anthropic'
     this.validator = new SixGateValidator()
     this.ledger = new JSONLLedger(ledgerPath)
   }
@@ -108,7 +114,8 @@ export class ConstrainedLLM {
         code,
         validation: validation.value,
         attempts: attempt,
-        evidenceId
+        evidenceId,
+        provider: this.providerType
       })
     }
 
@@ -130,13 +137,12 @@ export class ConstrainedLLM {
     // DETERMINISM-EXEMPT: Prompt strings reference forbidden patterns to instruct LLM what NOT to use
     const basePrompt = `You are generating TypeScript code for Motherlabs Runtime.
 
-STRICT REQUIREMENTS:
-- Must export at least one declaration (function, const, class, type, or interface)
-- Must compile with strict TypeScript (no implicit any)
-- Must use Result<T, Error> pattern for error handling
-- Must NOT use non-deterministic time or random functions directly
-- Must be clear and unambiguous (low entropy)
-- Return ONLY valid TypeScript code, no markdown, no explanations
+CRITICAL: Return ONLY raw TypeScript code. NO markdown code blocks. NO \`\`\`typescript. Just the code.
+
+MANDATORY REQUIREMENTS:
+1. MUST use 'export' keyword - e.g. 'export function', 'export const', 'export class'
+2. MUST compile with strict TypeScript (no implicit any)
+3. MUST be clear and unambiguous
 
 `
 

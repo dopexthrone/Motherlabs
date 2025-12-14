@@ -1,8 +1,10 @@
 "use strict";
 // Constrained LLM - All code generation passes through 6 gates
 // NO CODE ESCAPES WITHOUT VERIFICATION
+// Supports both Anthropic and OpenAI providers
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConstrainedLLM = void 0;
+const openaiAdapter_1 = require("../adapters/openaiAdapter");
 const sixGates_1 = require("../validation/sixGates");
 const result_1 = require("../core/result");
 const jsonlLedger_1 = require("../persistence/jsonlLedger");
@@ -12,10 +14,12 @@ const MAX_ATTEMPTS = 3;
 const LLM_TIMEOUT_MS = 60_000;
 class ConstrainedLLM {
     llm;
+    providerType;
     validator;
     ledger;
     constructor(llm, ledgerPath = 'evidence/llm-generations.jsonl') {
         this.llm = llm;
+        this.providerType = llm instanceof openaiAdapter_1.OpenAIAdapter ? 'openai' : 'anthropic';
         this.validator = new sixGates_1.SixGateValidator();
         this.ledger = new jsonlLedger_1.JSONLLedger(ledgerPath);
     }
@@ -74,7 +78,8 @@ class ConstrainedLLM {
                 code,
                 validation: validation.value,
                 attempts: attempt,
-                evidenceId
+                evidenceId,
+                provider: this.providerType
             });
         }
         // All attempts failed
@@ -93,13 +98,12 @@ class ConstrainedLLM {
         // DETERMINISM-EXEMPT: Prompt strings reference forbidden patterns to instruct LLM what NOT to use
         const basePrompt = `You are generating TypeScript code for Motherlabs Runtime.
 
-STRICT REQUIREMENTS:
-- Must export at least one declaration (function, const, class, type, or interface)
-- Must compile with strict TypeScript (no implicit any)
-- Must use Result<T, Error> pattern for error handling
-- Must NOT use non-deterministic time or random functions directly
-- Must be clear and unambiguous (low entropy)
-- Return ONLY valid TypeScript code, no markdown, no explanations
+CRITICAL: Return ONLY raw TypeScript code. NO markdown code blocks. NO \`\`\`typescript. Just the code.
+
+MANDATORY REQUIREMENTS:
+1. MUST use 'export' keyword - e.g. 'export function', 'export const', 'export class'
+2. MUST compile with strict TypeScript (no implicit any)
+3. MUST be clear and unambiguous
 
 `;
         const issuePrompts = {

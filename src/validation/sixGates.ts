@@ -100,15 +100,18 @@ export class SixGateValidator {
    */
   private gate1_schemaValidation(code: string): GateResult {
     try {
-      // Basic check: must export something
-      const hasExport = /export\s+(function|const|class|type|interface)/.test(code)
+      // Check for exports OR test patterns (describe/test/it)
+      // Match: export function, export const, export class, export type, export interface
+      // Also match: export async function, export default
+      const hasExport = /export\s+(async\s+)?(function|const|class|type|interface|default)/.test(code)
+      const hasTestPattern = /\b(describe|test|it)\s*\(/.test(code)
 
-      if (!hasExport) {
+      if (!hasExport && !hasTestPattern) {
         return {
           gateName: 'schema_validation',
           passed: false,
           required: true,
-          error: 'Code must export at least one declaration'
+          error: 'Code must export at least one declaration or contain test patterns'
         }
       }
 
@@ -366,7 +369,14 @@ export class SixGateValidator {
       'if', 'else', 'return', 'const', 'let', 'var', 'function',
       // TypeScript
       'number', 'string', 'boolean', 'void', 'any', 'unknown', 'never',
-      'undefined', 'null', 'true', 'false'
+      'undefined', 'null', 'true', 'false',
+      // Jest/Testing globals
+      'describe', 'test', 'it', 'expect', 'beforeEach', 'afterEach',
+      'beforeAll', 'afterAll', 'jest', 'toBe', 'toEqual', 'toThrow',
+      'toContain', 'toBeDefined', 'toBeUndefined', 'toBeNull', 'toBeTruthy',
+      'toBeFalsy', 'toHaveLength', 'toBeGreaterThan', 'toBeLessThan',
+      'toBeInstanceOf', 'toHaveBeenCalled', 'toHaveBeenCalledWith',
+      'mockResolvedValue', 'mockRejectedValue', 'mockReturnValue'
     ]
 
     return builtins.includes(name)
