@@ -7,6 +7,8 @@ import * as fs from 'fs'
 import * as crypto from 'crypto'
 import { Result, Ok, Err } from '../core/result'
 import { contentAddress, canonicalJSON } from '../core/contentAddress'
+import type { EvidenceArtifact, EvidenceKind } from './evidenceArtifact'
+import type { GateDecision } from '../core/gateDecision'
 
 export type JSONLRecord = {
   record_type: string
@@ -16,6 +18,16 @@ export type JSONLRecord = {
   record: unknown
   record_hash: string
 }
+
+/** Reserved record types for governance system */
+export type GovernanceRecordType =
+  | 'GENESIS'
+  | 'GATE_DECISION'
+  | 'EVIDENCE_ARTIFACT'
+  | 'PROPOSAL_ADMITTED'
+  | 'CHANGE_APPLIED'
+  | 'CHANGE_ROLLED_BACK'
+  | 'LEDGER_FREEZE'
 
 export class JSONLLedger {
   private filepath: string
@@ -215,5 +227,114 @@ export class JSONLLedger {
 
   count(): number {
     return this.seq
+  }
+
+  /**
+   * Append evidence artifact to ledger
+   */
+  async appendArtifact(artifact: EvidenceArtifact): Promise<Result<JSONLRecord, Error>> {
+    return this.append('EVIDENCE_ARTIFACT', artifact)
+  }
+
+  /**
+   * Append gate decision to ledger
+   */
+  async appendGateDecision(decision: GateDecision): Promise<Result<JSONLRecord, Error>> {
+    return this.append('GATE_DECISION', decision)
+  }
+
+  /**
+   * Get artifact by ID
+   */
+  getArtifact(artifactId: string): Result<EvidenceArtifact | undefined, Error> {
+    const all = this.readAll()
+    if (!all.ok) return Err(all.error)
+
+    for (const record of all.value) {
+      if (record.record_type === 'EVIDENCE_ARTIFACT') {
+        const artifact = record.record as EvidenceArtifact
+        if (artifact.artifact_id === artifactId) {
+          return Ok(artifact)
+        }
+      }
+    }
+
+    return Ok(undefined)
+  }
+
+  /**
+   * Get all artifacts of a specific kind
+   */
+  getArtifactsByKind(kind: EvidenceKind): Result<EvidenceArtifact[], Error> {
+    const all = this.readAll()
+    if (!all.ok) return Err(all.error)
+
+    const artifacts: EvidenceArtifact[] = []
+
+    for (const record of all.value) {
+      if (record.record_type === 'EVIDENCE_ARTIFACT') {
+        const artifact = record.record as EvidenceArtifact
+        if (artifact.evidence_kind === kind) {
+          artifacts.push(artifact)
+        }
+      }
+    }
+
+    return Ok(artifacts)
+  }
+
+  /**
+   * Get all gate decisions
+   */
+  getGateDecisions(): Result<GateDecision[], Error> {
+    const all = this.readAll()
+    if (!all.ok) return Err(all.error)
+
+    const decisions: GateDecision[] = []
+
+    for (const record of all.value) {
+      if (record.record_type === 'GATE_DECISION') {
+        decisions.push(record.record as GateDecision)
+      }
+    }
+
+    return Ok(decisions)
+  }
+
+  /**
+   * Find gate decision by target ID
+   */
+  findGateDecision(targetId: string, gateType?: string): Result<GateDecision | undefined, Error> {
+    const decisions = this.getGateDecisions()
+    if (!decisions.ok) return Err(decisions.error)
+
+    // Search in reverse order (most recent first)
+    for (let i = decisions.value.length - 1; i >= 0; i--) {
+      const decision = decisions.value[i]
+      if (decision.scope.target_id === targetId) {
+        if (!gateType || decision.gate_type === gateType) {
+          return Ok(decision)
+        }
+      }
+    }
+
+    return Ok(undefined)
+  }
+
+  /**
+   * Get records by type
+   */
+  getRecordsByType(recordType: string): Result<JSONLRecord[], Error> {
+    const all = this.readAll()
+    if (!all.ok) return Err(all.error)
+
+    return Ok(all.value.filter(r => r.record_type === recordType))
+  }
+
+  /**
+   * Get filepath for external access
+   */
+  getFilepath(): string {
+    return this.filepath
   }
 }

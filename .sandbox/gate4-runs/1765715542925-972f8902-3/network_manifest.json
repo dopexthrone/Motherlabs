@@ -1,0 +1,6 @@
+{
+  "artifact_type": "network_manifest",
+  "attempt_id": "972f8902-3",
+  "timestamp": 1765715542936,
+  "content": "{\"manifest_version\":\"1.0\",\"denied\":true,\"entries\":[]}"
+}

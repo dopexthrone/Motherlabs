@@ -1,0 +1,6 @@
+{
+  "artifact_type": "file_manifest",
+  "attempt_id": "5bd307cb-3",
+  "timestamp": 1765715020201,
+  "content": "{\"manifest_version\":\"1.0\",\"entries\":[],\"files_created\":0,\"files_overwritten\":0,\"files_deleted\":0,\"total_bytes_written\":0}"
+}

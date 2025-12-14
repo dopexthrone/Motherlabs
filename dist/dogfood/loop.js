@@ -3,6 +3,7 @@
 // Uses ConstrainedLLM for real code generation when API key available
 // Supports Anthropic, OpenAI, and Ollama (local) providers
 // Step 10 of ROADMAP_NEXT_10.md: Self-Improvement Validation Loop
+// Integrated with governance system (Phases 1-6)
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DogfoodingLoop = void 0;
 const codeAnalyzer_1 = require("../analysis/codeAnalyzer");
@@ -14,6 +15,10 @@ const anthropicAdapter_1 = require("../adapters/anthropicAdapter");
 const ollamaAdapter_1 = require("../adapters/ollamaAdapter");
 const jsonlLedger_1 = require("../persistence/jsonlLedger");
 const ids_1 = require("../core/ids");
+const gateDecision_1 = require("../core/gateDecision");
+const effects_1 = require("../core/effects");
+const outcomeConformance_1 = require("../verification/outcomeConformance");
+const evidenceArtifact_1 = require("../persistence/evidenceArtifact");
 class DogfoodingLoop {
     proposer;
     applier;
@@ -31,7 +36,7 @@ class DogfoodingLoop {
         if (config.openaiApiKey) {
             const openaiAdapter = new openaiAdapter_1.OpenAIAdapter(config.openaiApiKey, config.openaiModel || 'gpt-4o');
             const constrainedLLM = new constrained_1.ConstrainedLLM(openaiAdapter, 'evidence/llm-generations.jsonl');
-            this.proposer = new proposer_1.SelfImprovementProposer(constrainedLLM);
+            this.proposer = new proposer_1.SelfImprovementProposer(constrainedLLM, this.ledger);
             this.hasLLM = true;
             this.llmProvider = 'openai';
             this.llmModel = config.openaiModel || 'gpt-4o';
@@ -39,7 +44,7 @@ class DogfoodingLoop {
         else if (config.anthropicApiKey) {
             const anthropicAdapter = new anthropicAdapter_1.AnthropicAdapter(config.anthropicApiKey, config.anthropicModel || 'claude-sonnet-4-5-20250929');
             const constrainedLLM = new constrained_1.ConstrainedLLM(anthropicAdapter, 'evidence/llm-generations.jsonl');
-            this.proposer = new proposer_1.SelfImprovementProposer(constrainedLLM);
+            this.proposer = new proposer_1.SelfImprovementProposer(constrainedLLM, this.ledger);
             this.hasLLM = true;
             this.llmProvider = 'anthropic';
             this.llmModel = config.anthropicModel || 'claude-sonnet-4-5-20250929';
@@ -49,13 +54,13 @@ class DogfoodingLoop {
             // Offline-first: No external API dependency
             const ollamaAdapter = new ollamaAdapter_1.OllamaAdapter(config.ollamaConfig);
             const constrainedLLM = new constrained_1.ConstrainedLLM(ollamaAdapter, 'evidence/llm-generations.jsonl');
-            this.proposer = new proposer_1.SelfImprovementProposer(constrainedLLM);
+            this.proposer = new proposer_1.SelfImprovementProposer(constrainedLLM, this.ledger);
             this.hasLLM = true;
             this.llmProvider = 'ollama';
             this.llmModel = config.ollamaConfig?.model || 'codellama:13b';
         }
         else {
-            this.proposer = new proposer_1.SelfImprovementProposer();
+            this.proposer = new proposer_1.SelfImprovementProposer(undefined, this.ledger);
             this.hasLLM = false;
         }
     }
@@ -224,6 +229,13 @@ class DogfoodingLoop {
         });
     }
     async logSuccess(proposal, result) {
+        // Create evidence artifacts for governance compliance
+        const evidenceIds = [];
+        // Gate result artifact
+        const gateArtifact = (0, evidenceArtifact_1.createGateResultArtifact)('all_gates', true, undefined, { gateResults: proposal.gateValidation?.gateResults });
+        await this.ledger.appendArtifact(gateArtifact);
+        evidenceIds.push(gateArtifact.artifact_id);
+        // Log improvement with evidence
         await this.ledger.append('improvement_applied', {
             proposalId: proposal.id,
             issue: proposal.issue.type,
@@ -231,27 +243,47 @@ class DogfoodingLoop {
             beforeCommit: result.beforeCommit,
             afterCommit: result.afterCommit,
             testResults: result.testResults,
+            evidenceIds,
+            grantedEffects: effects_1.EFFECT_SETS.CODE_APPLICATION,
+            exercisedEffects: ['CODE_MODIFY', 'GIT_COMMIT', 'LEDGER_APPEND'],
             timestamp: ids_1.globalTimeProvider.now()
         });
+        // Create outcome record
+        const outcome = (0, outcomeConformance_1.createProposalOutcome)(proposal.id, 'COMPLETED', evidenceIds);
+        await this.ledger.append('proposal_outcome', outcome);
     }
     async logRejection(proposal, reason) {
+        // Create gate result artifact for rejection
+        const gateArtifact = (0, evidenceArtifact_1.createGateResultArtifact)('validation', false, reason, { gateResults: proposal.gateValidation?.gateResults });
+        await this.ledger.appendArtifact(gateArtifact);
         await this.ledger.append('proposal_rejected', {
             proposalId: proposal.id,
             issue: proposal.issue.type,
             source: proposal.source,
             reason,
+            evidenceIds: [gateArtifact.artifact_id],
             timestamp: ids_1.globalTimeProvider.now()
         });
+        // Create outcome record
+        const outcome = (0, outcomeConformance_1.createProposalOutcome)(proposal.id, 'REJECTED', [gateArtifact.artifact_id]);
+        await this.ledger.append('proposal_outcome', outcome);
     }
     async logRollback(proposal, result) {
+        // Create evidence artifact for rollback
+        const rollbackArtifact = (0, evidenceArtifact_1.createEvidenceArtifact)(JSON.stringify({ testResults: result.testResults, reason: 'Tests failed' }), 'rollback_snapshot', { created_at_utc: new Date().toISOString(), description: 'Rollback after failed tests' });
+        await this.ledger.appendArtifact(rollbackArtifact);
         await this.ledger.append('improvement_rolled_back', {
             proposalId: proposal.id,
             issue: proposal.issue.type,
             source: proposal.source,
             reason: 'Tests failed',
             testResults: result.testResults,
+            evidenceIds: [rollbackArtifact.artifact_id],
             timestamp: ids_1.globalTimeProvider.now()
         });
+        // Create outcome record
+        const outcome = (0, outcomeConformance_1.createProposalOutcome)(proposal.id, 'ROLLED_BACK', [rollbackArtifact.artifact_id]);
+        await this.ledger.append('proposal_outcome', outcome);
     }
     async logFailure(type, message) {
         await this.ledger.append('cycle_failure', {
@@ -259,6 +291,14 @@ class DogfoodingLoop {
             message,
             timestamp: ids_1.globalTimeProvider.now()
         });
+    }
+    /**
+     * Record gate decision for governance tracking
+     */
+    async recordGateDecision(gateType, decision, proposalId, reason) {
+        const scope = (0, gateDecision_1.createGateDecisionScope)('proposal', { id: proposalId }, undefined, decision === 'ALLOW' ? effects_1.EFFECT_SETS.CODE_APPLICATION : undefined);
+        const gateDecision = (0, gateDecision_1.createGateDecision)(gateType, decision, scope, this.llmProvider ? `provider:${this.llmProvider}` : 'system', reason);
+        await this.ledger.appendGateDecision(gateDecision);
     }
     /**
      * Sleep between cycles

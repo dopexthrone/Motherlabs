@@ -46,47 +46,62 @@ const missingVars_1 = require("../urco/missingVars");
 const contradictions_1 = require("../urco/contradictions");
 const runner_1 = require("../sandbox/runner");
 const securityScanner_1 = require("./securityScanner");
+const hollowDetector_1 = require("./hollowDetector");
+const contentAddress_1 = require("../core/contentAddress");
+const gateDecision_1 = require("../core/gateDecision");
 const os = __importStar(require("os"));
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const crypto_1 = require("crypto");
 class SixGateValidator {
+    /** Collected gate decisions from last validation */
+    lastGateDecisions = [];
     /**
      * Validate code through all 6 gates
      * ANY required gate fails → code REJECTED
+     *
+     * If context.ledger is provided, gate decisions are recorded to the ledger.
      */
     async validate(code, context) {
         const gateResults = [];
+        this.lastGateDecisions = [];
+        const codeId = (0, contentAddress_1.contentAddress)(code);
         // ═══════════════════════════════════════════════════════════
         // GATE 1: Schema Validation
         // ═══════════════════════════════════════════════════════════
         const g1 = this.gate1_schemaValidation(code);
         gateResults.push(g1);
+        await this.recordGateDecision(g1, codeId, code, context);
         // ═══════════════════════════════════════════════════════════
         // GATE 2: Syntax Validation
         // ═══════════════════════════════════════════════════════════
         const g2 = await this.gate2_syntaxValidation(code);
         gateResults.push(g2);
+        await this.recordGateDecision(g2, codeId, code, context);
         // ═══════════════════════════════════════════════════════════
         // GATE 3: Variable Resolution
         // ═══════════════════════════════════════════════════════════
         const g3 = this.gate3_variableResolution(code, context);
         gateResults.push(g3);
+        await this.recordGateDecision(g3, codeId, code, context);
         // ═══════════════════════════════════════════════════════════
         // GATE 4: Test Execution (kernel-grade sandbox)
         // ═══════════════════════════════════════════════════════════
         const g4 = await this.gate4_testExecution(code);
         gateResults.push(g4);
+        await this.recordGateDecision(g4, codeId, code, context);
         // ═══════════════════════════════════════════════════════════
         // GATE 5: URCO Entropy
         // ═══════════════════════════════════════════════════════════
         const g5 = this.gate5_urcoEntropy(code);
         gateResults.push(g5);
+        await this.recordGateDecision(g5, codeId, code, context);
         // ═══════════════════════════════════════════════════════════
         // GATE 6: Governance Check
         // ═══════════════════════════════════════════════════════════
         const g6 = this.gate6_governanceCheck(code, context);
         gateResults.push(g6);
+        await this.recordGateDecision(g6, codeId, code, context);
         // Determine overall validity
         const requiredGatesFailed = gateResults.filter(g => g.required && !g.passed);
         const valid = requiredGatesFailed.length === 0;
@@ -98,6 +113,49 @@ class SixGateValidator {
             gateResults,
             rejectedAt
         });
+    }
+    /**
+     * Record a gate decision to the ledger (if provided)
+     */
+    async recordGateDecision(result, codeId, code, context) {
+        // Determine granted effects based on gate type
+        const grantedEffects = result.passed
+            ? this.getGrantedEffectsForGate(result.gateName)
+            : [];
+        const scope = (0, gateDecision_1.createGateDecisionScope)('code', code, context.targetFile, grantedEffects);
+        const decision = (0, gateDecision_1.createGateDecision)(result.gateName, result.passed ? 'ALLOW' : 'DENY', scope, `gate:${result.gateName}`, result.error || (result.passed ? 'Passed validation' : 'Failed validation'), result.details);
+        this.lastGateDecisions.push(decision);
+        // Record to ledger if provided
+        if (context.ledger) {
+            await context.ledger.appendGateDecision(decision);
+        }
+    }
+    /**
+     * Get effects granted by a specific gate passing
+     */
+    getGrantedEffectsForGate(gateName) {
+        switch (gateName) {
+            case 'schema_validation':
+            case 'syntax_validation':
+            case 'variable_resolution':
+            case 'urco_entropy':
+                // Pure validation gates - no effects granted
+                return ['NONE'];
+            case 'test_execution':
+                // Test execution grants execution effects
+                return ['TEST_EXECUTE', 'LEDGER_APPEND'];
+            case 'governance_check':
+                // Governance check grants code modification effects if passed
+                return ['CODE_MODIFY', 'GIT_COMMIT', 'LEDGER_APPEND'];
+            default:
+                return ['NONE'];
+        }
+    }
+    /**
+     * Get gate decisions from last validation
+     */
+    getLastGateDecisions() {
+        return [...this.lastGateDecisions];
     }
     /**
      * Gate 1: Schema Validation
@@ -648,6 +706,19 @@ class SixGateValidator {
                     violations.push(`[SECURITY:${vuln.severity.toUpperCase()}] ${vuln.message}${vuln.line ? ` (line ${vuln.line})` : ''}`);
                 }
             }
+            // 3. Hollow Code Detection (AST-based, multi-line)
+            const hollowResult = (0, hollowDetector_1.detectHollowPatterns)(code);
+            let hollowScore = 100;
+            if (hollowResult.ok) {
+                hollowScore = hollowResult.value.hollowScore;
+                // Add critical/high hollow patterns as violations
+                for (const pattern of hollowResult.value.patterns) {
+                    if (pattern.severity === 'critical' || pattern.severity === 'high') {
+                        const name = pattern.nodeName ? ` (${pattern.nodeName})` : '';
+                        violations.push(`[HOLLOW:${pattern.severity.toUpperCase()}] ${pattern.type}${name}: ${pattern.message}`);
+                    }
+                }
+            }
             if (violations.length > 0) {
                 return {
                     gateName: 'governance_check',
@@ -657,18 +728,22 @@ class SixGateValidator {
                     details: {
                         violations,
                         securityScore: securityScan.score,
-                        securitySummary: (0, securityScanner_1.getVulnerabilitySummary)(securityScan)
+                        securitySummary: (0, securityScanner_1.getVulnerabilitySummary)(securityScan),
+                        hollowScore,
+                        hollowPatterns: hollowResult.ok ? hollowResult.value.patterns.length : 0
                     }
                 };
             }
-            // Include security info even on pass
+            // Include security and hollow info even on pass
             return {
                 gateName: 'governance_check',
                 passed: true,
                 required: true,
                 details: {
                     securityScore: securityScan.score,
-                    securityVulnerabilities: securityScan.vulnerabilities.length
+                    securityVulnerabilities: securityScan.vulnerabilities.length,
+                    hollowScore,
+                    hollowPatterns: hollowResult.ok ? hollowResult.value.patterns.length : 0
                 }
             };
         }

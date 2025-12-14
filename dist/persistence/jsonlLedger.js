@@ -207,5 +207,100 @@ class JSONLLedger {
     count() {
         return this.seq;
     }
+    /**
+     * Append evidence artifact to ledger
+     */
+    async appendArtifact(artifact) {
+        return this.append('EVIDENCE_ARTIFACT', artifact);
+    }
+    /**
+     * Append gate decision to ledger
+     */
+    async appendGateDecision(decision) {
+        return this.append('GATE_DECISION', decision);
+    }
+    /**
+     * Get artifact by ID
+     */
+    getArtifact(artifactId) {
+        const all = this.readAll();
+        if (!all.ok)
+            return (0, result_1.Err)(all.error);
+        for (const record of all.value) {
+            if (record.record_type === 'EVIDENCE_ARTIFACT') {
+                const artifact = record.record;
+                if (artifact.artifact_id === artifactId) {
+                    return (0, result_1.Ok)(artifact);
+                }
+            }
+        }
+        return (0, result_1.Ok)(undefined);
+    }
+    /**
+     * Get all artifacts of a specific kind
+     */
+    getArtifactsByKind(kind) {
+        const all = this.readAll();
+        if (!all.ok)
+            return (0, result_1.Err)(all.error);
+        const artifacts = [];
+        for (const record of all.value) {
+            if (record.record_type === 'EVIDENCE_ARTIFACT') {
+                const artifact = record.record;
+                if (artifact.evidence_kind === kind) {
+                    artifacts.push(artifact);
+                }
+            }
+        }
+        return (0, result_1.Ok)(artifacts);
+    }
+    /**
+     * Get all gate decisions
+     */
+    getGateDecisions() {
+        const all = this.readAll();
+        if (!all.ok)
+            return (0, result_1.Err)(all.error);
+        const decisions = [];
+        for (const record of all.value) {
+            if (record.record_type === 'GATE_DECISION') {
+                decisions.push(record.record);
+            }
+        }
+        return (0, result_1.Ok)(decisions);
+    }
+    /**
+     * Find gate decision by target ID
+     */
+    findGateDecision(targetId, gateType) {
+        const decisions = this.getGateDecisions();
+        if (!decisions.ok)
+            return (0, result_1.Err)(decisions.error);
+        // Search in reverse order (most recent first)
+        for (let i = decisions.value.length - 1; i >= 0; i--) {
+            const decision = decisions.value[i];
+            if (decision.scope.target_id === targetId) {
+                if (!gateType || decision.gate_type === gateType) {
+                    return (0, result_1.Ok)(decision);
+                }
+            }
+        }
+        return (0, result_1.Ok)(undefined);
+    }
+    /**
+     * Get records by type
+     */
+    getRecordsByType(recordType) {
+        const all = this.readAll();
+        if (!all.ok)
+            return (0, result_1.Err)(all.error);
+        return (0, result_1.Ok)(all.value.filter(r => r.record_type === recordType));
+    }
+    /**
+     * Get filepath for external access
+     */
+    getFilepath() {
+        return this.filepath;
+    }
 }
 exports.JSONLLedger = JSONLLedger;

@@ -13,6 +13,10 @@ import { runTestExec, verifyEvidence, cleanupRunDir } from '../sandbox/runner'
 import { scanForVulnerabilities, getVulnerabilitySummary } from './securityScanner'
 import { detectHollowPatterns, passesHollowDetection } from './hollowDetector'
 import type { TestExecRequest } from '../sandbox/types'
+import { contentAddress } from '../core/contentAddress'
+import { createGateDecision, createGateDecisionScope, GateDecision, ValidationGateType } from '../core/gateDecision'
+import { EFFECT_SETS, EffectType } from '../core/effects'
+import type { JSONLLedger } from '../persistence/jsonlLedger'
 import * as os from 'os'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -22,6 +26,10 @@ export type CodeValidationContext = {
   existingImports: string[]
   existingTypes: string[]
   governanceRules?: string[]
+  /** Optional ledger for recording gate decisions */
+  ledger?: JSONLLedger
+  /** Optional target file path for gate decisions */
+  targetFile?: string
 }
 
 export type GateResult = {
@@ -39,10 +47,14 @@ export type CodeValidationResult = {
 }
 
 export class SixGateValidator {
+  /** Collected gate decisions from last validation */
+  private lastGateDecisions: GateDecision[] = []
 
   /**
    * Validate code through all 6 gates
    * ANY required gate fails → code REJECTED
+   *
+   * If context.ledger is provided, gate decisions are recorded to the ledger.
    */
   async validate(
     code: string,
@@ -50,42 +62,50 @@ export class SixGateValidator {
   ): Promise<Result<CodeValidationResult, Error>> {
 
     const gateResults: GateResult[] = []
+    this.lastGateDecisions = []
+    const codeId = contentAddress(code)
 
     // ═══════════════════════════════════════════════════════════
     // GATE 1: Schema Validation
     // ═══════════════════════════════════════════════════════════
     const g1 = this.gate1_schemaValidation(code)
     gateResults.push(g1)
+    await this.recordGateDecision(g1, codeId, code, context)
 
     // ═══════════════════════════════════════════════════════════
     // GATE 2: Syntax Validation
     // ═══════════════════════════════════════════════════════════
     const g2 = await this.gate2_syntaxValidation(code)
     gateResults.push(g2)
+    await this.recordGateDecision(g2, codeId, code, context)
 
     // ═══════════════════════════════════════════════════════════
     // GATE 3: Variable Resolution
     // ═══════════════════════════════════════════════════════════
     const g3 = this.gate3_variableResolution(code, context)
     gateResults.push(g3)
+    await this.recordGateDecision(g3, codeId, code, context)
 
     // ═══════════════════════════════════════════════════════════
     // GATE 4: Test Execution (kernel-grade sandbox)
     // ═══════════════════════════════════════════════════════════
     const g4 = await this.gate4_testExecution(code)
     gateResults.push(g4)
+    await this.recordGateDecision(g4, codeId, code, context)
 
     // ═══════════════════════════════════════════════════════════
     // GATE 5: URCO Entropy
     // ═══════════════════════════════════════════════════════════
     const g5 = this.gate5_urcoEntropy(code)
     gateResults.push(g5)
+    await this.recordGateDecision(g5, codeId, code, context)
 
     // ═══════════════════════════════════════════════════════════
     // GATE 6: Governance Check
     // ═══════════════════════════════════════════════════════════
     const g6 = this.gate6_governanceCheck(code, context)
     gateResults.push(g6)
+    await this.recordGateDecision(g6, codeId, code, context)
 
     // Determine overall validity
     const requiredGatesFailed = gateResults.filter(g => g.required && !g.passed)
@@ -100,6 +120,76 @@ export class SixGateValidator {
       gateResults,
       rejectedAt
     })
+  }
+
+  /**
+   * Record a gate decision to the ledger (if provided)
+   */
+  private async recordGateDecision(
+    result: GateResult,
+    codeId: string,
+    code: string,
+    context: CodeValidationContext
+  ): Promise<void> {
+    // Determine granted effects based on gate type
+    const grantedEffects: EffectType[] = result.passed
+      ? this.getGrantedEffectsForGate(result.gateName)
+      : []
+
+    const scope = createGateDecisionScope(
+      'code',
+      code,
+      context.targetFile,
+      grantedEffects
+    )
+
+    const decision = createGateDecision(
+      result.gateName as ValidationGateType,
+      result.passed ? 'ALLOW' : 'DENY',
+      scope,
+      `gate:${result.gateName}`,
+      result.error || (result.passed ? 'Passed validation' : 'Failed validation'),
+      result.details
+    )
+
+    this.lastGateDecisions.push(decision)
+
+    // Record to ledger if provided
+    if (context.ledger) {
+      await context.ledger.appendGateDecision(decision)
+    }
+  }
+
+  /**
+   * Get effects granted by a specific gate passing
+   */
+  private getGrantedEffectsForGate(gateName: string): EffectType[] {
+    switch (gateName) {
+      case 'schema_validation':
+      case 'syntax_validation':
+      case 'variable_resolution':
+      case 'urco_entropy':
+        // Pure validation gates - no effects granted
+        return ['NONE']
+
+      case 'test_execution':
+        // Test execution grants execution effects
+        return ['TEST_EXECUTE', 'LEDGER_APPEND']
+
+      case 'governance_check':
+        // Governance check grants code modification effects if passed
+        return ['CODE_MODIFY', 'GIT_COMMIT', 'LEDGER_APPEND']
+
+      default:
+        return ['NONE']
+    }
+  }
+
+  /**
+   * Get gate decisions from last validation
+   */
+  getLastGateDecisions(): GateDecision[] {
+    return [...this.lastGateDecisions]
   }
 
   /**

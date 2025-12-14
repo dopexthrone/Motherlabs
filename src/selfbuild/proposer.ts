@@ -3,6 +3,7 @@
 // Enforces: AXIOM 2 (Probabilistic Non-Authority), AXIOM 5 (Refusal First-Class)
 // TCB Component: Self-modification subject to same gates as external artifacts
 // Uses ConstrainedLLM for real code generation (AXIOM 5: Refuses if LLM unavailable)
+// Integrated with governance system - records GATE_DECISION and EVIDENCE_ARTIFACT
 
 import * as fs from 'fs'
 import { analyzeFile } from '../analysis/codeAnalyzer'
@@ -16,6 +17,10 @@ import { generateConsequenceSurface, ConsequenceAnalysis } from '../analysis/con
 import { generateAlternatives, ProposalWithAlternatives } from '../core/proposal'
 import { checkPrematurity, PrematurityCheck } from '../validation/prematurityChecker'
 import { determineGateRequirements, GateElevation } from '../validation/gateElevation'
+import { createGateDecision, createGateDecisionScope } from '../core/gateDecision'
+import { EFFECT_SETS } from '../core/effects'
+import { createLLMResponseArtifact, createGateResultArtifact } from '../persistence/evidenceArtifact'
+import { JSONLLedger } from '../persistence/jsonlLedger'
 import type { CodeIssue } from '../analysis/codeAnalyzer'
 
 export type ImprovementProposal = {
@@ -53,10 +58,19 @@ export type ImprovementProposal = {
 export class SelfImprovementProposer {
   private validator: SixGateValidator
   private constrainedLLM: ConstrainedLLM | null
+  private ledger: JSONLLedger | null
 
-  constructor(constrainedLLM?: ConstrainedLLM) {
+  constructor(constrainedLLM?: ConstrainedLLM, ledger?: JSONLLedger) {
     this.validator = new SixGateValidator()
     this.constrainedLLM = constrainedLLM || null
+    this.ledger = ledger || null
+  }
+
+  /**
+   * Set the governance ledger for recording gate decisions and artifacts
+   */
+  setLedger(ledger: JSONLLedger): void {
+    this.ledger = ledger
   }
 
   /**
@@ -92,13 +106,26 @@ export class SelfImprovementProposer {
         existingCode = ''
       }
 
-      // 4. Build validation context
+      // 4. Build validation context (with ledger for governance tracking)
       const context: CodeValidationContext = {
         existingImports: this.extractImports(existingCode),
-        existingTypes: this.extractTypes(existingCode)
+        existingTypes: this.extractTypes(existingCode),
+        ledger: this.ledger || undefined,
+        targetFile: filepath
       }
 
-      // 5. Generate fix via LLM (AXIOM 5: No hollow placeholders)
+      // 5. Record proposal_admission gate decision
+      if (this.ledger) {
+        const proposalId = contentAddress({ issue: topIssue, filepath, timestamp: globalTimeProvider.now() })
+        await this.recordGateDecision(
+          'proposal_admission',
+          'ALLOW',
+          proposalId,
+          `Proposal admitted for ${topIssue.type} in ${filepath}`
+        )
+      }
+
+      // 7. Generate fix via LLM (AXIOM 5: No hollow placeholders)
       // We REFUSE if no LLM is available - never generate placeholder code
       if (!this.constrainedLLM) {
         return Err(new Error(
@@ -116,6 +143,17 @@ export class SelfImprovementProposer {
       })
 
       if (!llmResult.ok) {
+        // Record DENY gate decision for failed LLM generation
+        if (this.ledger) {
+          const codeId = contentAddress({ error: llmResult.error.message, filepath })
+          await this.recordGateDecision(
+            'llm_generation',
+            'DENY',
+            codeId,
+            `LLM generation failed: ${llmResult.error.message}`
+          )
+        }
+
         // AXIOM 5: Refusal Is a First-Class Outcome
         // LLM failed - REFUSE rather than generate hollow placeholder
         return Err(new Error(
@@ -131,7 +169,39 @@ export class SelfImprovementProposer {
       }
       const gateValidation = llmResult.value.validation
 
-      // 6. Build final proposal
+      // 8. Record ALLOW gate decision and evidence for successful LLM generation
+      if (this.ledger) {
+        const codeId = contentAddress(llmResult.value.code)
+
+        // Record llm_generation ALLOW
+        await this.recordGateDecision(
+          'llm_generation',
+          'ALLOW',
+          codeId,
+          `LLM generated code passed all ${gateValidation?.gateResults.length || 0} gates`
+        )
+
+        // Record LLM response artifact
+        const llmArtifact = createLLMResponseArtifact(
+          llmResult.value.code,
+          this.constrainedLLM.getModel?.() || 'unknown',
+          this.constrainedLLM.getProviderType?.() || 'unknown'
+        )
+        await this.ledger.appendArtifact(llmArtifact)
+
+        // Record gate results artifact
+        if (gateValidation) {
+          const gateArtifact = createGateResultArtifact(
+            'six_gate_validation',
+            gateValidation.valid,
+            gateValidation.rejectedAt,
+            { gateResults: gateValidation.gateResults }
+          )
+          await this.ledger.appendArtifact(gateArtifact)
+        }
+      }
+
+      // 9. Build final proposal
       const improvementProposal: ImprovementProposal = {
         id: contentAddress({ issue: topIssue, change: proposal, timestamp: globalTimeProvider.now() }),
         targetFile: filepath,
@@ -271,5 +341,34 @@ export class SelfImprovementProposer {
     }
 
     return reasons[issue.type] || 'Improves code quality'
+  }
+
+  /**
+   * Record a gate decision to the governance ledger
+   */
+  private async recordGateDecision(
+    gateType: 'proposal_admission' | 'llm_generation' | 'change_application' | 'human_approval',
+    decision: 'ALLOW' | 'DENY',
+    targetId: string,
+    reason: string
+  ): Promise<void> {
+    if (!this.ledger) return
+
+    const scope = createGateDecisionScope(
+      gateType === 'llm_generation' ? 'code' : 'proposal',
+      { id: targetId },
+      undefined,
+      decision === 'ALLOW' ? EFFECT_SETS.LLM_CODE_GENERATION : undefined
+    )
+
+    const gateDecision = createGateDecision(
+      gateType,
+      decision,
+      scope,
+      this.constrainedLLM ? `llm:${this.constrainedLLM.getProviderType?.() || 'unknown'}` : 'system',
+      reason
+    )
+
+    await this.ledger.appendGateDecision(gateDecision)
   }
 }

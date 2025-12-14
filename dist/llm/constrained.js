@@ -25,6 +25,22 @@ class ConstrainedLLM {
         this.ledger = new jsonlLedger_1.JSONLLedger(ledgerPath);
     }
     /**
+     * Get the LLM provider type
+     */
+    getProviderType() {
+        return this.providerType;
+    }
+    /**
+     * Get the model name if available
+     */
+    getModel() {
+        if (this.llm instanceof ollamaAdapter_1.OllamaAdapter) {
+            return this.llm.getModel();
+        }
+        // For other adapters, return a default
+        return this.providerType === 'openai' ? 'gpt-4o' : 'claude-sonnet-4-5-20250929';
+    }
+    /**
      * Generate code that MUST pass all 6 gates
      * Retries up to MAX_ATTEMPTS times
      * Returns Err if all attempts fail gates

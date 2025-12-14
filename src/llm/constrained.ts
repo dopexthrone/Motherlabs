@@ -46,6 +46,24 @@ export class ConstrainedLLM {
   }
 
   /**
+   * Get the LLM provider type
+   */
+  getProviderType(): LLMProviderType {
+    return this.providerType
+  }
+
+  /**
+   * Get the model name if available
+   */
+  getModel(): string {
+    if (this.llm instanceof OllamaAdapter) {
+      return this.llm.getModel()
+    }
+    // For other adapters, return a default
+    return this.providerType === 'openai' ? 'gpt-4o' : 'claude-sonnet-4-5-20250929'
+  }
+
+  /**
    * Generate code that MUST pass all 6 gates
    * Retries up to MAX_ATTEMPTS times
    * Returns Err if all attempts fail gates
