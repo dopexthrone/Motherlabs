@@ -6,6 +6,7 @@ import { computeEntropy } from '../urco/entropy'
 import { extractEntities, extractActions } from '../urco/extractor'
 import { detectMissingVars } from '../urco/missingVars'
 import { detectContradictions } from '../urco/contradictions'
+import { verifyCodeExecution, cleanupRunDirectory } from '../sandbox/executor'
 import * as os from 'os'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -467,16 +468,106 @@ export class SixGateValidator {
   }
 
   /**
-   * Gate 4: Test Execution (placeholder - requires sandbox)
+   * Gate 4: Test Execution
+   * Executes code in sandbox to verify it runs without runtime errors.
+   *
+   * SECURITY: Uses isolated sandbox with:
+   * - Command allowlist (node, npx, tsx only)
+   * - Environment scrubbing (no API keys, tokens)
+   * - Symlink protection
+   * - Timeout enforcement (10s default)
+   * - Output limits (1MB each for stdout/stderr)
+   *
+   * NOTE: Code with local imports (./  ../) cannot be executed in isolation.
+   * For such code, this gate is advisory (required: false) and passes with a note.
+   * The full test suite (198+ tests) validates code when actually applied.
    */
-  private async gate4_testExecution(_code: string): Promise<GateResult> {
-    // UNIMPLEMENTED: Requires execution engine integration
-    // For now: pass (will implement when code generation added)
-    return {
-      gateName: 'test_execution',
-      passed: true,
-      required: false,  // Not required until code generation active
-      error: 'UNIMPLEMENTED: Test execution not yet integrated'
+  private async gate4_testExecution(code: string): Promise<GateResult> {
+    try {
+      // Check for local imports that can't be resolved in sandbox
+      const hasLocalImports = /import\s+.*from\s+['"]\.\.?\//.test(code)
+
+      if (hasLocalImports) {
+        // Code has local imports - can't execute in isolation
+        // Make gate advisory and pass (actual validation happens via test suite on apply)
+        return {
+          gateName: 'test_execution',
+          passed: true,
+          required: false,  // Advisory for code with local imports
+          details: {
+            skipped: true,
+            reason: 'Code has local imports - deferred to test suite',
+            hasLocalImports: true
+          }
+        }
+      }
+
+      // Execute code directly - tsx handles TypeScript with exports
+      // The sandbox already captures exit codes and errors
+      const result = await verifyCodeExecution(code, 10_000)
+
+      if (!result.ok) {
+        return {
+          gateName: 'test_execution',
+          passed: false,
+          required: true,
+          error: `Execution failed: ${result.error.message}`
+        }
+      }
+
+      const { passed, details } = result.value
+
+      // Cleanup sandbox directory after execution
+      if (details.runDir) {
+        cleanupRunDirectory(details.runDir)
+      }
+
+      if (!passed) {
+        // Determine failure reason
+        let reason = 'Unknown error'
+        if (details.timedOut) {
+          reason = 'Execution timed out (>10s)'
+        } else if (details.exitCode !== 0) {
+          reason = `Exit code ${details.exitCode}`
+        } else if (details.stderr) {
+          // Extract first error line
+          const errorMatch = details.stderr.match(/(Error|TypeError|ReferenceError|SyntaxError):[^\n]+/)
+          if (errorMatch) {
+            reason = errorMatch[0]
+          }
+        }
+
+        return {
+          gateName: 'test_execution',
+          passed: false,
+          required: true,
+          error: reason,
+          details: {
+            exitCode: details.exitCode,
+            timedOut: details.timedOut,
+            durationMs: details.durationMs,
+            stderr: details.stderr.slice(0, 500)
+          }
+        }
+      }
+
+      return {
+        gateName: 'test_execution',
+        passed: true,
+        required: true,
+        details: {
+          exitCode: details.exitCode,
+          durationMs: details.durationMs
+        }
+      }
+
+    } catch (error) {
+      return {
+        gateName: 'test_execution',
+        passed: false,
+        required: true,
+        error: error instanceof Error ? error.message : String(error)
+      }
     }
   }
 

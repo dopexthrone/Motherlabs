@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "anthropicmodel.schema.json",
+  "title": "AnthropicModel",
+  "description": "Supported Anthropic Claude model identifiers",
+  "type": "string",
+  "enum": [
+    "claude-opus-4-5-20251101",
+    "claude-sonnet-4-5-20250929",
+    "claude-3-5-sonnet-20241022",
+    "claude-3-5-haiku-20241022"
+  ]
+}

@@ -8,8 +8,8 @@ const codeAnalyzer_1 = require("../analysis/codeAnalyzer");
 const proposer_1 = require("../selfbuild/proposer");
 const applier_1 = require("../selfbuild/applier");
 const constrained_1 = require("../llm/constrained");
-const llm_1 = require("../llm");
 const openaiAdapter_1 = require("../adapters/openaiAdapter");
+const anthropicAdapter_1 = require("../adapters/anthropicAdapter");
 const jsonlLedger_1 = require("../persistence/jsonlLedger");
 const ids_1 = require("../core/ids");
 class DogfoodingLoop {
@@ -33,8 +33,8 @@ class DogfoodingLoop {
             this.llmProvider = 'openai';
         }
         else if (config.anthropicApiKey) {
-            const llmAdapter = new llm_1.LLMAdapter(config.anthropicApiKey);
-            const constrainedLLM = new constrained_1.ConstrainedLLM(llmAdapter, 'evidence/llm-generations.jsonl');
+            const anthropicAdapter = new anthropicAdapter_1.AnthropicAdapter(config.anthropicApiKey, config.anthropicModel || 'claude-sonnet-4-5-20250929');
+            const constrainedLLM = new constrained_1.ConstrainedLLM(anthropicAdapter, 'evidence/llm-generations.jsonl');
             this.proposer = new proposer_1.SelfImprovementProposer(constrainedLLM);
             this.hasLLM = true;
             this.llmProvider = 'anthropic';
@@ -58,8 +58,11 @@ class DogfoodingLoop {
         console.log(`  LLM enabled: ${this.hasLLM}`);
         if (this.llmProvider) {
             console.log(`  LLM provider: ${this.llmProvider}`);
-            if (this.llmProvider === 'openai' && this.config.openaiModel) {
-                console.log(`  OpenAI model: ${this.config.openaiModel}`);
+            if (this.llmProvider === 'openai') {
+                console.log(`  Model: ${this.config.openaiModel || 'gpt-4o'}`);
+            }
+            else if (this.llmProvider === 'anthropic') {
+                console.log(`  Model: ${this.config.anthropicModel || 'claude-sonnet-4-5-20250929'}`);
             }
         }
         console.log('');

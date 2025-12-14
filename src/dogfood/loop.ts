@@ -6,8 +6,8 @@ import { analyzeDirectory } from '../analysis/codeAnalyzer'
 import { SelfImprovementProposer, ImprovementProposal } from '../selfbuild/proposer'
 import { AutoApplier, ApplyResult } from '../selfbuild/applier'
 import { ConstrainedLLM } from '../llm/constrained'
-import { LLMAdapter } from '../llm'
 import { OpenAIAdapter, OpenAIModel } from '../adapters/openaiAdapter'
+import { AnthropicAdapter, AnthropicModel } from '../adapters/anthropicAdapter'
 import { JSONLLedger } from '../persistence/jsonlLedger'
 import { globalTimeProvider } from '../core/ids'
 import type { LLMProviderType } from '../llm/types'
@@ -17,9 +17,10 @@ export type DogfoodingConfig = {
   requireHumanApproval: boolean
   maxImprovementsPerCycle: number
   ledgerPath: string
-  anthropicApiKey?: string  // Optional - enables Anthropic LLM
-  openaiApiKey?: string     // Optional - enables OpenAI LLM
-  openaiModel?: OpenAIModel // Optional - defaults to gpt-4o
+  anthropicApiKey?: string    // Optional - enables Anthropic Claude
+  anthropicModel?: AnthropicModel // Optional - defaults to claude-sonnet-4-5-20250929
+  openaiApiKey?: string       // Optional - enables OpenAI LLM
+  openaiModel?: OpenAIModel   // Optional - defaults to gpt-4o
 }
 
 export class DogfoodingLoop {
@@ -44,8 +45,11 @@ export class DogfoodingLoop {
       this.hasLLM = true
       this.llmProvider = 'openai'
     } else if (config.anthropicApiKey) {
-      const llmAdapter = new LLMAdapter(config.anthropicApiKey)
-      const constrainedLLM = new ConstrainedLLM(llmAdapter, 'evidence/llm-generations.jsonl')
+      const anthropicAdapter = new AnthropicAdapter(
+        config.anthropicApiKey,
+        config.anthropicModel || 'claude-sonnet-4-5-20250929'
+      )
+      const constrainedLLM = new ConstrainedLLM(anthropicAdapter, 'evidence/llm-generations.jsonl')
       this.proposer = new SelfImprovementProposer(constrainedLLM)
       this.hasLLM = true
       this.llmProvider = 'anthropic'
@@ -70,8 +74,10 @@ export class DogfoodingLoop {
     console.log(`  LLM enabled: ${this.hasLLM}`)
     if (this.llmProvider) {
       console.log(`  LLM provider: ${this.llmProvider}`)
-      if (this.llmProvider === 'openai' && this.config.openaiModel) {
-        console.log(`  OpenAI model: ${this.config.openaiModel}`)
+      if (this.llmProvider === 'openai') {
+        console.log(`  Model: ${this.config.openaiModel || 'gpt-4o'}`)
+      } else if (this.llmProvider === 'anthropic') {
+        console.log(`  Model: ${this.config.anthropicModel || 'claude-sonnet-4-5-20250929'}`)
       }
     }
     console.log('')

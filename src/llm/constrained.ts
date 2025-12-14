@@ -4,6 +4,7 @@
 
 import { LLMAdapter } from '../llm'
 import { OpenAIAdapter } from '../adapters/openaiAdapter'
+import { AnthropicAdapter } from '../adapters/anthropicAdapter'
 import { SixGateValidator, CodeValidationContext, CodeValidationResult } from '../validation/sixGates'
 import { Result, Ok, Err } from '../core/result'
 import { JSONLLedger } from '../persistence/jsonlLedger'
@@ -36,7 +37,7 @@ export class ConstrainedLLM {
   private validator: SixGateValidator
   private ledger: JSONLLedger
 
-  constructor(llm: LLMAdapter | OpenAIAdapter, ledgerPath: string = 'evidence/llm-generations.jsonl') {
+  constructor(llm: LLMAdapter | OpenAIAdapter | AnthropicAdapter, ledgerPath: string = 'evidence/llm-generations.jsonl') {
     this.llm = llm
     this.providerType = llm instanceof OpenAIAdapter ? 'openai' : 'anthropic'
     this.validator = new SixGateValidator()
