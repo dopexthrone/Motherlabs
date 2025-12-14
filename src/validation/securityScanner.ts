@@ -1,5 +1,7 @@
 // Security Scanner - Detects common vulnerability patterns in code
-// Part of the 6-Gate Validation System
+// CONSTITUTIONAL AUTHORITY - See docs/MOTHERLABS_CONSTITUTION.md
+// Enforces: AXIOM 6 (No Silent State Mutation), Gate 6 Governance
+// TCB Component: Part of the 6-Gate Validation System
 
 export type SecurityVulnerability = {
   type: SecurityVulnerabilityType
@@ -25,6 +27,10 @@ export type SecurityVulnerabilityType =
   | 'INVARIANT_SILENT_MUTATION'
   | 'INVARIANT_AUTO_ESCALATION'
   | 'INVARIANT_POLICY_EXECUTION_COLLAPSE'
+  // Hollow code patterns
+  | 'HOLLOW_TEST'
+  | 'HOLLOW_PLACEHOLDER'
+  | 'HOLLOW_FUNCTION'
 
 export type SecurityScanResult = {
   passed: boolean
@@ -261,6 +267,52 @@ const SECURITY_PATTERNS: Array<{
     severity: 'high',
     pattern: /validate.*&&.*apply|if\s*\(.*valid.*\)\s*\{[^}]*write/,
     message: 'INVARIANT VIOLATION: Policy and execution may be collapsed'
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // HOLLOW CODE DETECTION - Functions that do nothing meaningful
+  // ═══════════════════════════════════════════════════════════
+
+  // Hollow tests - functions that just return true/false
+  {
+    type: 'HOLLOW_TEST',
+    severity: 'critical',
+    pattern: /function\s+test\w*\s*\([^)]*\)\s*(?::\s*boolean)?\s*\{\s*(?:\/\/[^\n]*)?\s*return\s+true\s*;?\s*\}/,
+    message: 'HOLLOW CODE: Test function returns true without assertions'
+  },
+  {
+    type: 'HOLLOW_TEST',
+    severity: 'critical',
+    pattern: /(?:export\s+)?(?:async\s+)?function\s+\w+\s*\([^)]*\)\s*(?::\s*boolean)?\s*\{\s*return\s+(?:true|false)\s*;?\s*\}/,
+    message: 'HOLLOW CODE: Function body only returns constant boolean'
+  },
+
+  // Placeholder functions
+  {
+    type: 'HOLLOW_PLACEHOLDER',
+    severity: 'critical',
+    pattern: /function\s+placeholder\s*\(/,
+    message: 'HOLLOW CODE: Placeholder function detected'
+  },
+  {
+    type: 'HOLLOW_PLACEHOLDER',
+    severity: 'high',
+    pattern: /\/\/\s*DETERMINISTIC:\s*Placeholder/,
+    message: 'HOLLOW CODE: Deterministic placeholder marker detected'
+  },
+  {
+    type: 'HOLLOW_PLACEHOLDER',
+    severity: 'high',
+    pattern: /\/\/\s*(?:Basic|Error)\s+(?:test\s+)?placeholder/i,
+    message: 'HOLLOW CODE: Placeholder comment in test'
+  },
+
+  // Empty/trivial function bodies
+  {
+    type: 'HOLLOW_FUNCTION',
+    severity: 'high',
+    pattern: /(?:export\s+)?function\s+\w+\s*\([^)]*\)\s*(?::\s*void)?\s*\{\s*(?:\/\/[^\n]*)?\s*\}/,
+    message: 'HOLLOW CODE: Function with empty body'
   }
 ]
 

@@ -1,5 +1,8 @@
 "use strict";
 // Result<T,E> - Structured error handling (no exceptions in business logic)
+// CONSTITUTIONAL FOUNDATION - See docs/MOTHERLABS_CONSTITUTION.md
+// Enforces: AXIOM 1 (Deterministic Authority) via explicit Ok/Err returns
+// TCB Component: This file is part of the Trusted Computing Base
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Ok = Ok;
 exports.Err = Err;

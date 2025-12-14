@@ -1,4 +1,7 @@
 // Gate 4 Runner - Kernel-grade test execution
+// CONSTITUTIONAL AUTHORITY - See docs/MOTHERLABS_CONSTITUTION.md
+// Enforces: AXIOM 4 (Mechanical Verification), AXIOM 10 (Sandbox by Default)
+// TCB Component: This file is part of the Trusted Computing Base
 // Implements: sandbox creation, snapshot/diff, evidence production, acceptance predicate
 
 import { spawn } from 'node:child_process'

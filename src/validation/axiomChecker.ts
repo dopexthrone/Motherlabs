@@ -1,4 +1,7 @@
 // Axiom Checker - Automated violation tests for Motherlabs axioms
+// CONSTITUTIONAL AUTHORITY - See docs/MOTHERLABS_CONSTITUTION.md
+// Enforces: All 12 Axioms via pattern detection
+// TCB Component: This file is part of the Trusted Computing Base
 // See AXIOMS.md for full specification
 
 import { Result, Ok, Err } from '../core/result'

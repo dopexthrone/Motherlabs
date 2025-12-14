@@ -1,0 +1,63 @@
+{
+  "version": "kernel-v0.7.0",
+  "timestamp": "2025-12-14T02:30:00Z",
+  "git_commit": "90b0f16ca9e6604327fed182f6926849615a3d37",
+  "git_branch": "master",
+  "environment": {
+    "node_version": "v24.11.1",
+    "os": "Linux",
+    "os_version": "6.14.0-36-generic",
+    "architecture": "x86_64"
+  },
+  "verification_results": {
+    "npm_run_build": "PASS",
+    "scripts_test_all_js": "PASS (18/18 tests)",
+    "secret_scan": "PASS (no actual secrets found)"
+  },
+  "tcb_file_hashes": {
+    "docs/ARTIFACT_MODEL.md": "559cef80e96d198448dac2b8b2d49b498cf52b7454bd0de986398cc330ff71cf",
+    "docs/KERNEL_FREEZE_PROTOCOL.md": "7aff47468d75a334c52bfd47ba8c51c57a7e3f0d7edfd4e8d938557caff43121",
+    "docs/MOTHERLABS_CONSTITUTION.md": "debe9b4ed9459f3fecbea8e007b8bf26fa02fba403c869ee262254f8928dcf4e",
+    "docs/MOTHER_PC_POSITIONING.md": "d0b5fbef0d3b55151746c9cfc096781b6e040edf1f11ee64dc920ef11e20ae54",
+    "docs/NAMING_AND_SCOPE.md": "cfc5965c4b448c4664144c70883c9dfca8e120bc51d58172f17bb0098aa504fc",
+    "docs/SELF_SCALING_RULESET.md": "f94a1e114070ae9372adc4a3e0392a487af277493a1d21106314bda00ecaaed3",
+    "src/core/contentAddress.ts": "d6b98a12da7311e996974858f05f11864f8279342cf6ae193fc6a058df58ad5b",
+    "src/core/gateDecision.ts": "8657dadae9e82e857dc295fccbcc8b454fb13844df5405b0f48b232a579579f9",
+    "src/core/ids.ts": "bc82054aab4a6e7c063478653f6dc62732608cc906ed56873cb96464be2224bf",
+    "src/core/loop.ts": "f80d3181c55d9bb76cd0b85247611ec46fc11cc10b0d2e157216ad8b9971f168",
+    "src/core/result.ts": "593dd9e8e0b9024cd9922bcf4d837ec589c64551b5235ade5dcd3bd74d6cf713",
+    "src/core/sanitize.ts": "003b4517fad34afaa5aaef3e7e666f52b2c7897a69f50b0f8b1a3a611991c123",
+    "src/persistence/fileLedger.ts": "4d2a04e63a0e032830e73910f191b096a6ed00c563a0492711579eb6955141ee",
+    "src/persistence/jsonlLedger.ts": "19ec33bc46f799271ca21c9d60c2c778526a7cdd785b522b8de73b1de4404d1b",
+    "src/sandbox/executor.ts": "018ee44668bfbbabaf7eedc44be0df53c657a77b88fc70d0d577fc4edda00b0c",
+    "src/sandbox/index.ts": "123aa3046cbc578980a01810fcc00cd6748b4ada1cae3266d61100b4f832d225",
+    "src/sandbox/runner.ts": "e253785a3f37d4cecef96cff7b2358d0550051d92ec857665c6114c43e7842a0",
+    "src/sandbox/types.ts": "e901fe530f922ba2103bdaa578aec89d3fc8ac5d0964b236d2ff5533a7359026",
+    "src/selfbuild/applier.ts": "16125297a292fbfaa43e65f297eefb2e40a9e45906f4e26830f2d27f55abf6a7",
+    "src/selfbuild/proposer.ts": "41535245a989f76ffe53391361762f5cab7fea02ce7c47cc7d0e68d1fece8eda",
+    "src/validation/axiomChecker.ts": "6665766e62f517c3f8f643c4eb913f4b33117262f12157fd49456513d0b75133",
+    "src/validation/index.ts": "4796eb7da361986203f8d6ef06bfc5a173a5202f0c094b0bcbf32f26e85aa0ea",
+    "src/validation/securityScanner.ts": "354e848353192a16cc31f12ee5dd5272c30c1bce7ccca61758ba6b5ac83df52f",
+    "src/validation/sixGates.ts": "9242e3f7dff0299d51960dfd924b8a902588757d5f83ee9c619ad2b31ef59be1"
+  },
+  "schema_hashes": {
+    "total_schemas": 60,
+    "sample_hashes": {
+      "schemas/action.schema.json": "905a4612fe30a18847ef59eb22ac0594d7b6b82316617f9041694ca466dbfaa0",
+      "schemas/gatedecision.schema.json": "29e5506e075f0c87e913cf3b21ee9f2e835dd2a1fab729cd201fb21a7ee27dfb",
+      "schemas/result.schema.json": "c4bd923e5133b7b7e6b1972d33d1b70bcbda12581336230d5bf9d1c329d47593"
+    }
+  },
+  "constitutional_status": {
+    "axioms_enforced": 12,
+    "gates_operational": 6,
+    "hollow_code_detection": "enabled",
+    "axiom_5_refusal": "enforced"
+  },
+  "notes": [
+    "Constitutional documentation created and tied to implementation",
+    "Hollow code detection added to Gate 6",
+    "Proposer now refuses per AXIOM 5 instead of generating placeholders",
+    "All TCB files have constitutional reference headers"
+  ]
+}

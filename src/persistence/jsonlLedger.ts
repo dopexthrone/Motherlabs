@@ -1,4 +1,7 @@
 // JSONL Ledger - Single file, append-only, hash-chained
+// CONSTITUTIONAL AUTHORITY - See docs/MOTHERLABS_CONSTITUTION.md
+// Enforces: AXIOM 8 (Immutable Evidence)
+// TCB Component: This file is part of the Trusted Computing Base
 
 import * as fs from 'fs'
 import * as crypto from 'crypto'

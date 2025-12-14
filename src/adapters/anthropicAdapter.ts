@@ -1,4 +1,7 @@
 // Anthropic Adapter - Controlled AI inference via Claude models
+// NON-AUTHORITATIVE - See docs/NAMING_AND_SCOPE.md
+// Per AXIOM 2: LLMs propose only, never decide or execute
+// This adapter generates candidates; authority resides in gates
 
 import Anthropic from '@anthropic-ai/sdk'
 import { sanitizeInput, validateSanitized } from '../core/sanitize'

@@ -1,4 +1,7 @@
 // 6-Gate Validator - Prevents LLM escapes, enforces correctness
+// CONSTITUTIONAL AUTHORITY - See docs/MOTHERLABS_CONSTITUTION.md
+// Enforces: AXIOM 1 (Deterministic Authority), AXIOM 4 (Mechanical Verification)
+// TCB Component: This file is part of the Trusted Computing Base
 
 import { Project, SyntaxKind } from 'ts-morph'
 import { Result, Ok, Err } from '../core/result'
@@ -66,7 +69,7 @@ export class SixGateValidator {
     gateResults.push(g3)
 
     // ═══════════════════════════════════════════════════════════
-    // GATE 4: Test Execution (placeholder for now)
+    // GATE 4: Test Execution (kernel-grade sandbox)
     // ═══════════════════════════════════════════════════════════
     const g4 = await this.gate4_testExecution(code)
     gateResults.push(g4)

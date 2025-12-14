@@ -1,5 +1,8 @@
 "use strict";
 // Ollama Local LLM Adapter - For battle-testing without API costs
+// NON-AUTHORITATIVE - See docs/NAMING_AND_SCOPE.md
+// Per AXIOM 2: LLMs propose only, never decide or execute
+// This adapter generates candidates; authority resides in gates
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OllamaAdapter = void 0;
 const child_process_1 = require("child_process");

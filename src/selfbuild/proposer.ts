@@ -1,5 +1,8 @@
 // Self-Improvement Proposer - Motherlabs proposes improvements to itself
-// Uses ConstrainedLLM for real code generation, with deterministic fallback
+// CONSTITUTIONAL GOVERNANCE - See docs/SELF_SCALING_RULESET.md
+// Enforces: AXIOM 2 (Probabilistic Non-Authority), AXIOM 5 (Refusal First-Class)
+// TCB Component: Self-modification subject to same gates as external artifacts
+// Uses ConstrainedLLM for real code generation (AXIOM 5: Refuses if LLM unavailable)
 
 import * as fs from 'fs'
 import { analyzeFile } from '../analysis/codeAnalyzer'
@@ -76,50 +79,40 @@ export class SelfImprovementProposer {
         existingTypes: this.extractTypes(existingCode)
       }
 
-      // 5. Generate fix - TRY LLM FIRST, then fall back to deterministic
-      let proposal: { type: 'add_function' | 'modify_function' | 'add_test' | 'refactor'; code: string }
-      let source: 'llm' | 'deterministic' = 'deterministic'
-      let gateValidation: ImprovementProposal['gateValidation'] | undefined
-
-      if (this.constrainedLLM) {
-        // ATTEMPT LLM CODE GENERATION (through 6 gates)
-        const llmResult = await this.constrainedLLM.generateCode({
-          issue: topIssue,
-          filepath,
-          existingCode,
-          context
-        })
-
-        if (llmResult.ok) {
-          // LLM succeeded and passed all gates
-          proposal = {
-            type: this.issueToChangeType(topIssue.type),
-            code: llmResult.value.code
-          }
-          source = 'llm'
-          gateValidation = llmResult.value.validation
-        } else {
-          // LLM failed - fall back to deterministic
-          console.warn(`[Proposer] LLM failed: ${llmResult.error.message}, using deterministic fallback`)
-          proposal = this.generateDeterministicFix(topIssue, filepath)
-        }
-      } else {
-        // No LLM available - use deterministic
-        proposal = this.generateDeterministicFix(topIssue, filepath)
+      // 5. Generate fix via LLM (AXIOM 5: No hollow placeholders)
+      // We REFUSE if no LLM is available - never generate placeholder code
+      if (!this.constrainedLLM) {
+        return Err(new Error(
+          `AXIOM 5 REFUSAL: No LLM available for code generation. ` +
+          `Refusing to generate hollow placeholder. Configure LLM or fix manually.`
+        ))
       }
 
-      // 6. If deterministic, still validate through gates
-      if (source === 'deterministic') {
-        const validation = await this.validator.validate(proposal.code, context)
+      // ATTEMPT LLM CODE GENERATION (through 6 gates)
+      const llmResult = await this.constrainedLLM.generateCode({
+        issue: topIssue,
+        filepath,
+        existingCode,
+        context
+      })
 
-        if (!validation.ok) {
-          return Err(new Error('Proposal validation failed: ' + validation.error.message))
-        }
-
-        gateValidation = validation.value
+      if (!llmResult.ok) {
+        // AXIOM 5: Refusal Is a First-Class Outcome
+        // LLM failed - REFUSE rather than generate hollow placeholder
+        return Err(new Error(
+          `AXIOM 5 REFUSAL: LLM code generation failed (${llmResult.error.message}). ` +
+          `Refusing to generate hollow placeholder. Fix requires LLM or manual intervention.`
+        ))
       }
 
-      // 7. Build final proposal
+      // LLM succeeded and passed all gates
+      const proposal = {
+        type: this.issueToChangeType(topIssue.type),
+        code: llmResult.value.code
+      }
+      const gateValidation = llmResult.value.validation
+
+      // 6. Build final proposal
       const improvementProposal: ImprovementProposal = {
         id: contentAddress({ issue: topIssue, change: proposal, timestamp: globalTimeProvider.now() }),
         targetFile: filepath,
@@ -128,7 +121,7 @@ export class SelfImprovementProposer {
         rationale: this.generateRationale(topIssue),
         timestamp: globalTimeProvider.now(),
         gateValidation,
-        source
+        source: 'llm'  // Always 'llm' - we refuse rather than generate hollow placeholders
       }
 
       return Ok(improvementProposal)
@@ -188,81 +181,9 @@ export class SelfImprovementProposer {
     return types
   }
 
-  /**
-   * Generate deterministic fix (fallback when LLM unavailable or fails)
-   */
-  private generateDeterministicFix(issue: CodeIssue, filepath: string): {
-    type: 'add_function' | 'modify_function' | 'add_test' | 'refactor'
-    code: string
-  } {
-    // Extract module name from filepath
-    const basename = filepath.split('/').pop()?.replace('.ts', '') || 'module'
-
-    if (issue.type === 'NO_TESTS') {
-      // Generate minimal valid test file
-      const testCode = `// Test for ${filepath}
-// DETERMINISTIC: Placeholder - LLM generation failed or unavailable
-
-export function test${capitalize(basename)}Basic(): boolean {
-  // Basic test placeholder
-  return true
-}
-
-export function test${capitalize(basename)}Error(): boolean {
-  // Error case placeholder
-  return true
-}
-`
-      return { type: 'add_test', code: testCode }
-    }
-
-    if (issue.type === 'HIGH_COMPLEXITY') {
-      return {
-        type: 'refactor',
-        code: `// DETERMINISTIC: Refactoring needed for ${filepath}
-// Issue: ${issue.message}
-// Action: Break into smaller functions manually
-
-export function placeholder(): void {
-  // Placeholder for refactored code
-}
-`
-      }
-    }
-
-    if (issue.type === 'NO_ERROR_HANDLING') {
-      return {
-        type: 'modify_function',
-        code: `// DETERMINISTIC: Error handling needed
-// Issue: ${issue.message}
-// Action: Wrap in try/catch or use Result<T,E>
-
-import { Result, Ok, Err } from '../core/result'
-
-export function withErrorHandling<T>(fn: () => T): Result<T, Error> {
-  try {
-    return Ok(fn())
-  } catch (error) {
-    return Err(error instanceof Error ? error : new Error(String(error)))
-  }
-}
-`
-      }
-    }
-
-    // Default fallback
-    return {
-      type: 'modify_function',
-      code: `// DETERMINISTIC: Fix needed
-// Issue: ${issue.message}
-// File: ${filepath}
-
-export function placeholder(): void {
-  // Manual fix required
-}
-`
-    }
-  }
+  // NOTE: generateDeterministicFix was REMOVED per AXIOM 5
+  // The system now REFUSES rather than generating hollow placeholders.
+  // See commit for rationale.
 
   /**
    * Generate rationale for improvement
@@ -278,11 +199,4 @@ export function placeholder(): void {
 
     return reasons[issue.type] || 'Improves code quality'
   }
-}
-
-/**
- * Capitalize first letter
- */
-function capitalize(s: string): string {
-  return s.charAt(0).toUpperCase() + s.slice(1)
 }

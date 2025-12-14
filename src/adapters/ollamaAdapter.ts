@@ -1,4 +1,7 @@
 // Ollama Local LLM Adapter - For battle-testing without API costs
+// NON-AUTHORITATIVE - See docs/NAMING_AND_SCOPE.md
+// Per AXIOM 2: LLMs propose only, never decide or execute
+// This adapter generates candidates; authority resides in gates
 
 import { exec } from 'child_process'
 import { promisify } from 'util'
