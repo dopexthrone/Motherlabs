@@ -135,28 +135,198 @@ class SixGateValidator {
     /**
      * Gate 3: Variable Resolution
      * All used variables must be defined or imported
+     *
+     * This gate uses semantic analysis to find truly undefined references,
+     * properly handling: function parameters, property accesses, type annotations,
+     * import bindings, destructuring patterns, and type parameters.
      */
     gate3_variableResolution(code, context) {
         try {
             const project = new ts_morph_1.Project({ useInMemoryFileSystem: true });
             const sourceFile = project.createSourceFile('temp.ts', code);
+            // Collect all defined names in this file
+            const definedNames = new Set();
+            // 1. Function declarations
+            for (const fn of sourceFile.getFunctions()) {
+                const name = fn.getName();
+                if (name)
+                    definedNames.add(name);
+                // Add parameters (handle destructuring patterns)
+                for (const param of fn.getParameters()) {
+                    const nameNode = param.getNameNode();
+                    this.collectBindingNames(nameNode, definedNames);
+                }
+                // Add type parameters
+                for (const tp of fn.getTypeParameters()) {
+                    definedNames.add(tp.getName());
+                }
+            }
+            // 2. Variable declarations (const, let, var)
+            for (const stmt of sourceFile.getVariableStatements()) {
+                for (const decl of stmt.getDeclarations()) {
+                    // Handle destructuring: const { a, b } = obj
+                    const nameNode = decl.getNameNode();
+                    this.collectBindingNames(nameNode, definedNames);
+                }
+            }
+            // 3. Class declarations
+            for (const cls of sourceFile.getClasses()) {
+                const name = cls.getName();
+                if (name)
+                    definedNames.add(name);
+                // Add type parameters
+                for (const tp of cls.getTypeParameters()) {
+                    definedNames.add(tp.getName());
+                }
+                // Add method parameters (with destructuring support)
+                for (const method of cls.getMethods()) {
+                    for (const param of method.getParameters()) {
+                        const nameNode = param.getNameNode();
+                        this.collectBindingNames(nameNode, definedNames);
+                    }
+                }
+                // Add constructor parameters (with destructuring support)
+                const ctor = cls.getConstructors()[0];
+                if (ctor) {
+                    for (const param of ctor.getParameters()) {
+                        const nameNode = param.getNameNode();
+                        this.collectBindingNames(nameNode, definedNames);
+                    }
+                }
+            }
+            // 4. Type aliases
+            for (const typeAlias of sourceFile.getTypeAliases()) {
+                definedNames.add(typeAlias.getName());
+                for (const tp of typeAlias.getTypeParameters()) {
+                    definedNames.add(tp.getName());
+                }
+            }
+            // 5. Interface declarations
+            for (const iface of sourceFile.getInterfaces()) {
+                definedNames.add(iface.getName());
+                for (const tp of iface.getTypeParameters()) {
+                    definedNames.add(tp.getName());
+                }
+            }
+            // 6. Enum declarations
+            for (const enumDecl of sourceFile.getEnums()) {
+                definedNames.add(enumDecl.getName());
+            }
+            // 7. Import bindings
+            for (const imp of sourceFile.getImportDeclarations()) {
+                const defaultImport = imp.getDefaultImport();
+                if (defaultImport)
+                    definedNames.add(defaultImport.getText());
+                const namespaceImport = imp.getNamespaceImport();
+                if (namespaceImport)
+                    definedNames.add(namespaceImport.getText());
+                for (const named of imp.getNamedImports()) {
+                    definedNames.add(named.getName());
+                }
+            }
+            // 8. Arrow functions and function expressions (collect parameters with destructuring)
+            for (const arrow of sourceFile.getDescendantsOfKind(ts_morph_1.SyntaxKind.ArrowFunction)) {
+                for (const param of arrow.getParameters()) {
+                    const nameNode = param.getNameNode();
+                    this.collectBindingNames(nameNode, definedNames);
+                }
+                for (const tp of arrow.getTypeParameters()) {
+                    definedNames.add(tp.getName());
+                }
+            }
+            for (const funcExpr of sourceFile.getDescendantsOfKind(ts_morph_1.SyntaxKind.FunctionExpression)) {
+                for (const param of funcExpr.getParameters()) {
+                    const nameNode = param.getNameNode();
+                    this.collectBindingNames(nameNode, definedNames);
+                }
+            }
+            // 9. Catch clause bindings: catch (e) { ... }
+            for (const catchClause of sourceFile.getDescendantsOfKind(ts_morph_1.SyntaxKind.CatchClause)) {
+                const varDecl = catchClause.getVariableDeclaration();
+                if (varDecl) {
+                    definedNames.add(varDecl.getName());
+                }
+            }
+            // 10. For-of/for-in loop variable bindings
+            for (const forOf of sourceFile.getDescendantsOfKind(ts_morph_1.SyntaxKind.ForOfStatement)) {
+                const init = forOf.getInitializer();
+                if (init) {
+                    this.collectBindingNamesFromNode(init, definedNames);
+                }
+            }
+            for (const forIn of sourceFile.getDescendantsOfKind(ts_morph_1.SyntaxKind.ForInStatement)) {
+                const init = forIn.getInitializer();
+                if (init) {
+                    this.collectBindingNamesFromNode(init, definedNames);
+                }
+            }
+            // Now find identifiers that are truly undefined
             const identifiers = sourceFile.getDescendantsOfKind(ts_morph_1.SyntaxKind.Identifier);
             const undefinedRefs = [];
             for (const id of identifiers) {
                 const name = id.getText();
-                // Skip known types and imports
+                // Skip if already known
+                if (definedNames.has(name))
+                    continue;
                 if (context.existingTypes.includes(name))
                     continue;
                 if (context.existingImports.includes(name))
                     continue;
-                // Check if defined in this file
-                const definitions = sourceFile.getDescendantsOfKind(ts_morph_1.SyntaxKind.FunctionDeclaration)
-                    .concat(sourceFile.getDescendantsOfKind(ts_morph_1.SyntaxKind.VariableDeclaration))
-                    .concat(sourceFile.getDescendantsOfKind(ts_morph_1.SyntaxKind.ClassDeclaration));
-                const defined = definitions.some(d => d.getName?.() === name);
-                if (!defined && !this.isBuiltin(name)) {
-                    undefinedRefs.push(name);
+                if (this.isBuiltin(name))
+                    continue;
+                // Skip property accesses: obj.prop - skip 'prop'
+                const parent = id.getParent();
+                if (parent && parent.getKind() === ts_morph_1.SyntaxKind.PropertyAccessExpression) {
+                    // PropertyAccessExpression has: expression.name
+                    // Skip if this identifier is the name (right side of the dot)
+                    const propAccess = parent;
+                    const nameNode = propAccess.getNameNode?.();
+                    if (nameNode === id)
+                        continue;
                 }
+                // Skip type references - identifiers used as type names
+                if (parent && parent.getKind() === ts_morph_1.SyntaxKind.TypeReference)
+                    continue;
+                // Skip qualified names (namespace.Type)
+                if (parent && parent.getKind() === ts_morph_1.SyntaxKind.QualifiedName)
+                    continue;
+                // Skip property signatures in type literals: { name: string }
+                if (parent && parent.getKind() === ts_morph_1.SyntaxKind.PropertySignature)
+                    continue;
+                // Skip index signatures in type literals
+                if (parent && parent.getKind() === ts_morph_1.SyntaxKind.IndexSignature)
+                    continue;
+                // Skip type literal members in general
+                if (parent && parent.getKind() === ts_morph_1.SyntaxKind.TypeLiteral)
+                    continue;
+                // Skip property assignments in object literals: { foo: value }
+                if (parent && parent.getKind() === ts_morph_1.SyntaxKind.PropertyAssignment) {
+                    const propAssign = parent;
+                    if (propAssign.getChildAtIndex(0) === id)
+                        continue; // Skip the key
+                }
+                // Skip shorthand property assignments: { foo } (where foo is both key and value)
+                if (parent && parent.getKind() === ts_morph_1.SyntaxKind.ShorthandPropertyAssignment) {
+                    // The name IS the reference, so don't skip - it should be defined
+                }
+                // Skip method/property names in class/object
+                if (parent && (parent.getKind() === ts_morph_1.SyntaxKind.MethodDeclaration ||
+                    parent.getKind() === ts_morph_1.SyntaxKind.PropertyDeclaration ||
+                    parent.getKind() === ts_morph_1.SyntaxKind.GetAccessor ||
+                    parent.getKind() === ts_morph_1.SyntaxKind.SetAccessor)) {
+                    // Skip if this is the name of the member
+                    const memberName = parent.getName?.();
+                    if (memberName === name)
+                        continue;
+                }
+                // Skip labeled statements
+                if (parent && parent.getKind() === ts_morph_1.SyntaxKind.LabeledStatement)
+                    continue;
+                // Skip break/continue labels
+                if (parent && (parent.getKind() === ts_morph_1.SyntaxKind.BreakStatement ||
+                    parent.getKind() === ts_morph_1.SyntaxKind.ContinueStatement))
+                    continue;
+                undefinedRefs.push(name);
             }
             const uniqueUndefined = [...new Set(undefinedRefs)];
             if (uniqueUndefined.length > 0) {
@@ -181,6 +351,43 @@ class SixGateValidator {
                 required: true,
                 error: error instanceof Error ? error.message : String(error)
             };
+        }
+    }
+    /**
+     * Collect binding names from a binding pattern (handles destructuring)
+     */
+    collectBindingNames(nameNode, definedNames) {
+        const kind = nameNode.getKind();
+        if (kind === ts_morph_1.SyntaxKind.Identifier) {
+            definedNames.add(nameNode.getText());
+        }
+        else if (kind === ts_morph_1.SyntaxKind.ObjectBindingPattern) {
+            for (const element of nameNode.getElements()) {
+                const elementName = element.getNameNode();
+                this.collectBindingNames(elementName, definedNames);
+            }
+        }
+        else if (kind === ts_morph_1.SyntaxKind.ArrayBindingPattern) {
+            for (const element of nameNode.getElements()) {
+                if (element.getKind() === ts_morph_1.SyntaxKind.BindingElement) {
+                    const elementName = element.getNameNode();
+                    this.collectBindingNames(elementName, definedNames);
+                }
+            }
+        }
+    }
+    /**
+     * Collect binding names from a node (for for-of/for-in initializers)
+     */
+    collectBindingNamesFromNode(node, definedNames) {
+        const kind = node.getKind();
+        if (kind === ts_morph_1.SyntaxKind.VariableDeclarationList) {
+            for (const decl of node.getDeclarations()) {
+                this.collectBindingNames(decl.getNameNode(), definedNames);
+            }
+        }
+        else if (kind === ts_morph_1.SyntaxKind.Identifier) {
+            definedNames.add(node.getText());
         }
     }
     /**
