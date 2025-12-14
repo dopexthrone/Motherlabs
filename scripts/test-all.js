@@ -13,6 +13,7 @@ const { determineGateRequirements, checkGatesSatisfied, formatGateElevation } = 
 const { detectHollowPatterns, passesHollowDetection, formatHollowResult } = require('../dist/validation/hollowDetector');
 const { EvidenceQuery, formatEvidenceEntry } = require('../dist/persistence/evidenceQuery');
 const { JSONLLedger } = require('../dist/persistence/jsonlLedger');
+const { simulateAlternative, compareDecisions, formatSimulationResult } = require('../dist/analysis/decisionDiff');
 const { randomBytes } = require('crypto');
 const fs = require('fs');
 const path = require('path');
@@ -621,6 +622,63 @@ export function stub() {
 
   // Cleanup
   fs.rmSync(evidenceTempDir, { recursive: true, force: true });
+
+  // ═══════════════════════════════════════════════════════════
+  console.log('');
+  console.log('=== DECISION DIFF TESTS ===');
+  console.log('');
+
+  // Create mock entry for testing
+  const mockEntry = {
+    id: 'test-diff-001',
+    timestamp: Date.now(),
+    type: 'PROPOSAL',
+    hash: 'abc123',
+    data: {
+      proposalId: 'prop-001',
+      targetFile: 'src/example/file.ts',
+      decisionType: 'irreversible',
+      issueType: 'NO_ERROR_HANDLING',
+      severity: 'high',
+      enables: ['Better error handling', 'Safer code'],
+      forbids: ['Old API compatibility'],
+      assumptions: ['Error handling needed']
+    }
+  };
+
+  const simResult = simulateAlternative(mockEntry, 'Defer the decision');
+  check('Diff: simulateAlternative works', simResult.ok);
+
+  if (simResult.ok) {
+    check('Diff: has consequence diff', simResult.value.diff !== undefined);
+    check('Diff: has impact assessment', simResult.value.impact !== undefined);
+    check('Diff: has divergence point', simResult.value.divergencePoint !== undefined);
+  }
+
+  // Compare two entries
+  const mockEntry2 = {
+    ...mockEntry,
+    id: 'test-diff-002',
+    data: {
+      ...mockEntry.data,
+      enables: ['Different feature', 'Another benefit'],
+      forbids: ['Something else']
+    }
+  };
+
+  const compareResult = compareDecisions(mockEntry, mockEntry2);
+  check('Diff: compareDecisions works', compareResult.ok);
+  if (compareResult.ok) {
+    check('Diff: has unique enables', Array.isArray(compareResult.value.uniqueEnables));
+    check('Diff: has alternative enables', Array.isArray(compareResult.value.alternativeEnables));
+  }
+
+  // Format output
+  if (simResult.ok) {
+    const formatted = formatSimulationResult(simResult.value);
+    check('Diff: format includes sections',
+          formatted.includes('DECISION SIMULATION') && formatted.includes('IMPACT ASSESSMENT'));
+  }
 
   // ═══════════════════════════════════════════════════════════
   console.log('');
