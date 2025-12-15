@@ -2,6 +2,10 @@
 // CONSTITUTIONAL AUTHORITY - See docs/MOTHERLABS_CONSTITUTION.md
 // Enforces: AXIOM 8 (Immutable Evidence)
 // TCB Component: This file is part of the Trusted Computing Base
+//
+// SCHEMA ENFORCEMENT:
+// AXIOM: No record admitted without registered schema
+// AXIOM: Unknown schema = DENY (fail-closed)
 
 import * as fs from 'fs'
 import * as crypto from 'crypto'
@@ -9,6 +13,7 @@ import { Result, Ok, Err } from '../core/result'
 import { contentAddress, canonicalJSON } from '../core/contentAddress'
 import type { EvidenceArtifact, EvidenceKind } from './evidenceArtifact'
 import type { GateDecision } from '../core/gateDecision'
+import { validateSchemaForAdmission } from '../schema/registry'
 
 export type JSONLRecord = {
   record_type: string
@@ -28,6 +33,17 @@ export type GovernanceRecordType =
   | 'CHANGE_APPLIED'
   | 'CHANGE_ROLLED_BACK'
   | 'LEDGER_FREEZE'
+  | 'TCB_PROTECTION_EVENT'
+
+/** TCB Protection Event - recorded when autonomous modification of TCB is blocked */
+export type TCBProtectionEvent = {
+  targetFile: string
+  attemptedBy: 'autonomous_loop' | 'applier' | 'proposer' | 'unknown'
+  action: 'BLOCKED'
+  reason: string
+  proposalId?: string
+  timestamp: number
+}
 
 export class JSONLLedger {
   private filepath: string
@@ -51,24 +67,25 @@ export class JSONLLedger {
    * Create genesis record (first entry)
    */
   private createGenesis(): void {
+    // TIMESTAMP SEGREGATION: timestamp is metadata, NOT part of content hash
+    // This ensures replay determinism - same seq/prev_hash/record = same hash
     const genesis: JSONLRecord = {
       record_type: 'GENESIS',
       seq: 0,
-      timestamp: Date.now(),  // DETERMINISM-EXEMPT: Genesis timestamp
+      timestamp: Date.now(),  // Metadata: stored but not hashed
       prev_hash: 'genesis',
       record: {
         kernel_version: '1.0.0',
-        purpose: 'Foundation bootstrap',
-        timestamp: new Date().toISOString()  // DETERMINISM-EXEMPT: Genesis metadata
+        purpose: 'Foundation bootstrap'
+        // Removed timestamp from record - it's in the envelope already
       },
       record_hash: ''  // Computed below
     }
 
-    // Compute hash WITHOUT record_hash field (same as append)
+    // Compute hash WITHOUT timestamp or record_hash (deterministic content only)
     const genesisForHash = {
       record_type: genesis.record_type,
       seq: genesis.seq,
-      timestamp: genesis.timestamp,
       prev_hash: genesis.prev_hash,
       record: genesis.record
     }
@@ -103,28 +120,44 @@ export class JSONLLedger {
 
   /**
    * Append record to JSONL ledger (atomic)
+   *
+   * SCHEMA ENFORCEMENT: Record type must be registered in Schema Registry
+   * FAIL-CLOSED: Unknown schema = DENY, no ledger write
    */
   async append(
     record_type: string,
     record: unknown
   ): Promise<Result<JSONLRecord, Error>> {
+    // ═══════════════════════════════════════════════════════════════════════
+    // SCHEMA VALIDATION - DENY-BY-DEFAULT
+    // AXIOM: No record admitted without registered schema
+    // This check runs BEFORE any ledger modification
+    // ═══════════════════════════════════════════════════════════════════════
+    const schemaValidation = validateSchemaForAdmission(record_type, record)
+    if (!schemaValidation.ok) {
+      return Err(new Error(
+        `LEDGER ADMISSION DENIED: ${schemaValidation.error.message}`
+      ))
+    }
+
     try {
       this.seq++
 
+      // TIMESTAMP SEGREGATION: timestamp is metadata, NOT part of content hash
+      // This ensures replay determinism - same seq/prev_hash/record = same hash
       const entry: JSONLRecord = {
         record_type,
         seq: this.seq,
-        timestamp: Date.now(),  // DETERMINISM-EXEMPT: Record timestamp
+        timestamp: Date.now(),  // Metadata: stored but not hashed
         prev_hash: this.lastHash,
         record,
         record_hash: ''  // Computed below
       }
 
-      // Compute hash of entry WITHOUT record_hash field
+      // Compute hash WITHOUT timestamp or record_hash (deterministic content only)
       const entryForHash = {
         record_type: entry.record_type,
         seq: entry.seq,
-        timestamp: entry.timestamp,
         prev_hash: entry.prev_hash,
         record: entry.record
       }
@@ -204,12 +237,10 @@ export class JSONLLedger {
         return Err(new Error(`Hash chain break at seq ${record.seq}: expected prev=${expectedPrev}, got=${record.prev_hash}`))
       }
 
-      // Verify record_hash by recomputing
-      // Need to compute hash of record WITHOUT record_hash field
+      // Verify record_hash by recomputing (WITHOUT timestamp - timestamp is metadata)
       const recordForHash = {
         record_type: record.record_type,
         seq: record.seq,
-        timestamp: record.timestamp,
         prev_hash: record.prev_hash,
         record: record.record
       }
@@ -241,6 +272,14 @@ export class JSONLLedger {
    */
   async appendGateDecision(decision: GateDecision): Promise<Result<JSONLRecord, Error>> {
     return this.append('GATE_DECISION', decision)
+  }
+
+  /**
+   * Append TCB protection event to ledger
+   * Records every time autonomous TCB modification is blocked
+   */
+  async appendTCBProtectionEvent(event: TCBProtectionEvent): Promise<Result<JSONLRecord, Error>> {
+    return this.append('TCB_PROTECTION_EVENT', event)
   }
 
   /**

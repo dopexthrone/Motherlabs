@@ -11,15 +11,19 @@ import { ConstrainedLLM } from '../llm/constrained'
 import { OpenAIAdapter, OpenAIModel } from '../adapters/openaiAdapter'
 import { AnthropicAdapter, AnthropicModel } from '../adapters/anthropicAdapter'
 import { OllamaAdapter, OllamaConfig, detectBestCodeModel } from '../adapters/ollamaAdapter'
-import { JSONLLedger } from '../persistence/jsonlLedger'
+import { JSONLLedger, TCBProtectionEvent } from '../persistence/jsonlLedger'
 import { globalTimeProvider } from '../core/ids'
 import { contentAddress } from '../core/contentAddress'
 import { createGateDecision, createGateDecisionScope } from '../core/gateDecision'
 import { EFFECT_SETS } from '../core/effects'
-import { createProposalOutcome, TerminalStatus } from '../verification/outcomeConformance'
-import { createEvidenceArtifact, createGateResultArtifact, createLLMResponseArtifact } from '../persistence/evidenceArtifact'
+import { createProposalOutcome, TerminalStatus, validateOutcomeConformance, formatConformanceResult } from '../verification/outcomeConformance'
+import { createEvidenceArtifact, createGateResultArtifact, createLLMResponseArtifact, createExitCodeArtifact, createFileManifestArtifact, createCodeDiffArtifact, EvidenceArtifact } from '../persistence/evidenceArtifact'
 import { getProviderManifest } from '../adapters/manifest'
 import type { LLMProviderType } from '../llm/types'
+import { isTCBPath } from '../core/decisionClassifier'
+import { verifyTCBIntegrity, printTCBIntegrityReport } from '../core/tcbIntegrity'
+import { SafetyGuard, SafetyGuardConfig, DEFAULT_DOGFOOD_SAFETY_CONFIG } from '../safety'
+import { AuthorizationRouter, initializeAuthorizationRouter, type AuthorizationToken } from '../authorization/router'
 
 export type DogfoodingConfig = {
   cycleInterval: number  // ms between improvement attempts
@@ -32,6 +36,8 @@ export type DogfoodingConfig = {
   openaiModel?: OpenAIModel   // Optional - defaults to gpt-4o
   ollamaEnabled?: boolean     // Optional - enables local Ollama LLM
   ollamaConfig?: Partial<OllamaConfig>  // Optional - Ollama configuration
+  /** Safety guard configuration (rate limiting + circuit breaker) */
+  safetyConfig?: SafetyGuardConfig
 }
 
 export class DogfoodingLoop {
@@ -43,11 +49,18 @@ export class DogfoodingLoop {
   private hasLLM: boolean = false
   private llmProvider: LLMProviderType | null = null
   private llmModel: string | null = null
+  private safetyGuard: SafetyGuard
+  private authRouter: AuthorizationRouter
 
   constructor(config: DogfoodingConfig) {
     this.config = config
     this.ledger = new JSONLLedger(config.ledgerPath)
     this.applier = new AutoApplier()
+    this.safetyGuard = new SafetyGuard(config.safetyConfig || DEFAULT_DOGFOOD_SAFETY_CONFIG)
+
+    // Initialize Authorization Router - required for deny-by-default enforcement
+    this.authRouter = new AuthorizationRouter(this.ledger)
+    initializeAuthorizationRouter(this.ledger)
 
     // Initialize with ConstrainedLLM - prefer OpenAI if multiple provided
     if (config.openaiApiKey) {
@@ -88,6 +101,24 @@ export class DogfoodingLoop {
   async start(): Promise<void> {
     this.running = true
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // TCB INTEGRITY CHECK - Verify verifier hasn't been tampered with
+    // This runs BEFORE any self-improvement cycles begin
+    // ═══════════════════════════════════════════════════════════════════════
+    const integrityResult = verifyTCBIntegrity()
+    printTCBIntegrityReport(integrityResult)
+
+    if (!integrityResult.valid) {
+      console.error('⛔ TCB INTEGRITY CHECK FAILED - REFUSING TO START')
+      console.error('   The Trusted Computing Base may have been tampered with.')
+      console.error('   Review mismatches above and regenerate tcb-hashes.json if changes are legitimate.')
+      await this.ledger.append('tcb_integrity_failed', {
+        result: integrityResult,
+        timestamp: globalTimeProvider.now()
+      })
+      throw new Error('TCB integrity check failed - refusing to start self-improvement loop')
+    }
+
     console.log('═══════════════════════════════════════')
     console.log('  MOTHERLABS DOGFOODING LOOP')
     console.log('  Step 10: Self-Improvement Validation')
@@ -100,6 +131,11 @@ export class DogfoodingLoop {
       console.log(`  LLM provider: ${this.llmProvider}`)
       console.log(`  Model: ${this.llmModel}`)
     }
+    console.log('')
+    const safetyStats = this.safetyGuard.getStats()
+    console.log('  Safety Guard:')
+    console.log(`    Circuit breaker: ${safetyStats.circuitBreaker.state}`)
+    console.log(`    Rate limit: ${safetyStats.rateLimiter.operationsInWindow} ops in window`)
     console.log('')
 
     // Log startup
@@ -154,8 +190,28 @@ export class DogfoodingLoop {
    */
   private async runCycleInternal(): Promise<{ success: boolean; proposal?: ImprovementProposal; error?: string }> {
     try {
+      // ═══════════════════════════════════════════════════════════════════════
+      // SAFETY GUARD CHECK - Rate limiting & circuit breaker
+      // Prevents runaway loops and cascading failures
+      // ═══════════════════════════════════════════════════════════════════════
+      const safetyCheck = this.safetyGuard.canExecute()
+      if (!safetyCheck.allowed) {
+        const error = `SAFETY GUARD: Cycle blocked - ${safetyCheck.reason}`
+        console.log('')
+        console.log(`⚠ ${error}`)
+        const stats = this.safetyGuard.getStats()
+        console.log(`  Circuit: ${stats.circuitBreaker.state} (${stats.circuitBreaker.failureCount} failures)`)
+        console.log(`  Rate: ${stats.rateLimiter.operationsInWindow} ops in window`)
+        await this.logEvent('cycle_blocked_by_safety', { reason: safetyCheck.reason, stats })
+        // Don't record as failure - this is safety preventing execution
+        return { success: false, error }
+      }
+
+      // Cycle is allowed - record this in rate limiter stats display
+      const stats = this.safetyGuard.getStats()
       console.log('')
       console.log('═══ Improvement Cycle ═══')
+      console.log(`  (Rate: ${stats.rateLimiter.operationsInWindow + 1}/${DEFAULT_DOGFOOD_SAFETY_CONFIG.rateLimiter.maxOperations} in window)`)
       console.log('')
 
       // 1. ANALYZE SELF (deterministic)
@@ -214,7 +270,40 @@ export class DogfoodingLoop {
       const totalGates = proposal.value.gateValidation.gateResults.length
       console.log(`  ✓ Passed ${passedGates}/${totalGates} gates`)
 
-      // 4. HUMAN APPROVAL (if required)
+      // ═══════════════════════════════════════════════════════════════════════
+      // TCB PROTECTION - UNCONDITIONAL, CANNOT BE BYPASSED
+      // AXIOM: The verifier cannot modify itself autonomously
+      // This check runs regardless of requireHumanApproval setting
+      // ═══════════════════════════════════════════════════════════════════════
+      if (isTCBPath(proposal.value.targetFile)) {
+        console.log('')
+        console.log('  ⛔ TCB PROTECTION TRIGGERED')
+        console.log(`     Target: ${proposal.value.targetFile}`)
+        console.log('     TCB files cannot be modified by autonomous loop.')
+        console.log('     This protection is UNCONDITIONAL.')
+        console.log('')
+
+        // Record TCB protection event in audit trail
+        const tcbEvent: TCBProtectionEvent = {
+          targetFile: proposal.value.targetFile,
+          attemptedBy: 'autonomous_loop',
+          action: 'BLOCKED',
+          reason: 'TCB files cannot be modified by autonomous loop',
+          proposalId: proposal.value.id,
+          timestamp: globalTimeProvider.now()
+        }
+        await this.ledger.appendTCBProtectionEvent(tcbEvent)
+        console.log('     Event recorded in audit trail.')
+
+        await this.logFailure('tcb_protected', `Blocked autonomous modification of TCB: ${proposal.value.targetFile}`)
+        return {
+          success: false,
+          error: `TCB file cannot be modified autonomously: ${proposal.value.targetFile}`,
+          proposal: proposal.value
+        }
+      }
+
+      // 4. HUMAN APPROVAL (if required for non-TCB files)
       if (this.config.requireHumanApproval) {
         console.log('[4/6] Human approval required')
         console.log('  Proposal ready for review:')
@@ -230,7 +319,51 @@ export class DogfoodingLoop {
       // 5. APPLY WITH ROLLBACK
       console.log('[5/6] Applying change...')
 
-      const applyResult = await this.applier.apply(proposal.value)
+      // ═══════════════════════════════════════════════════════════════════════
+      // GATE DECISION: change_application
+      // Record authorization for applying this specific change
+      // This creates the audit trail showing the decision was authorized
+      // ═══════════════════════════════════════════════════════════════════════
+      const changeApplicationDecision = createGateDecision(
+        'change_application',
+        'ALLOW',
+        createGateDecisionScope(
+          'proposal',
+          proposal.value,
+          proposal.value.targetFile,
+          EFFECT_SETS.CODE_APPLICATION
+        ),
+        'dogfood_loop',
+        `Authorized to apply change: ${proposal.value.issue.type} in ${proposal.value.targetFile}`,
+        {
+          proposalId: proposal.value.id,
+          gateValidation: proposal.value.gateValidation,
+          source: proposal.value.source
+        }
+      )
+      await this.ledger.appendGateDecision(changeApplicationDecision)
+      console.log('  Gate decision: change_application ALLOW')
+
+      // ═══════════════════════════════════════════════════════════════════════
+      // AUTHORIZATION TOKEN: Request from router after ALLOW decision recorded
+      // The router verifies ALLOW decision exists in ledger before issuing token
+      // ═══════════════════════════════════════════════════════════════════════
+      const proposalId = contentAddress(proposal.value)
+      const authTokenResult = this.authRouter.requestAuthorization(
+        proposalId,
+        'change_application',
+        EFFECT_SETS.CODE_APPLICATION
+      )
+
+      if (!authTokenResult.ok) {
+        const error = `Authorization failed: ${authTokenResult.error.message}`
+        await this.logFailure('authorization_denied', error)
+        return { success: false, error, proposal: proposal.value }
+      }
+
+      console.log('  Authorization token obtained')
+
+      const applyResult = await this.applier.apply(proposal.value, authTokenResult.value)
 
       if (!applyResult.ok) {
         const error = `Apply failed: ${applyResult.error.message}`
@@ -278,10 +411,15 @@ export class DogfoodingLoop {
   }
 
   private async logSuccess(proposal: ImprovementProposal, result: ApplyResult): Promise<void> {
-    // Create evidence artifacts for governance compliance
-    const evidenceIds: string[] = []
+    // Record success to safety guard (circuit breaker)
+    this.safetyGuard.recordSuccess()
 
-    // Gate result artifact
+    // Create evidence artifacts for governance compliance
+    // REQUIRED for COMPLETED: gate_result, file_manifest, exit_code
+    const evidenceIds: string[] = []
+    const artifacts = new Map<string, EvidenceArtifact>()
+
+    // 1. Gate result artifact (REQUIRED)
     const gateArtifact = createGateResultArtifact(
       'all_gates',
       true,
@@ -290,6 +428,33 @@ export class DogfoodingLoop {
     )
     await this.ledger.appendArtifact(gateArtifact)
     evidenceIds.push(gateArtifact.artifact_id)
+    artifacts.set(gateArtifact.artifact_id, gateArtifact)
+
+    // 2. File manifest artifact (REQUIRED)
+    const fileManifestArtifact = createFileManifestArtifact([{
+      path: proposal.targetFile,
+      operation: 'overwrite',
+      byte_count: proposal.proposedChange.code.length,
+      sha256: contentAddress(proposal.proposedChange.code)
+    }])
+    await this.ledger.appendArtifact(fileManifestArtifact)
+    evidenceIds.push(fileManifestArtifact.artifact_id)
+    artifacts.set(fileManifestArtifact.artifact_id, fileManifestArtifact)
+
+    // 3. Exit code artifact (REQUIRED)
+    const exitCodeArtifact = createExitCodeArtifact(0, 'npm run build && npm test')
+    await this.ledger.appendArtifact(exitCodeArtifact)
+    evidenceIds.push(exitCodeArtifact.artifact_id)
+    artifacts.set(exitCodeArtifact.artifact_id, exitCodeArtifact)
+
+    // Create outcome and validate conformance
+    const outcome = createProposalOutcome(proposal.id, 'COMPLETED', evidenceIds)
+    const conformance = validateOutcomeConformance(outcome, artifacts)
+
+    if (!conformance.ok) {
+      console.log('  ⚠ Outcome conformance warning:')
+      console.log('    ' + formatConformanceResult(conformance).split('\n').join('\n    '))
+    }
 
     // Log improvement with evidence
     await this.ledger.append('improvement_applied', {
@@ -302,11 +467,11 @@ export class DogfoodingLoop {
       evidenceIds,
       grantedEffects: EFFECT_SETS.CODE_APPLICATION,
       exercisedEffects: ['CODE_MODIFY', 'GIT_COMMIT', 'LEDGER_APPEND'],
+      conformance,
       timestamp: globalTimeProvider.now()
     })
 
-    // Create outcome record
-    const outcome = createProposalOutcome(proposal.id, 'COMPLETED', evidenceIds)
+    // Record outcome
     await this.ledger.append('proposal_outcome', outcome)
   }
 
@@ -335,13 +500,57 @@ export class DogfoodingLoop {
   }
 
   private async logRollback(proposal: ImprovementProposal, result: ApplyResult): Promise<void> {
-    // Create evidence artifact for rollback
-    const rollbackArtifact = createEvidenceArtifact(
-      JSON.stringify({ testResults: result.testResults, reason: 'Tests failed' }),
-      'rollback_snapshot',
-      { created_at_utc: new Date().toISOString(), description: 'Rollback after failed tests' }
+    // Create evidence artifacts for governance compliance
+    // REQUIRED for ROLLED_BACK: gate_result, file_manifest, code_diff
+    const evidenceIds: string[] = []
+    const artifacts = new Map<string, EvidenceArtifact>()
+
+    // 1. Gate result artifact (REQUIRED)
+    const gateArtifact = createGateResultArtifact(
+      'post_apply_tests',
+      false,
+      'Tests failed after applying change',
+      { testResults: result.testResults }
     )
-    await this.ledger.appendArtifact(rollbackArtifact)
+    await this.ledger.appendArtifact(gateArtifact)
+    evidenceIds.push(gateArtifact.artifact_id)
+    artifacts.set(gateArtifact.artifact_id, gateArtifact)
+
+    // 2. File manifest artifact (REQUIRED)
+    const fileManifestArtifact = createFileManifestArtifact([{
+      path: proposal.targetFile,
+      operation: 'overwrite',
+      byte_count: proposal.proposedChange.code.length,
+      sha256: contentAddress(proposal.proposedChange.code)
+    }])
+    await this.ledger.appendArtifact(fileManifestArtifact)
+    evidenceIds.push(fileManifestArtifact.artifact_id)
+    artifacts.set(fileManifestArtifact.artifact_id, fileManifestArtifact)
+
+    // 3. Code diff artifact (REQUIRED)
+    // Use actual diff from rollback info if available
+    let diffContent: string
+    if (result.rollbackInfo?.fileDiff) {
+      diffContent = result.rollbackInfo.fileDiff.unifiedDiff
+    } else if (proposal.proposedChange.diff) {
+      diffContent = proposal.proposedChange.diff
+    } else {
+      diffContent = `[Applied then rolled back: ${proposal.proposedChange.code.length} chars]`
+    }
+
+    const codeDiffArtifact = createCodeDiffArtifact(diffContent, proposal.targetFile)
+    await this.ledger.appendArtifact(codeDiffArtifact)
+    evidenceIds.push(codeDiffArtifact.artifact_id)
+    artifacts.set(codeDiffArtifact.artifact_id, codeDiffArtifact)
+
+    // Create outcome and validate conformance
+    const outcome = createProposalOutcome(proposal.id, 'ROLLED_BACK', evidenceIds)
+    const conformance = validateOutcomeConformance(outcome, artifacts)
+
+    if (!conformance.ok) {
+      console.log('  ⚠ Outcome conformance warning:')
+      console.log('    ' + formatConformanceResult(conformance).split('\n').join('\n    '))
+    }
 
     await this.ledger.append('improvement_rolled_back', {
       proposalId: proposal.id,
@@ -349,19 +558,29 @@ export class DogfoodingLoop {
       source: proposal.source,
       reason: 'Tests failed',
       testResults: result.testResults,
-      evidenceIds: [rollbackArtifact.artifact_id],
+      evidenceIds,
+      conformance,
+      rollbackInfo: result.rollbackInfo ? {
+        backupSessionId: result.rollbackInfo.backupSessionId,
+        filesRestored: result.rollbackInfo.filesRestored,
+        diffLinesAdded: result.rollbackInfo.fileDiff?.linesAdded,
+        diffLinesRemoved: result.rollbackInfo.fileDiff?.linesRemoved
+      } : undefined,
       timestamp: globalTimeProvider.now()
     })
 
-    // Create outcome record
-    const outcome = createProposalOutcome(proposal.id, 'ROLLED_BACK', [rollbackArtifact.artifact_id])
+    // Record outcome
     await this.ledger.append('proposal_outcome', outcome)
   }
 
   private async logFailure(type: string, message: string): Promise<void> {
+    // Record failure to safety guard (circuit breaker)
+    this.safetyGuard.recordFailure()
+
     await this.ledger.append('cycle_failure', {
       type,
       message,
+      safetyGuardStats: this.safetyGuard.getStats(),
       timestamp: globalTimeProvider.now()
     })
   }
