@@ -257,7 +257,9 @@ export class JSONLLedger {
   }
 
   count(): number {
-    return this.seq
+    // seq is 0-indexed, so count = seq + 1
+    // After GENESIS (seq=0), count should be 1
+    return this.seq + 1
   }
 
   /**

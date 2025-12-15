@@ -185,10 +185,11 @@ function verifyEnvelopeSchema(record: JSONLRecord): string[] {
  * Layer 4: Verify record hash by recomputation
  */
 function verifyRecordHash(record: JSONLRecord): { valid: boolean; error?: string } {
+  // Hash is computed WITHOUT timestamp (timestamp is metadata, not content)
+  // This matches JSONLLedger.append() behavior
   const recordForHash = {
     record_type: record.record_type,
     seq: record.seq,
-    timestamp: record.timestamp,
     prev_hash: record.prev_hash,
     record: record.record
   }

@@ -579,20 +579,25 @@ export function stub() {
   const evidenceLedgerPath = path.join(evidenceTempDir, 'test-ledger.jsonl');
 
   const testLedger = new JSONLLedger(evidenceLedgerPath);
-  await testLedger.append('PROPOSAL', {
-    proposalId: 'test-prop-001',
+  // Use PROPOSAL_ADMITTED (registered schema) with required snake_case fields
+  await testLedger.append('PROPOSAL_ADMITTED', {
+    proposal_id: 'test-prop-001',
+    target_file: 'src/core/result.ts',
+    issue_type: 'NO_ERROR_HANDLING',
+    // Additional fields for EvidenceQuery testing
     targetFile: 'src/core/result.ts',
     decisionType: 'reversible',
-    issueType: 'NO_ERROR_HANDLING',
     severity: 'high',
     source: 'llm',
     rationale: 'Adding Result type'
   });
-  await testLedger.append('PROPOSAL', {
-    proposalId: 'test-prop-002',
+  await testLedger.append('PROPOSAL_ADMITTED', {
+    proposal_id: 'test-prop-002',
+    target_file: 'src/validation/sixGates.ts',
+    issue_type: 'HIGH_COMPLEXITY',
+    // Additional fields for EvidenceQuery testing
     targetFile: 'src/validation/sixGates.ts',
     decisionType: 'irreversible',
-    issueType: 'HIGH_COMPLEXITY',
     severity: 'critical',
     source: 'llm'
   });
