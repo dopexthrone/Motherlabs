@@ -10,6 +10,19 @@
 
 import { Result, Ok, Err } from './result'
 import type { ImprovementProposal } from '../selfbuild/proposer'
+// Import TCB boundary from authoritative source
+import {
+  TCB_AUTHORITY_PATHS,
+  TCB_GOVERNED_PATHS,
+  CONSTITUTIONAL_PATHS,
+  SCHEMA_PATHS,
+  isTCBPath as isTCBPathFromBoundary,
+  getTCBClassification as getTCBClassificationFromBoundary,
+  type TCBClassification
+} from './tcbBoundary'
+
+// Re-export TCB functions from authoritative source for backwards compatibility
+export { isTCBPath, getTCBClassification, type TCBClassification } from './tcbBoundary'
 
 /**
  * Decision classification types
@@ -35,33 +48,6 @@ export type DecisionSignal = {
   weight: 'strong' | 'moderate' | 'weak'
   direction: 'reversible' | 'irreversible' | 'premature'
 }
-
-/**
- * TCB (Trusted Computing Base) path patterns
- * Changes to these paths are potentially irreversible
- */
-const TCB_AUTHORITY_PATHS = [
-  'src/validation/',     // Gate implementations (AUTHORITY)
-  'src/sandbox/',        // Execution isolation (AUTHORITY)
-  'src/persistence/',    // Evidence storage (AUTHORITY)
-  'src/core/',           // Fundamental types (AUTHORITY)
-]
-
-const TCB_GOVERNED_PATHS = [
-  'src/selfbuild/',      // Self-improvement (GOVERNED)
-]
-
-const CONSTITUTIONAL_PATHS = [
-  'docs/MOTHERLABS_CONSTITUTION.md',
-  'docs/DECISION_PHILOSOPHY.md',
-  'docs/KERNEL_FREEZE_PROTOCOL.md',
-  'docs/ARTIFACT_MODEL.md',
-  'docs/SELF_SCALING_RULESET.md',
-]
-
-const SCHEMA_PATHS = [
-  'schemas/',
-]
 
 /**
  * Architectural change indicators in code
@@ -431,35 +417,6 @@ function buildReversibleReason(signals: DecisionSignal[]): string {
     return `Reversible: ${reversibleSignals.map(s => s.signal).join('; ')}`
   }
   return 'Reversible: No strong irreversibility signals detected'
-}
-
-/**
- * Check if a path is within the TCB
- */
-export function isTCBPath(filepath: string): boolean {
-  return TCB_AUTHORITY_PATHS.some(p => filepath.includes(p)) ||
-         TCB_GOVERNED_PATHS.some(p => filepath.includes(p)) ||
-         CONSTITUTIONAL_PATHS.some(p => filepath.includes(p)) ||
-         SCHEMA_PATHS.some(p => filepath.includes(p))
-}
-
-/**
- * Get TCB classification for a path
- */
-export function getTCBClassification(filepath: string): 'authority' | 'governed' | 'constitutional' | 'schema' | 'non-tcb' {
-  if (CONSTITUTIONAL_PATHS.some(p => filepath.includes(p))) {
-    return 'constitutional'
-  }
-  if (TCB_AUTHORITY_PATHS.some(p => filepath.includes(p))) {
-    return 'authority'
-  }
-  if (TCB_GOVERNED_PATHS.some(p => filepath.includes(p))) {
-    return 'governed'
-  }
-  if (SCHEMA_PATHS.some(p => filepath.includes(p))) {
-    return 'schema'
-  }
-  return 'non-tcb'
 }
 
 /**

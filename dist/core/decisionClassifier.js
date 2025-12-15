@@ -9,34 +9,16 @@
 // - Irreversible: Affects architecture/authority/scope → gate and document
 // - Premature: Cannot be justified with current evidence → refuse or defer
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getTCBClassification = exports.isTCBPath = void 0;
 exports.classifyDecision = classifyDecision;
-exports.isTCBPath = isTCBPath;
-exports.getTCBClassification = getTCBClassification;
 exports.getRequiredGates = getRequiredGates;
 const result_1 = require("./result");
-/**
- * TCB (Trusted Computing Base) path patterns
- * Changes to these paths are potentially irreversible
- */
-const TCB_AUTHORITY_PATHS = [
-    'src/validation/', // Gate implementations (AUTHORITY)
-    'src/sandbox/', // Execution isolation (AUTHORITY)
-    'src/persistence/', // Evidence storage (AUTHORITY)
-    'src/core/', // Fundamental types (AUTHORITY)
-];
-const TCB_GOVERNED_PATHS = [
-    'src/selfbuild/', // Self-improvement (GOVERNED)
-];
-const CONSTITUTIONAL_PATHS = [
-    'docs/MOTHERLABS_CONSTITUTION.md',
-    'docs/DECISION_PHILOSOPHY.md',
-    'docs/KERNEL_FREEZE_PROTOCOL.md',
-    'docs/ARTIFACT_MODEL.md',
-    'docs/SELF_SCALING_RULESET.md',
-];
-const SCHEMA_PATHS = [
-    'schemas/',
-];
+// Import TCB boundary from authoritative source
+const tcbBoundary_1 = require("./tcbBoundary");
+// Re-export TCB functions from authoritative source for backwards compatibility
+var tcbBoundary_2 = require("./tcbBoundary");
+Object.defineProperty(exports, "isTCBPath", { enumerable: true, get: function () { return tcbBoundary_2.isTCBPath; } });
+Object.defineProperty(exports, "getTCBClassification", { enumerable: true, get: function () { return tcbBoundary_2.getTCBClassification; } });
 /**
  * Architectural change indicators in code
  */
@@ -90,7 +72,7 @@ function classifyDecision(proposal) {
 function classifyPath(filepath) {
     const signals = [];
     // Check TCB authority paths (strongest irreversibility signal)
-    for (const path of TCB_AUTHORITY_PATHS) {
+    for (const path of tcbBoundary_1.TCB_AUTHORITY_PATHS) {
         if (filepath.includes(path)) {
             signals.push({
                 signal: `Target is TCB authority path: ${path}`,
@@ -100,7 +82,7 @@ function classifyPath(filepath) {
         }
     }
     // Check TCB governed paths (moderate irreversibility)
-    for (const path of TCB_GOVERNED_PATHS) {
+    for (const path of tcbBoundary_1.TCB_GOVERNED_PATHS) {
         if (filepath.includes(path)) {
             signals.push({
                 signal: `Target is TCB governed path: ${path}`,
@@ -110,7 +92,7 @@ function classifyPath(filepath) {
         }
     }
     // Check constitutional documents (highest irreversibility)
-    for (const path of CONSTITUTIONAL_PATHS) {
+    for (const path of tcbBoundary_1.CONSTITUTIONAL_PATHS) {
         if (filepath.includes(path)) {
             signals.push({
                 signal: `Target is constitutional document: ${path}`,
@@ -120,7 +102,7 @@ function classifyPath(filepath) {
         }
     }
     // Check schema paths
-    for (const path of SCHEMA_PATHS) {
+    for (const path of tcbBoundary_1.SCHEMA_PATHS) {
         if (filepath.includes(path)) {
             signals.push({
                 signal: `Target is schema definition: ${path}`,
@@ -138,10 +120,10 @@ function classifyPath(filepath) {
         });
     }
     // Check for non-TCB paths
-    if (!TCB_AUTHORITY_PATHS.some(p => filepath.includes(p)) &&
-        !TCB_GOVERNED_PATHS.some(p => filepath.includes(p)) &&
-        !CONSTITUTIONAL_PATHS.some(p => filepath.includes(p)) &&
-        !SCHEMA_PATHS.some(p => filepath.includes(p))) {
+    if (!tcbBoundary_1.TCB_AUTHORITY_PATHS.some(p => filepath.includes(p)) &&
+        !tcbBoundary_1.TCB_GOVERNED_PATHS.some(p => filepath.includes(p)) &&
+        !tcbBoundary_1.CONSTITUTIONAL_PATHS.some(p => filepath.includes(p)) &&
+        !tcbBoundary_1.SCHEMA_PATHS.some(p => filepath.includes(p))) {
         signals.push({
             signal: 'Target is non-TCB path',
             weight: 'moderate',
@@ -355,33 +337,6 @@ function buildReversibleReason(signals) {
         return `Reversible: ${reversibleSignals.map(s => s.signal).join('; ')}`;
     }
     return 'Reversible: No strong irreversibility signals detected';
-}
-/**
- * Check if a path is within the TCB
- */
-function isTCBPath(filepath) {
-    return TCB_AUTHORITY_PATHS.some(p => filepath.includes(p)) ||
-        TCB_GOVERNED_PATHS.some(p => filepath.includes(p)) ||
-        CONSTITUTIONAL_PATHS.some(p => filepath.includes(p)) ||
-        SCHEMA_PATHS.some(p => filepath.includes(p));
-}
-/**
- * Get TCB classification for a path
- */
-function getTCBClassification(filepath) {
-    if (CONSTITUTIONAL_PATHS.some(p => filepath.includes(p))) {
-        return 'constitutional';
-    }
-    if (TCB_AUTHORITY_PATHS.some(p => filepath.includes(p))) {
-        return 'authority';
-    }
-    if (TCB_GOVERNED_PATHS.some(p => filepath.includes(p))) {
-        return 'governed';
-    }
-    if (SCHEMA_PATHS.some(p => filepath.includes(p))) {
-        return 'schema';
-    }
-    return 'non-tcb';
 }
 /**
  * Get required gate level for decision type

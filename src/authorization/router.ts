@@ -4,19 +4,30 @@
 // INVARIANT: No execution without prior ALLOW decision in ledger
 // INVARIANT: Missing authorization = DENY (deny-by-default)
 // INVARIANT: Token required for all effect/tool execution
+// INVARIANT: Token is DETERMINISTIC - derived only from authorization truth, not time
+//
+// DETERMINISM AXIOM: Time is adversarial. Authorization truth comes from ledger only.
+// Token verification checks ledger state, not wall-clock.
 
 import { Result, Ok, Err } from '../core/result'
 import { contentAddress } from '../core/contentAddress'
-import { globalTimeProvider } from '../core/ids'
 import type { GateDecision, AuthorizationGateType } from '../core/gateDecision'
 import type { EffectType } from '../core/effects'
 
 /**
  * Authorization token - proof that execution is authorized
  * Cannot be forged: contains content-addressed reference to ALLOW decision
+ *
+ * DETERMINISM: token_id is computed from authorization truth only:
+ *   - authorization_decision_id
+ *   - target_id
+ *   - gate_type
+ *   - granted_effects
+ *
+ * issued_at is METADATA ONLY - not part of token_id, not checked during verification
  */
 export type AuthorizationToken = {
-  /** Token ID - content address of this token */
+  /** Token ID - content address of authorization truth (deterministic) */
   readonly token_id: string
   /** Reference to the ALLOW decision that authorized this */
   readonly authorization_decision_id: string
@@ -26,10 +37,8 @@ export type AuthorizationToken = {
   readonly gate_type: AuthorizationGateType
   /** Effects granted by this authorization */
   readonly granted_effects: readonly EffectType[]
-  /** When this token was issued */
-  readonly issued_at: number
-  /** Expiry (tokens are single-use but have time bound) */
-  readonly expires_at: number
+  /** METADATA ONLY: When this token was issued (not part of token_id, not verified) */
+  readonly issued_at_metadata?: number
 }
 
 /**
@@ -44,14 +53,17 @@ export interface AuthorizationLedger {
  *
  * AXIOM: No action proceeds without explicit ALLOW token
  * AXIOM: Token can only be issued if prior ALLOW decision exists in ledger
+ * AXIOM: Token validity derived from ledger state, not wall-clock
+ *
+ * DETERMINISM GUARANTEE:
+ * Given identical ledger state, requestAuthorization() returns identical token_id.
+ * This enables replay verification and audit.
  */
 export class AuthorizationRouter {
   private ledger: AuthorizationLedger
-  private tokenValidityMs: number
 
-  constructor(ledger: AuthorizationLedger, tokenValidityMs: number = 60000) {
+  constructor(ledger: AuthorizationLedger) {
     this.ledger = ledger
-    this.tokenValidityMs = tokenValidityMs
   }
 
   /**
@@ -94,20 +106,20 @@ export class AuthorizationRouter {
       ))
     }
 
-    // Issue token
-    const now = globalTimeProvider.now()
-    const tokenData = {
+    // Issue token - DETERMINISTIC
+    // Token ID computed from authorization truth only (no time)
+    const authorizationTruth = {
       authorization_decision_id: contentAddress(allowDecision),
       target_id: targetId,
       gate_type: gateType,
-      granted_effects: grantedEffects,
-      issued_at: now,
-      expires_at: now + this.tokenValidityMs
+      granted_effects: grantedEffects
     }
 
     const token: AuthorizationToken = {
-      token_id: contentAddress(tokenData),
-      ...tokenData
+      token_id: contentAddress(authorizationTruth),
+      ...authorizationTruth,
+      // Metadata only - not part of token_id, not verified
+      issued_at_metadata: Date.now()
     }
 
     return Ok(token)
@@ -115,21 +127,21 @@ export class AuthorizationRouter {
 
   /**
    * Verify a token is valid for execution
+   *
+   * DETERMINISM: Verification checks ledger state only, NOT wall-clock.
+   * Authorization truth comes from the ledger. Time is adversarial.
    */
   verifyToken(token: AuthorizationToken): Result<void, Error> {
-    const now = globalTimeProvider.now()
-
-    // Check expiry
-    if (now > token.expires_at) {
-      return Err(new Error(
-        `AUTHORIZATION DENIED: Token expired at ${new Date(token.expires_at).toISOString()}`
-      ))
+    // Verify token integrity (recompute token_id from authorization truth only)
+    // Note: issued_at_metadata is NOT part of token_id
+    const authorizationTruth = {
+      authorization_decision_id: token.authorization_decision_id,
+      target_id: token.target_id,
+      gate_type: token.gate_type,
+      granted_effects: token.granted_effects
     }
-
-    // Verify token integrity (recompute token_id)
-    const { token_id, ...tokenData } = token
-    const expectedId = contentAddress(tokenData)
-    if (token_id !== expectedId) {
+    const expectedId = contentAddress(authorizationTruth)
+    if (token.token_id !== expectedId) {
       return Err(new Error(
         `AUTHORIZATION DENIED: Token integrity check failed. ` +
         `Token may have been tampered with.`
@@ -137,6 +149,7 @@ export class AuthorizationRouter {
     }
 
     // Verify the original ALLOW decision still exists in ledger
+    // This is the authoritative source of truth - NOT time
     const decisionsResult = this.ledger.getGateDecisions()
     if (!decisionsResult.ok) {
       return Err(new Error(

@@ -72,14 +72,13 @@ async function runTests() {
   // test that the applier correctly rejects when given an invalid token
 
   // Create a fake token without proper authorization
+  // Note: issued_at_metadata is optional and not verified
   const fakeToken: AuthorizationToken = {
     token_id: 'fake-token-id',
     authorization_decision_id: 'nonexistent-decision-id',
     target_id: 'wrong-target-id',
     gate_type: 'change_application',
-    granted_effects: [],
-    issued_at: Date.now(),
-    expires_at: Date.now() + 60000
+    granted_effects: []
   }
 
   const result1 = await applier.apply(proposal, fakeToken)
@@ -249,15 +248,14 @@ async function runTests() {
   console.log('')
 
   // ============================================================================
-  // TEST 5: Expired token is rejected
+  // TEST 5: REPLAY DETERMINISM - Same ledger state yields identical token
+  // ACCEPTANCE TEST: Token issuance is deterministic (no time in token_id)
   // ============================================================================
-  console.log('TEST 5: Expired token is rejected\n')
+  console.log('TEST 5: Replay determinism - identical ledger state yields identical token\n')
 
   const ledger5Path = '/tmp/auth-router-test-5-' + Date.now() + '.jsonl'
   const ledger5 = new JSONLLedger(ledger5Path)
-
-  // Create router with very short token validity (1ms)
-  const router5 = new AuthorizationRouter(ledger5, 1)
+  const router5 = new AuthorizationRouter(ledger5)
 
   const proposal5 = createMockProposal()
   const proposalId5 = contentAddress(proposal5)
@@ -272,28 +270,37 @@ async function runTests() {
   )
   await ledger5.appendGateDecision(allowDecision5)
 
-  // Get token
-  const tokenResult5 = router5.requestAuthorization(
+  // Request token TWICE from same ledger state
+  const tokenResult5a = router5.requestAuthorization(
+    proposalId5,
+    'change_application',
+    EFFECT_SETS.CODE_APPLICATION
+  )
+  const tokenResult5b = router5.requestAuthorization(
     proposalId5,
     'change_application',
     EFFECT_SETS.CODE_APPLICATION
   )
 
-  assert(tokenResult5.ok, 'Token obtained')
+  assert(tokenResult5a.ok && tokenResult5b.ok, 'Both token requests succeeded')
 
-  if (tokenResult5.ok) {
-    // Wait for token to expire
-    await new Promise(resolve => setTimeout(resolve, 10))
+  if (tokenResult5a.ok && tokenResult5b.ok) {
+    // DETERMINISM: token_id must be identical
+    assert(
+      tokenResult5a.value.token_id === tokenResult5b.value.token_id,
+      'REPLAY DETERMINISM: Identical ledger state yields identical token_id'
+    )
+    assert(
+      tokenResult5a.value.authorization_decision_id === tokenResult5b.value.authorization_decision_id,
+      'authorization_decision_id is identical'
+    )
+    assert(
+      tokenResult5a.value.target_id === tokenResult5b.value.target_id,
+      'target_id is identical'
+    )
 
-    // Verify should fail
-    const verifyResult = router5.verifyToken(tokenResult5.value)
-    assert(!verifyResult.ok, 'Expired token verification fails')
-    if (!verifyResult.ok) {
-      assert(
-        verifyResult.error.message.includes('expired'),
-        'Error indicates token expired'
-      )
-    }
+    // issued_at_metadata may differ (it's metadata, not authorization truth)
+    // This is OK - only token_id must be deterministic
   }
 
   // Cleanup
@@ -345,17 +352,139 @@ async function runTests() {
   console.log('')
 
   // ============================================================================
+  // TEST 7: TIME INVARIANCE - Verification does not depend on system time
+  // ACCEPTANCE TEST: Token verification checks ledger state, not wall-clock
+  // ============================================================================
+  console.log('TEST 7: Time invariance - verification is time-independent\n')
+
+  const ledger7Path = '/tmp/auth-router-test-7-' + Date.now() + '.jsonl'
+  const ledger7 = new JSONLLedger(ledger7Path)
+  const router7 = new AuthorizationRouter(ledger7)
+
+  const proposal7 = createMockProposal()
+  const proposalId7 = contentAddress(proposal7)
+
+  // Record ALLOW decision
+  const allowDecision7 = createGateDecision(
+    'change_application',
+    'ALLOW',
+    createGateDecisionScope('proposal', proposal7, proposal7.targetFile, EFFECT_SETS.CODE_APPLICATION),
+    'test_authorizer',
+    'Test authorization'
+  )
+  await ledger7.appendGateDecision(allowDecision7)
+
+  // Get token
+  const tokenResult7 = router7.requestAuthorization(
+    proposalId7,
+    'change_application',
+    EFFECT_SETS.CODE_APPLICATION
+  )
+
+  assert(tokenResult7.ok, 'Token obtained')
+
+  if (tokenResult7.ok) {
+    const token7 = tokenResult7.value
+
+    // Verify immediately - should succeed
+    const verifyResult7a = router7.verifyToken(token7)
+    assert(verifyResult7a.ok, 'Token verification succeeds immediately')
+
+    // Wait arbitrary time - should STILL succeed (no expiry)
+    await new Promise(resolve => setTimeout(resolve, 100))
+
+    const verifyResult7b = router7.verifyToken(token7)
+    assert(verifyResult7b.ok, 'TIME INVARIANCE: Token still valid after delay (no time-based expiry)')
+
+    // Verify multiple times - deterministic result
+    const verifyResult7c = router7.verifyToken(token7)
+    const verifyResult7d = router7.verifyToken(token7)
+    assert(
+      verifyResult7c.ok && verifyResult7d.ok,
+      'Multiple verifications all succeed (deterministic)'
+    )
+  }
+
+  // Cleanup
+  try { fs.unlinkSync(ledger7Path) } catch {}
+
+  console.log('')
+
+  // ============================================================================
+  // TEST 8: NO LEDGER MUTATION during token operations
+  // ACCEPTANCE TEST: Token issuance and verification do not mutate ledger
+  // ============================================================================
+  console.log('TEST 8: No ledger mutation during token operations\n')
+
+  const ledger8Path = '/tmp/auth-router-test-8-' + Date.now() + '.jsonl'
+  const ledger8 = new JSONLLedger(ledger8Path)
+  const router8 = new AuthorizationRouter(ledger8)
+
+  const proposal8 = createMockProposal()
+  const proposalId8 = contentAddress(proposal8)
+
+  // Record ALLOW decision
+  const allowDecision8 = createGateDecision(
+    'change_application',
+    'ALLOW',
+    createGateDecisionScope('proposal', proposal8, proposal8.targetFile, EFFECT_SETS.CODE_APPLICATION),
+    'test_authorizer',
+    'Test authorization'
+  )
+  await ledger8.appendGateDecision(allowDecision8)
+
+  // Get ledger count BEFORE token operations
+  const countBefore = ledger8.count()
+
+  // Perform token issuance
+  const tokenResult8 = router8.requestAuthorization(
+    proposalId8,
+    'change_application',
+    EFFECT_SETS.CODE_APPLICATION
+  )
+
+  // Ledger count should NOT change
+  const countAfterIssuance = ledger8.count()
+  assert(
+    countAfterIssuance === countBefore,
+    'NO LEDGER MUTATION: Token issuance does not append to ledger'
+  )
+
+  if (tokenResult8.ok) {
+    // Perform token verification
+    router8.verifyToken(tokenResult8.value)
+
+    // Ledger count should STILL not change
+    const countAfterVerification = ledger8.count()
+    assert(
+      countAfterVerification === countBefore,
+      'NO LEDGER MUTATION: Token verification does not append to ledger'
+    )
+  }
+
+  // Cleanup
+  try { fs.unlinkSync(ledger8Path) } catch {}
+
+  console.log('')
+
+  // ============================================================================
   // SUMMARY
   // ============================================================================
   console.log('==========================================')
   console.log(`SUMMARY: ${passCount} passed, ${failCount} failed`)
   console.log('==========================================\n')
 
+  console.log('ACCEPTANCE CRITERIA:')
+  console.log('(a) Direct call from proposer to applier must fail - TESTED')
+  console.log('(b) Any attempt to execute without ALLOW decision must fail - TESTED')
+  console.log('(c) Proper authorization flow succeeds - TESTED')
+  console.log('')
+  console.log('DETERMINISM ACCEPTANCE TESTS:')
+  console.log('(d) Replay determinism: identical ledger state yields identical token_id - TEST 5')
+  console.log('(e) Time invariance: verification does not depend on system time - TEST 7')
+  console.log('(f) No ledger mutation during token issuance or verification - TEST 8')
+
   if (failCount > 0) {
-    console.log('ACCEPTANCE CRITERIA:')
-    console.log('(a) Direct call from proposer to applier must fail - TESTED')
-    console.log('(b) Any attempt to execute without ALLOW decision must fail - TESTED')
-    console.log('(c) Proper authorization flow succeeds - TESTED')
     process.exit(1)
   }
 }
