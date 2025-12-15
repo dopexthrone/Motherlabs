@@ -114,16 +114,10 @@ export class SelfImprovementProposer {
         targetFile: filepath
       }
 
-      // 5. Record proposal_admission gate decision
-      if (this.ledger) {
-        const proposalId = contentAddress({ issue: topIssue, filepath, timestamp: globalTimeProvider.now() })
-        await this.recordGateDecision(
-          'proposal_admission',
-          'ALLOW',
-          proposalId,
-          `Proposal admitted for ${topIssue.type} in ${filepath}`
-        )
-      }
+      // NOTE: proposal_admission gate decision is now handled by ProposalBridge
+      // in the dogfooding loop (step 4). The proposer's job is to propose and
+      // validate, not to admit. Admission happens through the canonical ProposalV0
+      // admission system after all gates pass.
 
       // 7. Generate fix via LLM (AXIOM 5: No hollow placeholders)
       // We REFUSE if no LLM is available - never generate placeholder code
