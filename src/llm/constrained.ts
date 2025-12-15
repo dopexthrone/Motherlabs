@@ -174,13 +174,38 @@ Existing code to test:
 ${existingCode.slice(0, 2000)}
 \`\`\`
 
+IMPORTANT: This project uses a CUSTOM test pattern, NOT Jest/Mocha. Use this exact pattern:
+
+\`\`\`typescript
+let passCount = 0;
+let failCount = 0;
+
+function assert(condition: boolean, message: string) {
+  if (!condition) {
+    console.error(\`✗ FAIL: \${message}\`);
+    failCount++;
+  } else {
+    console.log(\`✓ PASS: \${message}\`);
+    passCount++;
+  }
+}
+
+async function runTests() {
+  // Your tests here using assert(condition, 'message')
+}
+
+runTests().catch(err => {
+  console.error('Test error:', err);
+  process.exit(1);
+});
+\`\`\`
+
 Requirements:
-- Import from the source file
-- Include success cases
+- Use the assert(condition, message) pattern shown above
+- Import from the source file using relative paths like '../src/...'
+- Include success cases with meaningful assertions
 - Include failure/error cases
-- Include edge cases
-- Use expect() assertions
-- Export test functions or use describe/test pattern`,
+- Test actual return values, not just that functions exist`,
 
       'HIGH_COMPLEXITY': `Refactor this complex function to reduce cyclomatic complexity.
 
@@ -208,10 +233,29 @@ Current code:
 ${existingCode.slice(0, 2000)}
 \`\`\`
 
+IMPORTANT: This project uses the Result<T, Error> pattern from '../core/result':
+\`\`\`typescript
+import { Result, Ok, Err } from '../core/result';
+
+// Success: return Ok(value)
+// Failure: return Err(new Error('message'))
+
+export async function example(): Promise<Result<string, Error>> {
+  try {
+    const result = await someOperation();
+    return Ok(result);
+  } catch (error) {
+    return Err(error instanceof Error ? error : new Error(String(error)));
+  }
+}
+\`\`\`
+
 Requirements:
-- Use Result<T, Error> pattern OR try/catch with proper error propagation
-- Never silently swallow errors
-- Return structured errors with context`,
+- Import Result, Ok, Err from '../core/result'
+- Change return type to Promise<Result<T, Error>> where T is the success type
+- Wrap async operations in try/catch
+- Return Ok(value) on success, Err(error) on failure
+- Preserve the original function signature and exports`,
 
       'DUPLICATE_CODE': `Refactor to eliminate duplicate code.
 
