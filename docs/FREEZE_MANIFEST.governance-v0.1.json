@@ -2,7 +2,7 @@
   "version": "governance-v0.1",
   "freeze_type": "KERNEL_GOVERNANCE_FREEZE",
   "timestamp": "2025-12-15T07:00:00Z",
-  "git_commit": "58247a76d507a884cb815702e73fe3316d8c66be",
+  "git_commit": "a1694e7d73dfdcb94a66f781da018e53b1a5ab5d",
   "git_branch": "master",
   "environment": {
     "node_version": "v24.11.1",
@@ -82,6 +82,8 @@
     "AXIOM_DETERMINISM": "Same inputs always produce same outputs"
   },
   "commit_history": [
+    "a1694e7 chore: add .gitignore and remove dist/ from tracking",
+    "d3ea2a1 chore(freeze): update manifest with verification commit hash",
     "58247a7 docs(verify): add verification report and manifest validator for governance-v0.1",
     "e018869 chore(freeze): update Kernel Governance Freeze v0.1 manifest",
     "89ae290 fix: remove broken imports to non-existent modules",
