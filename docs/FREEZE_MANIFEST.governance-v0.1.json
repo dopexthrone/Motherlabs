@@ -2,7 +2,7 @@
   "version": "governance-v0.1",
   "freeze_type": "KERNEL_GOVERNANCE_FREEZE",
   "timestamp": "2025-12-15T07:00:00Z",
-  "git_commit": "89ae2902e8ac38c26f496373d1265cad66b759ea",
+  "git_commit": "58247a76d507a884cb815702e73fe3316d8c66be",
   "git_branch": "master",
   "environment": {
     "node_version": "v24.11.1",
@@ -16,7 +16,7 @@
     "authorization_router_tests": "PASS (26/26)",
     "schema_registry_tests": "PASS (40/40)",
     "tcb_boundary_tests": "PASS (95/95)",
-    "total_tests": "179 passed, 0 failed",
+    "total_tests": "233 passed, 0 failed",
     "deny_by_default_inline": "PASS",
     "tcb_immutability_inline": "PASS",
     "deterministic_hashing_inline": "PASS"
@@ -82,6 +82,8 @@
     "AXIOM_DETERMINISM": "Same inputs always produce same outputs"
   },
   "commit_history": [
+    "58247a7 docs(verify): add verification report and manifest validator for governance-v0.1",
+    "e018869 chore(freeze): update Kernel Governance Freeze v0.1 manifest",
     "89ae290 fix: remove broken imports to non-existent modules",
     "bd310e0 chore(freeze): Kernel Governance Freeze v0.1",
     "2b83266 docs: add COMMANDS_REFERENCE for invariant verification",
@@ -96,7 +98,8 @@
     "Schema Registry implements deny-by-default for ledger writes",
     "TCB Boundary formalized with runtime immutability (Object.freeze)",
     "All time dependencies removed from authorization tokens",
-    "179 acceptance tests verify governance invariants",
-    "Build now compiles cleanly on frozen commit"
+    "233 tests verify governance invariants (72 core + 161 acceptance)",
+    "Build now compiles cleanly on frozen commit",
+    "Audit-grade verification report included (clean-room build verified)"
   ]
 }
