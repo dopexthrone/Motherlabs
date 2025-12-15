@@ -1,11 +1,15 @@
 #!/usr/bin/env node
 // Motherlabs Runtime CLI
 
+import * as fs from 'fs'
 import { decomposeTask, printTaskTree } from './decompose'
 import { Ledger } from './evidence'
 import { LLMAdapter } from './llm'
 import { Config } from './types'
 import { DogfoodingLoop } from './dogfood/loop'
+import { JSONLLedger } from './persistence/jsonlLedger'
+import { createAdmissionService } from './proposal/admissionService'
+import { validateProposalV0 } from './validation/proposalV0Validator'
 import type { AnthropicModel } from './adapters/anthropicAdapter'
 import type { OpenAIModel } from './adapters/openaiAdapter'
 
@@ -17,12 +21,15 @@ async function main() {
     console.log('Motherlabs Runtime v0.2.0')
     console.log('')
     console.log('Commands:')
-    console.log('  decompose <task>  - Break task into subtasks (uses LLM if ANTHROPIC_API_KEY set)')
-    console.log('  dogfood [once]    - Run self-improvement cycle')
-    console.log('    --anthropic     - Use Anthropic Claude (default: claude-sonnet-4-5)')
-    console.log('    --openai        - Use OpenAI GPT (default: gpt-4o)')
-    console.log('    --model <name>  - Specify model name')
-    console.log('  help              - Show this message')
+    console.log('  propose <json|file> - Submit a proposal to the ledger')
+    console.log('    --ledger <path>   - Ledger path (default: evidence/proposals.jsonl)')
+    console.log('    --validate-only   - Validate without submitting')
+    console.log('  decompose <task>    - Break task into subtasks (uses LLM if ANTHROPIC_API_KEY set)')
+    console.log('  dogfood [once]      - Run self-improvement cycle')
+    console.log('    --anthropic       - Use Anthropic Claude (default: claude-sonnet-4-5)')
+    console.log('    --openai          - Use OpenAI GPT (default: gpt-4o)')
+    console.log('    --model <name>    - Specify model name')
+    console.log('  help                - Show this message')
     console.log('')
     console.log('Environment:')
     console.log('  ANTHROPIC_API_KEY  - Required for Anthropic provider')
@@ -55,6 +62,104 @@ async function main() {
     console.log('\n=== Task Decomposition ===\n')
     printTaskTree(task)
     console.log(`\n=== Evidence: ${ledger.count()} records ===\n`)
+
+  } else if (command === 'propose') {
+    // Parse propose options
+    const ledgerIdx = args.indexOf('--ledger')
+    const ledgerPath = ledgerIdx >= 0 ? args[ledgerIdx + 1] : 'evidence/proposals.jsonl'
+    const validateOnly = args.includes('--validate-only')
+
+    // Get proposal input (JSON string or file path)
+    const proposalArg = args.find(a => !a.startsWith('--') && a !== 'propose' && a !== (ledgerIdx >= 0 ? args[ledgerIdx + 1] : ''))
+
+    if (!proposalArg) {
+      console.error('Error: No proposal provided')
+      console.error('')
+      console.error('Usage:')
+      console.error('  propose \'{"version":"v0",...}\'  - Inline JSON')
+      console.error('  propose proposal.json           - From file')
+      process.exit(1)
+    }
+
+    // Parse proposal
+    let proposalData: unknown
+    try {
+      if (fs.existsSync(proposalArg)) {
+        // Read from file
+        const content = fs.readFileSync(proposalArg, 'utf8')
+        proposalData = JSON.parse(content)
+        console.log(`Read proposal from: ${proposalArg}`)
+      } else {
+        // Parse as inline JSON
+        proposalData = JSON.parse(proposalArg)
+      }
+    } catch (parseErr) {
+      console.error('Error: Failed to parse proposal')
+      console.error(parseErr instanceof Error ? parseErr.message : String(parseErr))
+      process.exit(1)
+    }
+
+    // Validate proposal
+    console.log('')
+    console.log('Validating proposal...')
+    const validationResult = validateProposalV0(proposalData)
+
+    if (!validationResult.ok) {
+      console.error('')
+      console.error('Validation FAILED:')
+      for (const err of validationResult.error) {
+        console.error(`  [${err.code}] ${err.message}`)
+      }
+      process.exit(1)
+    }
+
+    const proposal = validationResult.value
+    console.log(`  Version:   ${proposal.version}`)
+    console.log(`  ID:        ${proposal.proposal_id}`)
+    console.log(`  Action:    ${proposal.requested_action}`)
+    console.log(`  Targets:   ${proposal.targets.length} target(s)`)
+    console.log('')
+    console.log('Validation PASSED')
+
+    if (validateOnly) {
+      console.log('')
+      console.log('(--validate-only: skipping submission)')
+      process.exit(0)
+    }
+
+    // Submit to admission service
+    console.log('')
+    console.log(`Submitting to ledger: ${ledgerPath}`)
+
+    const proposalLedger = new JSONLLedger(ledgerPath)
+    const admissionService = createAdmissionService(proposalLedger, 'cli')
+
+    const admissionResult = await admissionService.admitValidatedProposal(proposal)
+
+    if (!admissionResult.ok) {
+      console.error('')
+      console.error('Admission ERROR:')
+      console.error(`  ${admissionResult.error.message}`)
+      process.exit(1)
+    }
+
+    const admission = admissionResult.value
+
+    if (admission.admitted) {
+      console.log('')
+      console.log('=== PROPOSAL ADMITTED ===')
+      console.log(`  Gate Decision:  ${admission.gateDecision.decision}`)
+      console.log(`  Gate Record:    seq ${admission.gateDecisionRecord.seq}`)
+      console.log(`  Proposal Record: seq ${admission.proposalRecord?.seq}`)
+      console.log('')
+      console.log(`Ledger: ${ledgerPath} (${proposalLedger.count()} records)`)
+    } else {
+      console.error('')
+      console.error('=== PROPOSAL REJECTED ===')
+      console.error(`  Gate Decision: ${admission.gateDecision.decision}`)
+      console.error(`  Reason: ${admission.gateDecision.reason}`)
+      process.exit(1)
+    }
 
   } else if (command === 'dogfood') {
     // Parse dogfood options
