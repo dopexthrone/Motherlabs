@@ -5,6 +5,7 @@
 // INVARIANT: This file is the SINGLE SOURCE OF TRUTH for TCB membership
 // INVARIANT: Any file in TCB_AUTHORITY_PATHS is automatically protected
 // INVARIANT: TCB membership is STATIC and DETERMINISTIC (no runtime registration)
+// INVARIANT: Path arrays are FROZEN at runtime (Object.freeze) - mutation throws TypeError
 //
 // CONSTITUTIONAL AUTHORITY: Changes to this file require human approval
 // See docs/MOTHERLABS_CONSTITUTION.md
@@ -28,7 +29,7 @@ exports.listAllTCBPaths = listAllTCBPaths;
  * Autonomous modification of these paths is BLOCKED.
  * Human approval required for all changes.
  */
-exports.TCB_AUTHORITY_PATHS = [
+exports.TCB_AUTHORITY_PATHS = Object.freeze([
     'src/validation/', // Gate implementations - the verifiers
     'src/sandbox/', // Execution isolation
     'src/persistence/', // Evidence storage (ledger)
@@ -36,7 +37,7 @@ exports.TCB_AUTHORITY_PATHS = [
     'src/authorization/', // Authorization router
     'src/schema/', // Schema registry
     'src/verification/', // Ledger verification
-];
+]);
 /**
  * TCB GOVERNED PATHS (Ring 2)
  *
@@ -46,31 +47,31 @@ exports.TCB_AUTHORITY_PATHS = [
  *
  * Changes go through gates but can be autonomous (with ALLOW token).
  */
-exports.TCB_GOVERNED_PATHS = [
+exports.TCB_GOVERNED_PATHS = Object.freeze([
     'src/selfbuild/', // Self-improvement machinery
-];
+]);
 /**
  * CONSTITUTIONAL PATHS
  *
  * These paths define the system's rules and philosophy.
  * Changes require constitutional amendment process.
  */
-exports.CONSTITUTIONAL_PATHS = [
+exports.CONSTITUTIONAL_PATHS = Object.freeze([
     'docs/MOTHERLABS_CONSTITUTION.md',
     'docs/DECISION_PHILOSOPHY.md',
     'docs/KERNEL_FREEZE_PROTOCOL.md',
     'docs/ARTIFACT_MODEL.md',
     'docs/SELF_SCALING_RULESET.md',
-];
+]);
 /**
  * SCHEMA PATHS
  *
  * Schema definitions for ledger records.
  * Changes require careful migration planning.
  */
-exports.SCHEMA_PATHS = [
+exports.SCHEMA_PATHS = Object.freeze([
     'schemas/',
-];
+]);
 /**
  * Check if a path is within the TCB
  *

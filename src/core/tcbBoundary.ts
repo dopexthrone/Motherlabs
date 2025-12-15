@@ -4,6 +4,7 @@
 // INVARIANT: This file is the SINGLE SOURCE OF TRUTH for TCB membership
 // INVARIANT: Any file in TCB_AUTHORITY_PATHS is automatically protected
 // INVARIANT: TCB membership is STATIC and DETERMINISTIC (no runtime registration)
+// INVARIANT: Path arrays are FROZEN at runtime (Object.freeze) - mutation throws TypeError
 //
 // CONSTITUTIONAL AUTHORITY: Changes to this file require human approval
 // See docs/MOTHERLABS_CONSTITUTION.md
@@ -36,7 +37,7 @@ export type TCBClassification =
  * Autonomous modification of these paths is BLOCKED.
  * Human approval required for all changes.
  */
-export const TCB_AUTHORITY_PATHS: readonly string[] = [
+export const TCB_AUTHORITY_PATHS: readonly string[] = Object.freeze([
   'src/validation/',      // Gate implementations - the verifiers
   'src/sandbox/',         // Execution isolation
   'src/persistence/',     // Evidence storage (ledger)
@@ -44,7 +45,7 @@ export const TCB_AUTHORITY_PATHS: readonly string[] = [
   'src/authorization/',   // Authorization router
   'src/schema/',          // Schema registry
   'src/verification/',    // Ledger verification
-] as const
+])
 
 /**
  * TCB GOVERNED PATHS (Ring 2)
@@ -55,9 +56,9 @@ export const TCB_AUTHORITY_PATHS: readonly string[] = [
  *
  * Changes go through gates but can be autonomous (with ALLOW token).
  */
-export const TCB_GOVERNED_PATHS: readonly string[] = [
+export const TCB_GOVERNED_PATHS: readonly string[] = Object.freeze([
   'src/selfbuild/',       // Self-improvement machinery
-] as const
+])
 
 /**
  * CONSTITUTIONAL PATHS
@@ -65,13 +66,13 @@ export const TCB_GOVERNED_PATHS: readonly string[] = [
  * These paths define the system's rules and philosophy.
  * Changes require constitutional amendment process.
  */
-export const CONSTITUTIONAL_PATHS: readonly string[] = [
+export const CONSTITUTIONAL_PATHS: readonly string[] = Object.freeze([
   'docs/MOTHERLABS_CONSTITUTION.md',
   'docs/DECISION_PHILOSOPHY.md',
   'docs/KERNEL_FREEZE_PROTOCOL.md',
   'docs/ARTIFACT_MODEL.md',
   'docs/SELF_SCALING_RULESET.md',
-] as const
+])
 
 /**
  * SCHEMA PATHS
@@ -79,9 +80,9 @@ export const CONSTITUTIONAL_PATHS: readonly string[] = [
  * Schema definitions for ledger records.
  * Changes require careful migration planning.
  */
-export const SCHEMA_PATHS: readonly string[] = [
+export const SCHEMA_PATHS: readonly string[] = Object.freeze([
   'schemas/',
-] as const
+])
 
 /**
  * Check if a path is within the TCB

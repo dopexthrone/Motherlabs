@@ -260,6 +260,63 @@ function runTests() {
   console.log('')
 
   // ============================================================================
+  // TEST 9: RUNTIME MUTATION BLOCKED (Object.freeze)
+  // CRITICAL: Proves TCB boundary cannot be silently expanded at runtime
+  // ============================================================================
+  console.log('TEST 9: Runtime mutation blocked (Object.freeze)\n')
+
+  // Before mutation attempt
+  const maliciousPath = 'src/malicious/evil.ts'
+  const beforeIsTCB = isTCBPath(maliciousPath)
+  const beforeClassification = getTCBClassification(maliciousPath)
+
+  assert(!beforeIsTCB, `BEFORE: "${maliciousPath}" is NOT TCB`)
+  assert(beforeClassification === 'non-tcb', `BEFORE: "${maliciousPath}" classified as non-tcb`)
+
+  // Attempt mutation - should throw TypeError or silently fail
+  let mutationThrew = false
+  let mutationError = ''
+  try {
+    // This should throw TypeError because array is frozen
+    (TCB_AUTHORITY_PATHS as string[]).push('src/malicious/')
+  } catch (e) {
+    mutationThrew = true
+    mutationError = (e as Error).message
+  }
+
+  // Verify mutation was blocked
+  assert(mutationThrew, 'MUTATION BLOCKED: push() threw TypeError on frozen array')
+  if (mutationThrew) {
+    assert(
+      mutationError.includes('Cannot add property') ||
+      mutationError.includes('object is not extensible') ||
+      mutationError.includes('read only'),
+      `Error message indicates frozen array: "${mutationError.slice(0, 50)}..."`
+    )
+  }
+
+  // After mutation attempt - classification must be unchanged
+  const afterIsTCB = isTCBPath(maliciousPath)
+  const afterClassification = getTCBClassification(maliciousPath)
+
+  assert(!afterIsTCB, `AFTER: "${maliciousPath}" still NOT TCB`)
+  assert(afterClassification === 'non-tcb', `AFTER: "${maliciousPath}" still classified as non-tcb`)
+
+  // Verify array length unchanged
+  assert(
+    TCB_AUTHORITY_PATHS.length === 7,
+    `TCB_AUTHORITY_PATHS length unchanged (expected 7, got ${TCB_AUTHORITY_PATHS.length})`
+  )
+
+  // Verify all boundary arrays are frozen
+  assert(Object.isFrozen(TCB_AUTHORITY_PATHS), 'TCB_AUTHORITY_PATHS is Object.frozen')
+  assert(Object.isFrozen(TCB_GOVERNED_PATHS), 'TCB_GOVERNED_PATHS is Object.frozen')
+  assert(Object.isFrozen(CONSTITUTIONAL_PATHS), 'CONSTITUTIONAL_PATHS is Object.frozen')
+  assert(Object.isFrozen(SCHEMA_PATHS), 'SCHEMA_PATHS is Object.frozen')
+
+  console.log('')
+
+  // ============================================================================
   // SUMMARY
   // ============================================================================
   console.log('==========================================')
@@ -270,6 +327,7 @@ function runTests() {
   console.log('(a) File outside declared TCB NOT treated as TCB - TEST 1')
   console.log('(b) Authority paths correctly identified - TEST 2')
   console.log('(c) TCB boundary is deterministic (static) - TEST 6')
+  console.log('(d) Runtime mutation blocked (Object.freeze) - TEST 9')
   console.log('')
   console.log('TCB BOUNDARY VERIFICATION:')
   console.log('- Authority (Ring 1): src/validation, src/core, src/persistence,')
