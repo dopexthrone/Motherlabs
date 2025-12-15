@@ -1,0 +1,98 @@
+{
+  "version": "governance-v0.1",
+  "freeze_type": "KERNEL_GOVERNANCE_FREEZE",
+  "timestamp": "2025-12-15T06:30:00Z",
+  "git_commit": "2b83266677c880b2f91d11ac69070749497fe2b1",
+  "git_branch": "master",
+  "environment": {
+    "node_version": "v24.11.1",
+    "os": "Linux",
+    "os_version": "6.14.0-36-generic",
+    "architecture": "x86_64"
+  },
+  "verification_results": {
+    "npm_run_build": "PASS",
+    "npm_test": "PASS (18/18)",
+    "authorization_router_tests": "PASS (26/26)",
+    "schema_registry_tests": "PASS (40/40)",
+    "tcb_boundary_tests": "PASS (95/95)",
+    "total_tests": "179 passed, 0 failed",
+    "deny_by_default_inline": "PASS",
+    "tcb_immutability_inline": "PASS",
+    "deterministic_hashing_inline": "PASS"
+  },
+  "governance_components": {
+    "authorization_router": {
+      "path": "src/authorization/router.ts",
+      "sha256": "3bf53f3ddc81072fd84695dd676ef3d97ff9d831b953ca29b4996aa110153fb5",
+      "invariants": [
+        "Deny-by-default: No token without prior ALLOW in ledger",
+        "Replay determinism: Identical ledger state yields identical token_id",
+        "Time invariance: No wall-clock in token_id or verification",
+        "No ledger mutation: Token operations are read-only"
+      ]
+    },
+    "schema_registry": {
+      "path": "src/schema/registry.ts",
+      "sha256": "f7e092d43374ecdc68c7c549fbdcfd28dd02b57de23b575615841f36fd5b6160",
+      "invariants": [
+        "Deny-by-default: Unknown schema = DENY",
+        "Deterministic: Same schema_id always resolves identically",
+        "Fail-closed: Missing required fields = DENY"
+      ]
+    },
+    "tcb_boundary": {
+      "path": "src/core/tcbBoundary.ts",
+      "sha256": "41766e7a94e4911575c1b06f154bc3012b40d16286e6292e134b853acd886314",
+      "invariants": [
+        "Single source of truth: All TCB membership declared here",
+        "Static boundary: No runtime registration of TCB paths",
+        "Runtime immutability: Object.freeze on all path arrays",
+        "Deterministic classification: Same path always gets same classification"
+      ]
+    }
+  },
+  "tcb_authority_files": {
+    "src/core/tcbBoundary.ts": "41766e7a94e4911575c1b06f154bc3012b40d16286e6292e134b853acd886314",
+    "src/core/contentAddress.ts": "cba9cc4044da5f18277d08ae99a453861ef1c81256d55c82e74815337b591ce0",
+    "src/authorization/router.ts": "3bf53f3ddc81072fd84695dd676ef3d97ff9d831b953ca29b4996aa110153fb5",
+    "src/schema/registry.ts": "f7e092d43374ecdc68c7c549fbdcfd28dd02b57de23b575615841f36fd5b6160",
+    "src/validation/sixGates.ts": "90db462551df75fcc22aa05694365f71057c55f6fbec0074a1d9e8ea586591c0",
+    "src/persistence/jsonlLedger.ts": "d6ceba65ecae01e5055e7a5d428dfa0d32aa071ff4dcc70cdb6d3e6b99aa5b8a",
+    "src/verification/verify.ts": "b775ed987bf2387ab20c375ff6997942d2a33ff1c31d3fe0b3db8a41f061b78d"
+  },
+  "tcb_governed_files": {
+    "src/selfbuild/proposer.ts": "ae4f2470f349a88f008a811e0cda76e86c701fed9c59e73dc9b36baef56bf2fd",
+    "src/selfbuild/applier.ts": "fa4b0adc9c5ce17f6583a1287b99dcdf705f9791961363409ece7eaa836680b4"
+  },
+  "constitutional_files": {
+    "docs/MOTHERLABS_CONSTITUTION.md": "bc3d38687cf86522c6496460e48b38fa55639766bd6d01d61c84324006d02636",
+    "docs/DECISION_PHILOSOPHY.md": "d07010d8ba521c811903d1c9c0ba81427ba09a70a8ea22664aaa964e22a1d39d",
+    "docs/KERNEL_FREEZE_PROTOCOL.md": "fc930033f64b62fc2f250b7a81446498f50f6c6f2158ef3e636de47288b22414"
+  },
+  "acceptance_test_files": {
+    "tests/authorization-router.test.ts": "6c60fa95c6733089748f7c7477f17010314cba41e53f78246f764d694b6ce0bb",
+    "tests/schema-registry.test.ts": "4af675030e6a5a91127ef9f0a13586baadcca069c3106c665bb2ab1996abb8fa",
+    "tests/tcb-boundary.test.ts": "fcccc32debbca8d2e323c37263c1fd1ebfc501f291c4d1d521ae0a47ef012b72"
+  },
+  "axioms_enforced": {
+    "AXIOM_TIME_ADVERSARIAL": "Authorization truth comes from ledger only, not wall-clock",
+    "AXIOM_DENY_BY_DEFAULT": "No authorization without explicit prior ALLOW",
+    "AXIOM_TCB_STATIC": "TCB boundary cannot expand at runtime",
+    "AXIOM_DETERMINISM": "Same inputs always produce same outputs"
+  },
+  "commit_history": [
+    "2b83266 docs: add COMMANDS_REFERENCE for invariant verification",
+    "2c72746 fix: block runtime TCB boundary mutation with Object.freeze",
+    "bedf9a5 feat: determinism hardening + TCB boundary formalization",
+    "e57d596 feat: implement Authorization Router and Schema Registry with deny-by-default"
+  ],
+  "notes": [
+    "First Kernel Governance Freeze - establishes authorization foundation",
+    "Authorization Router implements deny-by-default with deterministic tokens",
+    "Schema Registry implements deny-by-default for ledger writes",
+    "TCB Boundary formalized with runtime immutability (Object.freeze)",
+    "All time dependencies removed from authorization tokens",
+    "179 acceptance tests verify governance invariants"
+  ]
+}
