@@ -1,8 +1,8 @@
 {
   "version": "governance-v0.1",
   "freeze_type": "KERNEL_GOVERNANCE_FREEZE",
-  "timestamp": "2025-12-15T06:30:00Z",
-  "git_commit": "2b83266677c880b2f91d11ac69070749497fe2b1",
+  "timestamp": "2025-12-15T07:00:00Z",
+  "git_commit": "89ae2902e8ac38c26f496373d1265cad66b759ea",
   "git_branch": "master",
   "environment": {
     "node_version": "v24.11.1",
@@ -63,7 +63,7 @@
   },
   "tcb_governed_files": {
     "src/selfbuild/proposer.ts": "ae4f2470f349a88f008a811e0cda76e86c701fed9c59e73dc9b36baef56bf2fd",
-    "src/selfbuild/applier.ts": "fa4b0adc9c5ce17f6583a1287b99dcdf705f9791961363409ece7eaa836680b4"
+    "src/selfbuild/applier.ts": "7951fb72f6954ba21915385a6100dfe567260d7bd913777809a2d01071ac5f8f"
   },
   "constitutional_files": {
     "docs/MOTHERLABS_CONSTITUTION.md": "bc3d38687cf86522c6496460e48b38fa55639766bd6d01d61c84324006d02636",
@@ -82,17 +82,21 @@
     "AXIOM_DETERMINISM": "Same inputs always produce same outputs"
   },
   "commit_history": [
+    "89ae290 fix: remove broken imports to non-existent modules",
+    "bd310e0 chore(freeze): Kernel Governance Freeze v0.1",
     "2b83266 docs: add COMMANDS_REFERENCE for invariant verification",
     "2c72746 fix: block runtime TCB boundary mutation with Object.freeze",
     "bedf9a5 feat: determinism hardening + TCB boundary formalization",
     "e57d596 feat: implement Authorization Router and Schema Registry with deny-by-default"
   ],
   "notes": [
-    "First Kernel Governance Freeze - establishes authorization foundation",
+    "Kernel Governance Freeze v0.1 - establishes authorization foundation",
+    "Fixed: Removed broken imports to uncommitted modules (tcbIntegrity, safety, fileBackup)",
     "Authorization Router implements deny-by-default with deterministic tokens",
     "Schema Registry implements deny-by-default for ledger writes",
     "TCB Boundary formalized with runtime immutability (Object.freeze)",
     "All time dependencies removed from authorization tokens",
-    "179 acceptance tests verify governance invariants"
+    "179 acceptance tests verify governance invariants",
+    "Build now compiles cleanly on frozen commit"
   ]
 }
