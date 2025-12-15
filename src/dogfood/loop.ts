@@ -22,6 +22,7 @@ import { getProviderManifest } from '../adapters/manifest'
 import type { LLMProviderType } from '../llm/types'
 import { isTCBPath } from '../core/decisionClassifier'
 import { AuthorizationRouter, initializeAuthorizationRouter, type AuthorizationToken } from '../authorization/router'
+import { createProposalBridge, ProposalBridge, type BridgeResult } from '../proposal/proposalBridge'
 
 export type DogfoodingConfig = {
   cycleInterval: number  // ms between improvement attempts
@@ -46,6 +47,7 @@ export class DogfoodingLoop {
   private llmProvider: LLMProviderType | null = null
   private llmModel: string | null = null
   private authRouter: AuthorizationRouter
+  private proposalBridge: ProposalBridge
 
   constructor(config: DogfoodingConfig) {
     this.config = config
@@ -55,6 +57,9 @@ export class DogfoodingLoop {
     // Initialize Authorization Router - required for deny-by-default enforcement
     this.authRouter = new AuthorizationRouter(this.ledger)
     initializeAuthorizationRouter(this.ledger)
+
+    // Initialize Proposal Bridge - connects to ProposalV0 admission system
+    this.proposalBridge = createProposalBridge(this.ledger, 'dogfood_loop')
 
     // Initialize with ConstrainedLLM - prefer OpenAI if multiple provided
     if (config.openaiApiKey) {
@@ -266,6 +271,24 @@ export class DogfoodingLoop {
         await this.logEvent('awaiting_approval', { proposalId: proposal.value.id })
         return { success: true, proposal: proposal.value }
       }
+
+      // ═══════════════════════════════════════════════════════════════════════
+      // PROPOSAL ADMISSION: Bridge to ProposalV0 governance system
+      // This creates the canonical proposal record in the ledger
+      // ═══════════════════════════════════════════════════════════════════════
+      console.log('[4/6] Admitting proposal to ledger...')
+
+      const bridgeResult = await this.proposalBridge.bridgeValidated(proposal.value)
+
+      if (!bridgeResult.ok) {
+        const error = `Proposal admission failed: ${bridgeResult.error.message}`
+        await this.logFailure('proposal_admission_failed', error)
+        return { success: false, error, proposal: proposal.value }
+      }
+
+      const admittedProposal = bridgeResult.value
+      console.log(`  ✓ Proposal admitted: ${admittedProposal.proposalId}`)
+      console.log(`  Gate Decision: ${admittedProposal.admissionResult.gateDecision.decision}`)
 
       // 5. APPLY WITH ROLLBACK
       console.log('[5/6] Applying change...')
