@@ -95,6 +95,14 @@ const SCHEMAS: readonly SchemaDef[] = [
   // ═══════════════════════════════════════════════════════════════════════════
 
   {
+    schema_id: 'PROPOSAL_V0',
+    version: '1.0.0',
+    description: 'Proposal Schema v0 - input contract for kernel requests',
+    required_fields: ['version', 'proposal_id', 'intent', 'requested_action', 'targets', 'constraints', 'evidence_plan', 'provenance'],
+    governance_critical: false
+  },
+
+  {
     schema_id: 'PROPOSAL_ADMITTED',
     version: '1.0.0',
     description: 'Proposal admitted to ledger after gate approval',
