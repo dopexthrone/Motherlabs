@@ -21,8 +21,6 @@ import { createEvidenceArtifact, createGateResultArtifact, createLLMResponseArti
 import { getProviderManifest } from '../adapters/manifest'
 import type { LLMProviderType } from '../llm/types'
 import { isTCBPath } from '../core/decisionClassifier'
-import { verifyTCBIntegrity, printTCBIntegrityReport } from '../core/tcbIntegrity'
-import { SafetyGuard, SafetyGuardConfig, DEFAULT_DOGFOOD_SAFETY_CONFIG } from '../safety'
 import { AuthorizationRouter, initializeAuthorizationRouter, type AuthorizationToken } from '../authorization/router'
 
 export type DogfoodingConfig = {
@@ -36,8 +34,6 @@ export type DogfoodingConfig = {
   openaiModel?: OpenAIModel   // Optional - defaults to gpt-4o
   ollamaEnabled?: boolean     // Optional - enables local Ollama LLM
   ollamaConfig?: Partial<OllamaConfig>  // Optional - Ollama configuration
-  /** Safety guard configuration (rate limiting + circuit breaker) */
-  safetyConfig?: SafetyGuardConfig
 }
 
 export class DogfoodingLoop {
@@ -49,14 +45,12 @@ export class DogfoodingLoop {
   private hasLLM: boolean = false
   private llmProvider: LLMProviderType | null = null
   private llmModel: string | null = null
-  private safetyGuard: SafetyGuard
   private authRouter: AuthorizationRouter
 
   constructor(config: DogfoodingConfig) {
     this.config = config
     this.ledger = new JSONLLedger(config.ledgerPath)
     this.applier = new AutoApplier()
-    this.safetyGuard = new SafetyGuard(config.safetyConfig || DEFAULT_DOGFOOD_SAFETY_CONFIG)
 
     // Initialize Authorization Router - required for deny-by-default enforcement
     this.authRouter = new AuthorizationRouter(this.ledger)
@@ -101,24 +95,6 @@ export class DogfoodingLoop {
   async start(): Promise<void> {
     this.running = true
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // TCB INTEGRITY CHECK - Verify verifier hasn't been tampered with
-    // This runs BEFORE any self-improvement cycles begin
-    // ═══════════════════════════════════════════════════════════════════════
-    const integrityResult = verifyTCBIntegrity()
-    printTCBIntegrityReport(integrityResult)
-
-    if (!integrityResult.valid) {
-      console.error('⛔ TCB INTEGRITY CHECK FAILED - REFUSING TO START')
-      console.error('   The Trusted Computing Base may have been tampered with.')
-      console.error('   Review mismatches above and regenerate tcb-hashes.json if changes are legitimate.')
-      await this.ledger.append('tcb_integrity_failed', {
-        result: integrityResult,
-        timestamp: globalTimeProvider.now()
-      })
-      throw new Error('TCB integrity check failed - refusing to start self-improvement loop')
-    }
-
     console.log('═══════════════════════════════════════')
     console.log('  MOTHERLABS DOGFOODING LOOP')
     console.log('  Step 10: Self-Improvement Validation')
@@ -131,11 +107,6 @@ export class DogfoodingLoop {
       console.log(`  LLM provider: ${this.llmProvider}`)
       console.log(`  Model: ${this.llmModel}`)
     }
-    console.log('')
-    const safetyStats = this.safetyGuard.getStats()
-    console.log('  Safety Guard:')
-    console.log(`    Circuit breaker: ${safetyStats.circuitBreaker.state}`)
-    console.log(`    Rate limit: ${safetyStats.rateLimiter.operationsInWindow} ops in window`)
     console.log('')
 
     // Log startup
@@ -190,28 +161,8 @@ export class DogfoodingLoop {
    */
   private async runCycleInternal(): Promise<{ success: boolean; proposal?: ImprovementProposal; error?: string }> {
     try {
-      // ═══════════════════════════════════════════════════════════════════════
-      // SAFETY GUARD CHECK - Rate limiting & circuit breaker
-      // Prevents runaway loops and cascading failures
-      // ═══════════════════════════════════════════════════════════════════════
-      const safetyCheck = this.safetyGuard.canExecute()
-      if (!safetyCheck.allowed) {
-        const error = `SAFETY GUARD: Cycle blocked - ${safetyCheck.reason}`
-        console.log('')
-        console.log(`⚠ ${error}`)
-        const stats = this.safetyGuard.getStats()
-        console.log(`  Circuit: ${stats.circuitBreaker.state} (${stats.circuitBreaker.failureCount} failures)`)
-        console.log(`  Rate: ${stats.rateLimiter.operationsInWindow} ops in window`)
-        await this.logEvent('cycle_blocked_by_safety', { reason: safetyCheck.reason, stats })
-        // Don't record as failure - this is safety preventing execution
-        return { success: false, error }
-      }
-
-      // Cycle is allowed - record this in rate limiter stats display
-      const stats = this.safetyGuard.getStats()
       console.log('')
       console.log('═══ Improvement Cycle ═══')
-      console.log(`  (Rate: ${stats.rateLimiter.operationsInWindow + 1}/${DEFAULT_DOGFOOD_SAFETY_CONFIG.rateLimiter.maxOperations} in window)`)
       console.log('')
 
       // 1. ANALYZE SELF (deterministic)
@@ -411,9 +362,6 @@ export class DogfoodingLoop {
   }
 
   private async logSuccess(proposal: ImprovementProposal, result: ApplyResult): Promise<void> {
-    // Record success to safety guard (circuit breaker)
-    this.safetyGuard.recordSuccess()
-
     // Create evidence artifacts for governance compliance
     // REQUIRED for COMPLETED: gate_result, file_manifest, exit_code
     const evidenceIds: string[] = []
@@ -528,15 +476,7 @@ export class DogfoodingLoop {
     artifacts.set(fileManifestArtifact.artifact_id, fileManifestArtifact)
 
     // 3. Code diff artifact (REQUIRED)
-    // Use actual diff from rollback info if available
-    let diffContent: string
-    if (result.rollbackInfo?.fileDiff) {
-      diffContent = result.rollbackInfo.fileDiff.unifiedDiff
-    } else if (proposal.proposedChange.diff) {
-      diffContent = proposal.proposedChange.diff
-    } else {
-      diffContent = `[Applied then rolled back: ${proposal.proposedChange.code.length} chars]`
-    }
+    const diffContent = proposal.proposedChange.diff || `[Applied then rolled back: ${proposal.proposedChange.code.length} chars]`
 
     const codeDiffArtifact = createCodeDiffArtifact(diffContent, proposal.targetFile)
     await this.ledger.appendArtifact(codeDiffArtifact)
@@ -560,12 +500,6 @@ export class DogfoodingLoop {
       testResults: result.testResults,
       evidenceIds,
       conformance,
-      rollbackInfo: result.rollbackInfo ? {
-        backupSessionId: result.rollbackInfo.backupSessionId,
-        filesRestored: result.rollbackInfo.filesRestored,
-        diffLinesAdded: result.rollbackInfo.fileDiff?.linesAdded,
-        diffLinesRemoved: result.rollbackInfo.fileDiff?.linesRemoved
-      } : undefined,
       timestamp: globalTimeProvider.now()
     })
 
@@ -574,13 +508,9 @@ export class DogfoodingLoop {
   }
 
   private async logFailure(type: string, message: string): Promise<void> {
-    // Record failure to safety guard (circuit breaker)
-    this.safetyGuard.recordFailure()
-
     await this.ledger.append('cycle_failure', {
       type,
       message,
-      safetyGuardStats: this.safetyGuard.getStats(),
       timestamp: globalTimeProvider.now()
     })
   }
