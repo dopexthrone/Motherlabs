@@ -1060,29 +1060,183 @@ export class SixGateValidator {
    * Check if identifier is a built-in
    */
   private isBuiltin(name: string): boolean {
-    const builtins = [
-      // JavaScript builtins
-      'console', 'process', 'Buffer', 'global', 'require', 'module', 'exports',
-      'setTimeout', 'setInterval', 'clearTimeout', 'clearInterval',
-      'Error', 'TypeError', 'RangeError', 'ReferenceError',
-      'Array', 'Object', 'String', 'Number', 'Boolean', 'Date', 'Math', 'JSON',
-      'Promise', 'Map', 'Set', 'WeakMap', 'WeakSet',
-      // Common single letters / keywords
-      'a', 'b', 'c', 'd', 'e', 'i', 'j', 'k', 'x', 'y', 'z',
-      'n', 't', 'v', 'fn', 'cb', 'err', 'id',
-      'if', 'else', 'return', 'const', 'let', 'var', 'function',
-      // TypeScript
-      'number', 'string', 'boolean', 'void', 'any', 'unknown', 'never',
-      'undefined', 'null', 'true', 'false',
-      // Jest/Testing globals
-      'describe', 'test', 'it', 'expect', 'beforeEach', 'afterEach',
-      'beforeAll', 'afterAll', 'jest', 'toBe', 'toEqual', 'toThrow',
-      'toContain', 'toBeDefined', 'toBeUndefined', 'toBeNull', 'toBeTruthy',
-      'toBeFalsy', 'toHaveLength', 'toBeGreaterThan', 'toBeLessThan',
-      'toBeInstanceOf', 'toHaveBeenCalled', 'toHaveBeenCalledWith',
-      'mockResolvedValue', 'mockRejectedValue', 'mockReturnValue'
-    ]
-
-    return builtins.includes(name)
+    return JAVASCRIPT_GLOBALS.has(name)
   }
 }
+
+/**
+ * Comprehensive set of JavaScript/TypeScript/Node.js globals
+ * These are always available without explicit import
+ */
+const JAVASCRIPT_GLOBALS = new Set([
+  // ═══════════════════════════════════════════════════════════════
+  // ECMAScript Standard Built-in Objects
+  // ═══════════════════════════════════════════════════════════════
+
+  // Global object
+  'globalThis', 'global', 'window', 'self',
+
+  // Value properties
+  'Infinity', 'NaN', 'undefined', 'null',
+
+  // Function properties
+  'eval', 'isFinite', 'isNaN', 'parseFloat', 'parseInt',
+  'encodeURI', 'encodeURIComponent', 'decodeURI', 'decodeURIComponent',
+
+  // Fundamental objects
+  'Object', 'Function', 'Boolean', 'Symbol',
+
+  // Error objects
+  'Error', 'AggregateError', 'EvalError', 'RangeError', 'ReferenceError',
+  'SyntaxError', 'TypeError', 'URIError',
+
+  // Numbers and dates
+  'Number', 'BigInt', 'Math', 'Date',
+
+  // Text processing
+  'String', 'RegExp',
+
+  // Indexed collections
+  'Array', 'Int8Array', 'Uint8Array', 'Uint8ClampedArray',
+  'Int16Array', 'Uint16Array', 'Int32Array', 'Uint32Array',
+  'BigInt64Array', 'BigUint64Array', 'Float32Array', 'Float64Array',
+
+  // Keyed collections
+  'Map', 'Set', 'WeakMap', 'WeakSet', 'WeakRef',
+
+  // Structured data
+  'ArrayBuffer', 'SharedArrayBuffer', 'DataView', 'Atomics', 'JSON',
+
+  // Control abstraction
+  'Promise', 'Generator', 'GeneratorFunction',
+  'AsyncFunction', 'AsyncGenerator', 'AsyncGeneratorFunction',
+
+  // Reflection
+  'Reflect', 'Proxy',
+
+  // Internationalization
+  'Intl',
+
+  // ═══════════════════════════════════════════════════════════════
+  // Web APIs (available in Node.js 18+)
+  // ═══════════════════════════════════════════════════════════════
+
+  // Fetch API
+  'fetch', 'Request', 'Response', 'Headers',
+
+  // URL API
+  'URL', 'URLSearchParams',
+
+  // Abort API
+  'AbortController', 'AbortSignal',
+
+  // Encoding API
+  'TextEncoder', 'TextDecoder',
+
+  // Streams API
+  'ReadableStream', 'WritableStream', 'TransformStream',
+  'ReadableStreamDefaultReader', 'WritableStreamDefaultWriter',
+  'ByteLengthQueuingStrategy', 'CountQueuingStrategy',
+
+  // Blob/File API
+  'Blob', 'File', 'FileReader',
+
+  // Form data
+  'FormData',
+
+  // Web Crypto
+  'crypto', 'Crypto', 'CryptoKey', 'SubtleCrypto',
+
+  // Performance
+  'performance', 'Performance', 'PerformanceEntry', 'PerformanceObserver',
+
+  // Events
+  'Event', 'EventTarget', 'CustomEvent', 'MessageEvent',
+  'ErrorEvent', 'ProgressEvent',
+
+  // Messaging
+  'MessageChannel', 'MessagePort', 'BroadcastChannel',
+
+  // Timers
+  'setTimeout', 'setInterval', 'setImmediate',
+  'clearTimeout', 'clearInterval', 'clearImmediate',
+  'queueMicrotask',
+
+  // Structured clone
+  'structuredClone',
+
+  // Base64
+  'atob', 'btoa',
+
+  // Console
+  'console',
+
+  // ═══════════════════════════════════════════════════════════════
+  // Node.js Globals
+  // ═══════════════════════════════════════════════════════════════
+
+  'process', 'Buffer', 'require', 'module', 'exports', '__dirname', '__filename',
+
+  // ═══════════════════════════════════════════════════════════════
+  // TypeScript Keywords and Type Names
+  // ═══════════════════════════════════════════════════════════════
+
+  // Primitive types
+  'number', 'string', 'boolean', 'void', 'any', 'unknown', 'never', 'object',
+
+  // Literal values
+  'true', 'false',
+
+  // Special types
+  'this', 'super',
+
+  // Utility types (commonly used)
+  'Partial', 'Required', 'Readonly', 'Record', 'Pick', 'Omit', 'Exclude',
+  'Extract', 'NonNullable', 'Parameters', 'ConstructorParameters',
+  'ReturnType', 'InstanceType', 'ThisParameterType', 'OmitThisParameter',
+  'ThisType', 'Uppercase', 'Lowercase', 'Capitalize', 'Uncapitalize',
+  'Awaited',
+
+  // ═══════════════════════════════════════════════════════════════
+  // JavaScript Keywords (not identifiers but can appear in AST)
+  // ═══════════════════════════════════════════════════════════════
+
+  'if', 'else', 'return', 'const', 'let', 'var', 'function', 'class',
+  'new', 'delete', 'typeof', 'instanceof', 'in', 'of',
+  'for', 'while', 'do', 'switch', 'case', 'default', 'break', 'continue',
+  'try', 'catch', 'finally', 'throw',
+  'async', 'await', 'yield',
+  'static', 'get', 'set',
+  'extends', 'implements',
+  'import', 'export', 'from', 'as',
+  'public', 'private', 'protected', 'readonly',
+  'abstract', 'interface', 'type', 'enum', 'namespace', 'declare',
+
+  // ═══════════════════════════════════════════════════════════════
+  // Testing Framework Globals (Jest, Mocha, etc.)
+  // ═══════════════════════════════════════════════════════════════
+
+  'describe', 'test', 'it', 'expect', 'beforeEach', 'afterEach',
+  'beforeAll', 'afterAll', 'jest', 'vi', 'mock',
+  'toBe', 'toEqual', 'toThrow', 'toContain', 'toBeDefined', 'toBeUndefined',
+  'toBeNull', 'toBeTruthy', 'toBeFalsy', 'toHaveLength', 'toBeGreaterThan',
+  'toBeLessThan', 'toBeInstanceOf', 'toHaveBeenCalled', 'toHaveBeenCalledWith',
+  'mockResolvedValue', 'mockRejectedValue', 'mockReturnValue', 'mockImplementation',
+  'spyOn', 'fn',
+
+  // ═══════════════════════════════════════════════════════════════
+  // Common Short Variable Names (false positive prevention)
+  // ═══════════════════════════════════════════════════════════════
+
+  'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+  'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+  '_', '$',
+  'fn', 'cb', 'err', 'id', 'el', 'ev', 'ctx', 'req', 'res', 'obj', 'arr',
+  'key', 'val', 'idx', 'len', 'acc', 'cur', 'prev', 'next', 'item', 'data',
+  'args', 'opts', 'config', 'options', 'params', 'result', 'value', 'values',
+  'name', 'type', 'kind', 'path', 'file', 'dir', 'src', 'dest', 'input', 'output',
+  'start', 'end', 'min', 'max', 'count', 'index', 'size', 'total',
+  'ok', 'error', 'message', 'code', 'status', 'state', 'event', 'handler',
+  'callback', 'promise', 'resolve', 'reject', 'then', 'catch', 'finally',
+  'self', 'that', 'instance', 'context', 'scope', 'target', 'source'
+])
