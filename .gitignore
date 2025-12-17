@@ -7,6 +7,18 @@ node_modules/
 # Evidence and sandbox (runtime artifacts)
 evidence/
 .sandbox/
+.gate-temp/
+
+# Sensitive data - API keys, credentials, secrets
+.env
+.env.*
+*.env
+api_keys.md
+api_providers.md
+credentials.json
+secrets.json
+*.pem
+*.key
 
 # Editor and OS
 .vscode/
@@ -14,6 +26,7 @@ evidence/
 *.swp
 *.swo
 .DS_Store
+Thumbs.db
 
 # Logs
 *.log
@@ -22,3 +35,14 @@ npm-debug.log*
 # Temporary files
 *.tmp
 .tmp/
+
+# Lock files (runtime)
+*.lock
+
+# Coverage reports
+coverage/
+.nyc_output/
+
+# Local config overrides
+local.config.js
+local.config.json

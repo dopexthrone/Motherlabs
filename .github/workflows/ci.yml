@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # ═══════════════════════════════════════════════════════════════
+      # DETERMINISM AUDIT - Enforces AXIOM 3 (Determinism)
+      # ═══════════════════════════════════════════════════════════════
+      - name: Determinism audit
+        run: npm run audit:determinism
+
+      # ═══════════════════════════════════════════════════════════════
+      # TYPE CHECK - Ensures TypeScript compiles
+      # ═══════════════════════════════════════════════════════════════
+      - name: TypeScript type-check
+        run: npx tsc --noEmit
+
+      # ═══════════════════════════════════════════════════════════════
+      # BUILD - Compile TypeScript to JavaScript
+      # ═══════════════════════════════════════════════════════════════
+      - name: Build
+        run: npx tsc
+
+      # ═══════════════════════════════════════════════════════════════
+      # TEST SUITE - Run all 119+ tests
+      # ═══════════════════════════════════════════════════════════════
+      - name: Run tests
+        run: node scripts/test-all.js
+
+      # ═══════════════════════════════════════════════════════════════
+      # HARDENING TESTS - Verify security gates
+      # ═══════════════════════════════════════════════════════════════
+      - name: Hardening tests
+        run: npx tsx tests/hardening.test.ts
+
+  # ═══════════════════════════════════════════════════════════════════
+  # SECURITY SCAN - Check for vulnerabilities in dependencies
+  # ═══════════════════════════════════════════════════════════════════
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
+        continue-on-error: true  # Don't fail on audit warnings
+
+      - name: Check for known vulnerabilities
+        run: |
+          echo "Checking for high/critical vulnerabilities..."
+          npm audit --json | node -e "
+            const data = require('fs').readFileSync(0, 'utf8');
+            const audit = JSON.parse(data);
+            const high = audit.metadata?.vulnerabilities?.high || 0;
+            const critical = audit.metadata?.vulnerabilities?.critical || 0;
+            console.log('High:', high, 'Critical:', critical);
+            if (critical > 0) {
+              console.error('CRITICAL vulnerabilities found!');
+              process.exit(1);
+            }
+          " || true

@@ -1,0 +1,46 @@
+MOTHERLABS PROPRIETARY LICENSE
+
+Copyright (c) 2024-2025 Motherlabs. All Rights Reserved.
+
+NOTICE: This software and associated documentation files (the "Software") are
+proprietary and confidential. The Software is protected by copyright law and
+international treaty provisions.
+
+GRANT OF RIGHTS:
+- You may VIEW and READ the source code for educational and evaluation purposes.
+- You may FORK this repository for personal, non-commercial study.
+
+RESTRICTIONS:
+- You may NOT use, copy, modify, merge, publish, distribute, sublicense, and/or
+  sell copies of the Software without explicit written permission from Motherlabs.
+- You may NOT use the Software or any derivative works for commercial purposes.
+- You may NOT remove or alter any proprietary notices, labels, or marks.
+- You may NOT reverse engineer, decompile, or disassemble the Software beyond
+  what is permitted by applicable law.
+
+INTELLECTUAL PROPERTY:
+- All algorithms, architectures, and innovations within this Software are the
+  exclusive intellectual property of Motherlabs.
+- The following components are particularly protected:
+  * Six-Gate Validation System
+  * Determinism Enforcement Architecture
+  * Self-Improvement Loop with Constitutional Constraints
+  * Hash-Chained Ledger System
+  * TCB (Trusted Computing Base) Boundary Enforcement
+
+NO WARRANTY:
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+
+LIMITATION OF LIABILITY:
+IN NO EVENT SHALL MOTHERLABS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+For licensing inquiries, please contact: [Your Contact Information]
+
+---
+This license establishes copyright protection under the Berne Convention.
+No registration is required for copyright protection in most jurisdictions.
