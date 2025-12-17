@@ -120,7 +120,7 @@ export function createProposalOutcome(
   status: TerminalStatus,
   evidenceIds: string[]
 ): ProposalOutcome {
-  const now = new Date().toISOString()
+  const now = new Date().toISOString()  // DETERMINISM-EXEMPT:TIME
 
   const outcome: ProposalOutcome = {
     proposal_id: proposalId,

@@ -26,7 +26,8 @@ import { createProposalBridge, ProposalBridge, type BridgeResult } from '../prop
 
 export type DogfoodingConfig = {
   cycleInterval: number  // ms between improvement attempts
-  requireHumanApproval: boolean
+  requireHumanApproval?: boolean  // Default: true - human review required
+  bootstrapBypass?: boolean       // Explicit opt-in for auto-apply without approval
   maxImprovementsPerCycle: number
   ledgerPath: string
   anthropicApiKey?: string    // Optional - enables Anthropic Claude
@@ -35,6 +36,12 @@ export type DogfoodingConfig = {
   openaiModel?: OpenAIModel   // Optional - defaults to gpt-4o
   ollamaEnabled?: boolean     // Optional - enables local Ollama LLM
   ollamaConfig?: Partial<OllamaConfig>  // Optional - Ollama configuration
+}
+
+/** Default: requireHumanApproval = true (safe default) */
+const DEFAULT_CONFIG: Partial<DogfoodingConfig> = {
+  requireHumanApproval: true,
+  bootstrapBypass: false
 }
 
 export class DogfoodingLoop {
@@ -50,13 +57,28 @@ export class DogfoodingLoop {
   private proposalBridge: ProposalBridge
 
   constructor(config: DogfoodingConfig) {
-    this.config = config
+    // Apply defaults - requireHumanApproval defaults to true (safe default)
+    this.config = { ...DEFAULT_CONFIG, ...config } as DogfoodingConfig & Required<Pick<DogfoodingConfig, 'requireHumanApproval' | 'bootstrapBypass'>>
     this.ledger = new JSONLLedger(config.ledgerPath)
     this.applier = new AutoApplier()
 
     // Initialize Authorization Router - required for deny-by-default enforcement
     this.authRouter = new AuthorizationRouter(this.ledger)
     initializeAuthorizationRouter(this.ledger)
+
+    // Log bootstrap exception if auto-apply enabled without human approval
+    if (this.config.bootstrapBypass && !this.config.requireHumanApproval) {
+      // DETERMINISM-EXEMPT:TIME - Ledger metadata
+      this.ledger.append('BOOTSTRAP_EXCEPTION', {
+        reason: 'Bootstrap mode enabled - requireHumanApproval=false with bootstrapBypass=true',
+        config_hash: contentAddress({
+          requireHumanApproval: this.config.requireHumanApproval,
+          bootstrapBypass: this.config.bootstrapBypass,
+          llmProvider: config.anthropicApiKey ? 'anthropic' : config.openaiApiKey ? 'openai' : 'ollama'
+        }),
+        timestamp: globalTimeProvider.now()
+      }).catch(() => { /* ignore ledger write errors during bootstrap */ })
+    }
 
     // Initialize Proposal Bridge - connects to ProposalV0 admission system
     this.proposalBridge = createProposalBridge(this.ledger, 'dogfood_loop')

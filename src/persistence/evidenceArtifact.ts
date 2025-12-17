@@ -1,6 +1,10 @@
 // Evidence Artifact System - Content-addressed evidence storage
 // Ported from manual kernel verifier governance patterns
 // CONSTITUTIONAL AUTHORITY - Enforces: AXIOM 8 (Immutable Evidence)
+//
+// DETERMINISM NOTE: All timestamps in this file are metadata-only.
+// The artifact_id is computed from payload content ONLY (via SHA256).
+// Timestamps don't affect content addressing or reproducibility.
 
 import * as crypto from 'crypto'
 import { contentAddress } from '../core/contentAddress'
@@ -71,7 +75,7 @@ export function createEvidenceArtifact(
     payload_encoding: encoding,
     payload: payloadStr,
     metadata: metadata ?? {
-      created_at_utc: new Date().toISOString()
+      created_at_utc: new Date().toISOString()  // DETERMINISM-EXEMPT:TIME - Metadata only
     }
   }
 }
@@ -93,7 +97,7 @@ export function createStdoutArtifact(
   sourceCommand?: string
 ): EvidenceArtifact {
   return createEvidenceArtifact(stdout, 'stdout_log', {
-    created_at_utc: new Date().toISOString(),
+    created_at_utc: new Date().toISOString(),  // DETERMINISM-EXEMPT:TIME
     description: sourceCommand ? `stdout from: ${sourceCommand}` : 'stdout capture'
   })
 }
@@ -106,7 +110,7 @@ export function createStderrArtifact(
   sourceCommand?: string
 ): EvidenceArtifact {
   return createEvidenceArtifact(stderr, 'stderr_log', {
-    created_at_utc: new Date().toISOString(),
+    created_at_utc: new Date().toISOString(),  // DETERMINISM-EXEMPT:TIME
     description: sourceCommand ? `stderr from: ${sourceCommand}` : 'stderr capture'
   })
 }
@@ -122,7 +126,7 @@ export function createExitCodeArtifact(
     JSON.stringify({ exit_code: exitCode, command }),
     'exit_code',
     {
-      created_at_utc: new Date().toISOString(),
+      created_at_utc: new Date().toISOString(),  // DETERMINISM-EXEMPT:TIME
       description: `exit code ${exitCode}`
     }
   )
@@ -141,7 +145,7 @@ export function createGateResultArtifact(
     JSON.stringify({ gate: gateName, passed, error, details }),
     'gate_result',
     {
-      created_at_utc: new Date().toISOString(),
+      created_at_utc: new Date().toISOString(),  // DETERMINISM-EXEMPT:TIME
       description: `${gateName}: ${passed ? 'PASS' : 'FAIL'}`,
       tags: [gateName, passed ? 'passed' : 'failed']
     }
@@ -158,7 +162,7 @@ export function createLLMResponseArtifact(
   promptHash?: string
 ): EvidenceArtifact {
   return createEvidenceArtifact(response, 'llm_response', {
-    created_at_utc: new Date().toISOString(),
+    created_at_utc: new Date().toISOString(),  // DETERMINISM-EXEMPT:TIME
     description: `LLM response from ${provider}/${model}`,
     tags: [provider, model],
     related_artifacts: promptHash ? [promptHash] : undefined
@@ -173,7 +177,7 @@ export function createCodeDiffArtifact(
   filepath: string
 ): EvidenceArtifact {
   return createEvidenceArtifact(diff, 'code_diff', {
-    created_at_utc: new Date().toISOString(),
+    created_at_utc: new Date().toISOString(),  // DETERMINISM-EXEMPT:TIME
     source_file: filepath,
     description: `diff for ${filepath}`
   })
@@ -192,7 +196,7 @@ export function createTestResultArtifact(
     JSON.stringify({ passed, failed, skipped, total: passed + failed + skipped, output }),
     'test_result',
     {
-      created_at_utc: new Date().toISOString(),
+      created_at_utc: new Date().toISOString(),  // DETERMINISM-EXEMPT:TIME
       description: `tests: ${passed} passed, ${failed} failed, ${skipped} skipped`,
       tags: failed > 0 ? ['has_failures'] : ['all_passed']
     }
@@ -214,7 +218,7 @@ export function createFileManifestArtifact(
     JSON.stringify({ entries, count: entries.length }),
     'file_manifest',
     {
-      created_at_utc: new Date().toISOString(),
+      created_at_utc: new Date().toISOString(),  // DETERMINISM-EXEMPT:TIME
       description: `${entries.length} file operations`
     }
   )

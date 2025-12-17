@@ -46,7 +46,7 @@ export async function bundleForExecution(
 ): Promise<Result<BundleResult, Error>> {
   const opts = { ...DEFAULT_OPTIONS, ...options }
   const tempDir = path.join(process.cwd(), '.gate-temp')
-  const timestamp = Date.now()
+  const timestamp = Date.now()  // DETERMINISM-EXEMPT:TIME - Temp file uniqueness
   const tempInput = path.join(tempDir, `input-${timestamp}.ts`)
   const tempOutput = path.join(tempDir, `output-${timestamp}.js`)
 

@@ -105,7 +105,7 @@ function hashObject(obj: unknown): string {
  */
 function snapshotSandboxState(runDir: string): SandboxSnapshot {
   const snapshot: SandboxSnapshot = {
-    timestamp: Date.now(),
+    timestamp: Date.now(),  // DETERMINISM-EXEMPT:TIME - Snapshot metadata
     files: new Map()
   }
 
@@ -253,7 +253,7 @@ function diffSandboxState(
  * Create run directory
  */
 function createRunDirectory(attemptId: string): string {
-  const timestamp = Date.now()
+  const timestamp = Date.now()  // DETERMINISM-EXEMPT:TIME - Directory name only
   const runDir = resolve(SANDBOX_ROOT, `${timestamp}-${attemptId}`)
 
   if (!existsSync(SANDBOX_ROOT)) {
@@ -281,7 +281,7 @@ function writeEvidence(
   const artifact = {
     artifact_type: artifactType,
     attempt_id: attemptId,
-    timestamp: Date.now(),
+    timestamp: Date.now(),  // DETERMINISM-EXEMPT:TIME - Evidence metadata
     content: contentStr
   }
 

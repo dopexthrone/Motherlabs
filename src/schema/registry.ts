@@ -83,6 +83,14 @@ const SCHEMAS: readonly SchemaDef[] = [
   },
 
   {
+    schema_id: 'BOOTSTRAP_EXCEPTION',
+    version: '1.0.0',
+    description: 'Bootstrap mode enabled - records when human approval is bypassed',
+    required_fields: ['reason', 'config_hash', 'timestamp'],
+    governance_critical: true
+  },
+
+  {
     schema_id: 'LEDGER_FREEZE',
     version: '1.0.0',
     description: 'Ledger freeze event - marks ledger as immutable',

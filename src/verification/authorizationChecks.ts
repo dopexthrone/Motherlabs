@@ -193,7 +193,7 @@ export function createAuthorizationGateDecision(
       granted_effects: grantedEffects
     },
     authorizer,
-    issued_at_utc: new Date().toISOString(),
+    issued_at_utc: new Date().toISOString(),  // DETERMINISM-EXEMPT:TIME
     reason
   }
 }

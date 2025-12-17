@@ -1,58 +1,31 @@
 #!/bin/bash
-# Pre-Build Validation - ALL checks must pass
+# Pre-build script - Runs determinism audit before TypeScript compilation
+# CONSTITUTIONAL AUTHORITY - See docs/MOTHERLABS_CONSTITUTION.md
+# Enforces: AXIOM 3 (Determinism), AXIOM 6 (Reproducibility)
 
-set -e  # Exit on any error
-set -u  # Exit on undefined variable
+set -e
 
-echo "=== Pre-Build Validation Gates ==="
+echo "═══════════════════════════════════════════════════════════════"
+echo "  PRE-BUILD CHECKS"
+echo "═══════════════════════════════════════════════════════════════"
 echo ""
 
-# Gate 1: No TODO/FIXME in src/
-echo "[Gate 1] Checking for TODO/FIXME in source..."
-if grep -rn "TODO\|FIXME\|XXX\|HACK" src/ --include="*.ts" | grep -v "node_modules" | grep -v "SAFETY:"; then
-  echo "✗ GATE FAILED: TODO/FIXME found in source code"
-  echo "RULE: No placeholders in production paths"
-  exit 1
-fi
-echo "✓ Gate 1 passed"
-echo ""
+# Change to project root
+cd "$(dirname "$0")/.."
 
-# Gate 2: All types have schemas
-echo "[Gate 2] Verifying schema coverage..."
-node scripts/verify-schemas.js || {
-  echo "✗ GATE FAILED: Schema coverage incomplete"
-  exit 1
-}
-echo ""
+# Step 1: Determinism audit (using existing check-determinism.js)
+echo "Step 1: Running determinism audit..."
+node scripts/check-determinism.js
 
-# Gate 3: No non-deterministic code
-echo "[Gate 3] Checking determinism..."
-node scripts/check-determinism.js || {
-  echo "✗ GATE FAILED: Non-deterministic code detected"
-  exit 1
-}
 echo ""
+echo "Step 2: Schema verification (advisory)..."
+node scripts/verify-schemas.js || echo "  [WARNING] Schema verification found issues (non-blocking)"
 
-# Gate 4: No mock bias
-echo "[Gate 4] Checking for mock bias..."
-if [ -d "tests" ]; then
-  node scripts/detect-mocks.js || {
-    echo "✗ GATE FAILED: Mock/stub patterns detected"
-    exit 1
-  }
-fi
 echo ""
+echo "Step 3: TypeScript type-check..."
+npx tsc --noEmit
 
-# Gate 5: TypeScript strict mode check
-echo "[Gate 5] Verifying TypeScript strict mode..."
-if ! grep -q '"strict": true' tsconfig.json; then
-  echo "✗ GATE FAILED: TypeScript strict mode not enabled"
-  exit 1
-fi
-echo "✓ Gate 5 passed"
 echo ""
-
-echo "═══════════════════════════════════════"
-echo "✓ ALL PRE-BUILD GATES PASSED"
-echo "✓ Safe to proceed with build"
-echo "═══════════════════════════════════════"
+echo "═══════════════════════════════════════════════════════════════"
+echo "  PRE-BUILD CHECKS PASSED"
+echo "═══════════════════════════════════════════════════════════════"

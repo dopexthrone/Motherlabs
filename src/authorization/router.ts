@@ -118,8 +118,7 @@ export class AuthorizationRouter {
     const token: AuthorizationToken = {
       token_id: contentAddress(authorizationTruth),
       ...authorizationTruth,
-      // Metadata only - not part of token_id, not verified
-      issued_at_metadata: Date.now()
+      issued_at_metadata: Date.now()  // DETERMINISM-EXEMPT:TIME - Metadata only, not part of token_id
     }
 
     return Ok(token)

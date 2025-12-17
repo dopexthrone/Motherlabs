@@ -137,7 +137,7 @@ function killProcessTree(pid: number): void {
  */
 function createRunDirectory(): string {
   const id = randomBytes(8).toString('hex')
-  const timestamp = Date.now()
+  const timestamp = Date.now()  // DETERMINISM-EXEMPT:TIME - Used for unique directory name only
   const runDirName = `${timestamp}-${id}`
   const runDir = resolve(SANDBOX_ROOT, runDirName)
 
@@ -159,7 +159,7 @@ async function executeInSandbox(
   cwd: string,
   config: ExecutionConfig
 ): Promise<ExecutionResult> {
-  const startTime = Date.now()
+  const startTime = Date.now()  // DETERMINISM-EXEMPT:TIME - Performance measurement only
 
   return new Promise((resolvePromise) => {
     let stdout = ''
@@ -223,7 +223,7 @@ async function executeInSandbox(
 
     proc.on('close', (code) => {
       clearTimeout(timeoutId)
-      const durationMs = Date.now() - startTime
+      const durationMs = Date.now() - startTime  // DETERMINISM-EXEMPT:TIME
 
       resolvePromise({
         success: code === 0,
@@ -238,7 +238,7 @@ async function executeInSandbox(
 
     proc.on('error', (err) => {
       clearTimeout(timeoutId)
-      const durationMs = Date.now() - startTime
+      const durationMs = Date.now() - startTime  // DETERMINISM-EXEMPT:TIME
       stderr += `\n[SANDBOX] Process error: ${err.message}`
 
       resolvePromise({

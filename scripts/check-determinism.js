@@ -31,11 +31,22 @@ const FORBIDDEN_PATTERNS = [
   { pattern: /crypto\.randomBytes/, message: 'randomBytes breaks determinism - use seeded generator' }
 ]
 
+// Files that are exempt from determinism audit (they define rules, not code)
+const EXEMPT_FILES = [
+  'src/validation/determinismAudit.ts',  // Defines the audit rules
+  'src/validation/securityScanner.ts'    // Security pattern definitions
+]
+
 const files = globSync('src/**/*.ts')
 
 let errors = 0
 
 for (const file of files) {
+  // Skip exempt files
+  if (EXEMPT_FILES.some(exempt => file.endsWith(exempt) || file.includes(exempt))) {
+    continue
+  }
+
   const content = fs.readFileSync(file, 'utf-8')
   const lines = content.split('\n')
 

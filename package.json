@@ -4,8 +4,10 @@
   "description": "Motherlabs Runtime - Deterministic Reasoning Engine",
   "main": "dist/index.js",
   "scripts": {
+    "prebuild": "./scripts/pre-build.sh",
     "build": "tsc",
     "start": "node dist/cli.js",
+    "audit:determinism": "node scripts/check-determinism.js",
     "test": "npm run build && node scripts/test-all.js",
     "test:quick": "npm run build && npx tsx tests/urco.test.ts && npx tsx tests/urco-failures.test.ts && npx tsx tests/llm-deterministic.test.ts && npx tsx tests/state-corruption.test.ts && npx tsx tests/serialization.test.ts",
     "test:urco": "npm run build && npx tsx tests/urco.test.ts",

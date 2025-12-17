@@ -73,7 +73,7 @@ export class JSONLLedger {
     const genesis: JSONLRecord = {
       record_type: 'GENESIS',
       seq: 0,
-      timestamp: Date.now(),  // Metadata: stored but not hashed
+      timestamp: Date.now(),  // DETERMINISM-EXEMPT:TIME - Metadata: stored but not hashed
       prev_hash: 'genesis',
       record: {
         kernel_version: '1.0.0',
@@ -220,7 +220,7 @@ export class JSONLLedger {
       const entry: JSONLRecord = {
         record_type,
         seq: this.seq,
-        timestamp: Date.now(),  // Metadata: stored but not hashed
+        timestamp: Date.now(),  // DETERMINISM-EXEMPT:TIME - Metadata: stored but not hashed
         prev_hash: this.lastHash,
         record,
         record_hash: ''  // Computed below
