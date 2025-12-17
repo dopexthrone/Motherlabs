@@ -1225,6 +1225,13 @@ const JAVASCRIPT_GLOBALS = new Set([
   'spyOn', 'fn',
 
   // ═══════════════════════════════════════════════════════════════
+  // Generic Type Parameters (uppercase single letters)
+  // ═══════════════════════════════════════════════════════════════
+
+  'T', 'K', 'V', 'U', 'R', 'P', 'S', 'A', 'B', 'C', 'E', 'N', 'M',
+  'TKey', 'TValue', 'TResult', 'TInput', 'TOutput', 'TError', 'TData',
+
+  // ═══════════════════════════════════════════════════════════════
   // Common Short Variable Names (false positive prevention)
   // ═══════════════════════════════════════════════════════════════
 
