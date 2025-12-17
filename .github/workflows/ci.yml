@@ -57,6 +57,49 @@ jobs:
       - name: Hardening tests
         run: npx tsx tests/hardening.test.ts
 
+      # ═══════════════════════════════════════════════════════════════
+      # HASH CHAIN VERIFICATION - Verify ledger integrity
+      # ═══════════════════════════════════════════════════════════════
+      - name: Verify hash chain integrity
+        run: |
+          echo "Verifying hash chain integrity..."
+          node -e "
+            const { JSONLLedger } = require('./dist/persistence/jsonlLedger');
+            const fs = require('fs');
+            const path = require('path');
+
+            // Check if any test ledgers exist
+            const evidenceDir = 'evidence';
+            if (fs.existsSync(evidenceDir)) {
+              const files = fs.readdirSync(evidenceDir).filter(f => f.endsWith('.jsonl'));
+              console.log('Found', files.length, 'ledger files');
+
+              for (const file of files.slice(0, 3)) {  // Check first 3
+                const ledger = new JSONLLedger(path.join(evidenceDir, file));
+                const result = ledger.verifyChain();
+                if (result.ok) {
+                  console.log('  ✓', file, '- chain valid');
+                } else {
+                  console.error('  ✗', file, '-', result.error.message);
+                  process.exit(1);
+                }
+              }
+            } else {
+              console.log('No evidence directory - skipping');
+            }
+          "
+
+      # ═══════════════════════════════════════════════════════════════
+      # UPLOAD BUILD ARTIFACTS
+      # ═══════════════════════════════════════════════════════════════
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        if: matrix.node-version == '20.x'
+        with:
+          name: build-dist
+          path: dist/
+          retention-days: 7
+
   # ═══════════════════════════════════════════════════════════════════
   # SECURITY SCAN - Check for vulnerabilities in dependencies
   # ═══════════════════════════════════════════════════════════════════

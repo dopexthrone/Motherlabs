@@ -6,6 +6,7 @@ node_modules/
 
 # Evidence and sandbox (runtime artifacts)
 evidence/
+!evidence/public-tasks.json
 .sandbox/
 .gate-temp/
 

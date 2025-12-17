@@ -1,0 +1,207 @@
+{
+  "version": "1.0.0",
+  "description": "Public benchmark tasks for externally verifiable validation",
+  "created": "2024-12-16",
+  "tasks": [
+    {
+      "id": "task-001",
+      "category": "api",
+      "input": "Build a REST API with JWT authentication",
+      "expected_properties": {
+        "min_subtasks": 3,
+        "max_subtasks": 10,
+        "required_keywords": ["auth", "jwt", "endpoint", "middleware"]
+      }
+    },
+    {
+      "id": "task-002",
+      "category": "api",
+      "input": "Create a GraphQL server with user queries and mutations",
+      "expected_properties": {
+        "min_subtasks": 3,
+        "max_subtasks": 8,
+        "required_keywords": ["graphql", "query", "mutation", "resolver"]
+      }
+    },
+    {
+      "id": "task-003",
+      "category": "database",
+      "input": "Implement a connection pool for PostgreSQL with retry logic",
+      "expected_properties": {
+        "min_subtasks": 2,
+        "max_subtasks": 6,
+        "required_keywords": ["pool", "connection", "retry"]
+      }
+    },
+    {
+      "id": "task-004",
+      "category": "database",
+      "input": "Build a key-value store with LRU cache eviction",
+      "expected_properties": {
+        "min_subtasks": 2,
+        "max_subtasks": 5,
+        "required_keywords": ["cache", "lru", "evict"]
+      }
+    },
+    {
+      "id": "task-005",
+      "category": "security",
+      "input": "Implement rate limiting middleware with sliding window",
+      "expected_properties": {
+        "min_subtasks": 2,
+        "max_subtasks": 5,
+        "required_keywords": ["rate", "limit", "window"]
+      }
+    },
+    {
+      "id": "task-006",
+      "category": "security",
+      "input": "Create input validation library with sanitization",
+      "expected_properties": {
+        "min_subtasks": 2,
+        "max_subtasks": 6,
+        "required_keywords": ["valid", "saniti", "input"]
+      }
+    },
+    {
+      "id": "task-007",
+      "category": "testing",
+      "input": "Build a test runner with parallel execution support",
+      "expected_properties": {
+        "min_subtasks": 3,
+        "max_subtasks": 7,
+        "required_keywords": ["test", "parallel", "run"]
+      }
+    },
+    {
+      "id": "task-008",
+      "category": "testing",
+      "input": "Implement snapshot testing for JSON outputs",
+      "expected_properties": {
+        "min_subtasks": 2,
+        "max_subtasks": 5,
+        "required_keywords": ["snapshot", "test", "compare"]
+      }
+    },
+    {
+      "id": "task-009",
+      "category": "cli",
+      "input": "Create a CLI tool with subcommands and help generation",
+      "expected_properties": {
+        "min_subtasks": 2,
+        "max_subtasks": 6,
+        "required_keywords": ["cli", "command", "help"]
+      }
+    },
+    {
+      "id": "task-010",
+      "category": "cli",
+      "input": "Build a configuration file parser supporting JSON and YAML",
+      "expected_properties": {
+        "min_subtasks": 2,
+        "max_subtasks": 5,
+        "required_keywords": ["config", "parse", "json"]
+      }
+    },
+    {
+      "id": "task-011",
+      "category": "async",
+      "input": "Implement a job queue with priority scheduling",
+      "expected_properties": {
+        "min_subtasks": 2,
+        "max_subtasks": 6,
+        "required_keywords": ["queue", "job", "priority"]
+      }
+    },
+    {
+      "id": "task-012",
+      "category": "async",
+      "input": "Create an event emitter with typed events and once listeners",
+      "expected_properties": {
+        "min_subtasks": 2,
+        "max_subtasks": 5,
+        "required_keywords": ["event", "emit", "listen"]
+      }
+    },
+    {
+      "id": "task-013",
+      "category": "data",
+      "input": "Build a CSV parser with streaming support",
+      "expected_properties": {
+        "min_subtasks": 2,
+        "max_subtasks": 5,
+        "required_keywords": ["csv", "parse", "stream"]
+      }
+    },
+    {
+      "id": "task-014",
+      "category": "data",
+      "input": "Implement JSON schema validator with custom error messages",
+      "expected_properties": {
+        "min_subtasks": 2,
+        "max_subtasks": 6,
+        "required_keywords": ["schema", "valid", "error"]
+      }
+    },
+    {
+      "id": "task-015",
+      "category": "network",
+      "input": "Create HTTP client with automatic retries and timeout",
+      "expected_properties": {
+        "min_subtasks": 2,
+        "max_subtasks": 5,
+        "required_keywords": ["http", "retry", "timeout"]
+      }
+    },
+    {
+      "id": "task-016",
+      "category": "network",
+      "input": "Build WebSocket server with room-based messaging",
+      "expected_properties": {
+        "min_subtasks": 3,
+        "max_subtasks": 7,
+        "required_keywords": ["websocket", "room", "message"]
+      }
+    },
+    {
+      "id": "task-017",
+      "category": "logging",
+      "input": "Implement structured logger with log levels and formatters",
+      "expected_properties": {
+        "min_subtasks": 2,
+        "max_subtasks": 5,
+        "required_keywords": ["log", "level", "format"]
+      }
+    },
+    {
+      "id": "task-018",
+      "category": "logging",
+      "input": "Create metrics collector with histogram and counter types",
+      "expected_properties": {
+        "min_subtasks": 2,
+        "max_subtasks": 5,
+        "required_keywords": ["metric", "counter", "histogram"]
+      }
+    },
+    {
+      "id": "task-019",
+      "category": "algorithm",
+      "input": "Implement a trie data structure with autocomplete",
+      "expected_properties": {
+        "min_subtasks": 2,
+        "max_subtasks": 4,
+        "required_keywords": ["trie", "insert", "search"]
+      }
+    },
+    {
+      "id": "task-020",
+      "category": "algorithm",
+      "input": "Build a bloom filter for membership testing",
+      "expected_properties": {
+        "min_subtasks": 2,
+        "max_subtasks": 4,
+        "required_keywords": ["bloom", "filter", "hash"]
+      }
+    }
+  ]
+}
