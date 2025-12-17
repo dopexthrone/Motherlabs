@@ -2,6 +2,12 @@
 // CONSTITUTIONAL AUTHORITY - See docs/MOTHERLABS_CONSTITUTION.md
 // Enforces: AXIOM 6 (No Silent State Mutation), Gate 6 Governance
 // TCB Component: Part of the 6-Gate Validation System
+//
+// Two-tier scanning:
+// 1. Regex patterns (fast, catches obvious patterns)
+// 2. AST analysis (slower, catches dataflow to dangerous sinks)
+
+import { scanWithAST } from './astSecurityScanner'
 
 export type SecurityVulnerability = {
   type: SecurityVulnerabilityType
@@ -77,7 +83,7 @@ const SECURITY_PATTERNS: Array<{
     message: 'Dynamic string in spawn() - potential command injection'
   },
 
-  // Path Traversal
+  // Path Traversal - import/require with ../ is filtered in scan loop
   {
     type: 'PATH_TRAVERSAL',
     severity: 'high',
@@ -330,6 +336,10 @@ const SAFE_PATTERNS: RegExp[] = [
 
 /**
  * Scan code for security vulnerabilities
+ *
+ * Two-tier scanning:
+ * 1. Fast regex patterns (catches obvious patterns)
+ * 2. AST analysis (catches dataflow to dangerous sinks)
  */
 export function scanForVulnerabilities(code: string): SecurityScanResult {
   const vulnerabilities: SecurityVulnerability[] = []
@@ -338,6 +348,9 @@ export function scanForVulnerabilities(code: string): SecurityScanResult {
   // Check if code matches any safe patterns (e.g., test files)
   const isSafeContext = SAFE_PATTERNS.some(p => p.test(code))
 
+  // ═══════════════════════════════════════════════════════════
+  // TIER 1: Fast regex-based scanning
+  // ═══════════════════════════════════════════════════════════
   for (const patternDef of SECURITY_PATTERNS) {
     // Skip some patterns in safe contexts
     if (isSafeContext && patternDef.severity !== 'critical') {
@@ -350,6 +363,11 @@ export function scanForVulnerabilities(code: string): SecurityScanResult {
 
       // Skip comments
       if (/^\s*\/\//.test(line) || /^\s*\*/.test(line)) {
+        continue
+      }
+
+      // Skip PATH_TRAVERSAL on import/require lines - relative imports are normal
+      if (patternDef.type === 'PATH_TRAVERSAL' && /^\s*(import\s|.*\sfrom\s|require\s*\()/.test(line)) {
         continue
       }
 
@@ -367,6 +385,21 @@ export function scanForVulnerabilities(code: string): SecurityScanResult {
           pattern: patternDef.pattern.source
         })
       }
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // TIER 2: AST-based dataflow scanning
+  // ═══════════════════════════════════════════════════════════
+  const astVulns = scanWithAST(code)
+
+  // Merge AST vulnerabilities (dedupe by line/type)
+  const seenKeys = new Set(vulnerabilities.map(v => `${v.type}:${v.line}`))
+  for (const astVuln of astVulns) {
+    const key = `${astVuln.type}:${astVuln.line}`
+    if (!seenKeys.has(key)) {
+      vulnerabilities.push(astVuln)
+      seenKeys.add(key)
     }
   }
 

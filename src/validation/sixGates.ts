@@ -17,6 +17,7 @@ import { contentAddress } from '../core/contentAddress'
 import { createGateDecision, createGateDecisionScope, GateDecision, ValidationGateType } from '../core/gateDecision'
 import { EFFECT_SETS, EffectType } from '../core/effects'
 import type { JSONLLedger } from '../persistence/jsonlLedger'
+import { bundleForExecution, hasLocalImports } from './bundler'
 import * as os from 'os'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -198,11 +199,23 @@ export class SixGateValidator {
    */
   private gate1_schemaValidation(code: string): GateResult {
     try {
-      // Check for exports OR test patterns (describe/test/it)
+      // Check for exports OR test patterns
       // Match: export function, export const, export class, export type, export interface
       // Also match: export async function, export default
       const hasExport = /export\s+(async\s+)?(function|const|class|type|interface|default)/.test(code)
-      const hasTestPattern = /\b(describe|test|it)\s*\(/.test(code)
+
+      // Jest/Mocha patterns
+      const hasJestPattern = /\b(describe|test|it)\s*\(/.test(code)
+
+      // Custom test pattern used in this project:
+      // function assert(condition: boolean, message: string)
+      // async function runTests()
+      // runTests().catch(...)
+      const hasCustomTestPattern = /function\s+assert\s*\(/.test(code) &&
+                                   /function\s+runTests\s*\(/.test(code) &&
+                                   /runTests\s*\(\s*\)\.catch/.test(code)
+
+      const hasTestPattern = hasJestPattern || hasCustomTestPattern
 
       if (!hasExport && !hasTestPattern) {
         return {
@@ -230,30 +243,32 @@ export class SixGateValidator {
   }
 
   /**
-   * Gate 2: Syntax Validation
-   * TypeScript must parse without syntax errors
+   * Gate 2: Syntax & Type Validation
+   * TypeScript must parse without errors and pass type checking
    *
-   * Note: We only check for parse/syntax errors, not type errors.
-   * Type checking requires the full project context (node_modules, tsconfig, etc.)
-   * which isn't available for isolated code snippets.
+   * HARDENED: Uses project tsconfig with strict mode for real type checking.
+   * Falls back to syntax-only validation if project context isn't available.
+   *
+   * Two-phase validation:
+   * 1. Fast syntax check (parse errors are immediate failures)
+   * 2. Type checking (catches type mismatches, invalid member access, etc.)
    */
   private async gate2_syntaxValidation(code: string): Promise<GateResult> {
     try {
-      const project = new Project({
+      // Phase 1: Fast syntax check with in-memory project
+      const syntaxProject = new Project({
         useInMemoryFileSystem: true,
         compilerOptions: {
           target: 99, // ScriptTarget.ESNext
           noEmit: true,
-          // Skip type checking - we only care about syntax
           skipLibCheck: true,
           noLib: true
         }
       })
 
-      const sourceFile = project.createSourceFile('temp.ts', code)
+      const sourceFile = syntaxProject.createSourceFile('temp.ts', code)
 
-      // Access parse diagnostics directly from the underlying TypeScript compiler node
-      // This gives us only syntax/parse errors, not type errors
+      // Check parse diagnostics (syntax errors)
       const tsSourceFile = sourceFile.compilerNode as any
       const parseDiagnostics = tsSourceFile.parseDiagnostics || []
 
@@ -271,10 +286,87 @@ export class SixGateValidator {
         }
       }
 
-      return {
-        gateName: 'syntax_validation',
-        passed: true,
-        required: true
+      // Phase 2: Real type checking with project context
+      // Write to temp file so we can use project's tsconfig
+      const attemptId = randomBytes(4).toString('hex')
+      const tempDir = path.join(process.cwd(), '.gate-temp')
+      fs.mkdirSync(tempDir, { recursive: true })
+      const tempFile = path.join(tempDir, `check-${attemptId}.ts`)
+
+      try {
+        fs.writeFileSync(tempFile, code)
+
+        // Use project-aware type checking
+        const typeProject = new Project({
+          compilerOptions: {
+            strict: true,
+            noEmit: true,
+            skipLibCheck: true,  // Skip checking node_modules
+            esModuleInterop: true,
+            target: 99,  // ESNext
+            module: 99,  // ESNext
+            moduleResolution: 2  // Node
+          }
+        })
+
+        const typeSourceFile = typeProject.addSourceFileAtPath(tempFile)
+        const diagnostics = typeSourceFile.getPreEmitDiagnostics()
+
+        // Filter to only errors from this file (not from imports)
+        const ownErrors = diagnostics.filter(d => {
+          const file = d.getSourceFile()
+          if (!file) return false
+          return file.getFilePath().includes('check-')
+        })
+
+        // Filter out errors about missing modules (those are handled in Gate 4)
+        const typeErrors = ownErrors.filter(d => {
+          const message = d.getMessageText()
+          const text = typeof message === 'string' ? message : message.getMessageText()
+          // Skip "Cannot find module" errors - imports are checked in Gate 4
+          if (text.includes('Cannot find module')) return false
+          // Skip errors about implicit 'any' on external modules
+          if (text.includes('implicitly has an \'any\' type')) return false
+          return true
+        })
+
+        if (typeErrors.length > 0) {
+          const firstError = typeErrors[0]
+          const message = firstError.getMessageText()
+          const errorText = typeof message === 'string' ? message : message.getMessageText()
+
+          return {
+            gateName: 'syntax_validation',
+            passed: false,
+            required: true,
+            error: errorText.slice(0, 200),
+            details: {
+              typeErrors: typeErrors.length,
+              errors: typeErrors.slice(0, 3).map(d => {
+                const msg = d.getMessageText()
+                return typeof msg === 'string' ? msg : msg.getMessageText()
+              })
+            }
+          }
+        }
+
+        return {
+          gateName: 'syntax_validation',
+          passed: true,
+          required: true,
+          details: {
+            typeCheckPassed: true,
+            diagnosticsChecked: diagnostics.length
+          }
+        }
+
+      } finally {
+        // Cleanup temp file
+        try {
+          if (fs.existsSync(tempFile)) {
+            fs.unlinkSync(tempFile)
+          }
+        } catch { /* ignore cleanup errors */ }
       }
 
     } catch (error) {
@@ -585,13 +677,29 @@ export class SixGateValidator {
    */
   private async gate4_testExecution(code: string, context: CodeValidationContext): Promise<GateResult> {
     try {
-      // Check for local imports that can't be resolved in sandbox
-      const hasLocalImports = /import\s+.*from\s+['"]\.\.?\//.test(code)
+      // Check for local imports that need bundling
+      const needsBundling = hasLocalImports(code)
 
-      if (hasLocalImports) {
-        // Code has local imports - run TypeScript compilation check
-        // This verifies types, import resolution, and catches real errors
-        return await this.runTypeScriptCompilationCheck(code, context.targetFile)
+      let executableCode = code
+      let bundleWarnings: string[] = []
+
+      if (needsBundling) {
+        // ═══════════════════════════════════════════════════════════
+        // ESBUILD BUNDLING - Resolve local imports before execution
+        // ═══════════════════════════════════════════════════════════
+        const targetDir = context.targetFile
+          ? path.dirname(path.resolve(context.targetFile))
+          : undefined
+
+        const bundleResult = await bundleForExecution(code, { targetDir })
+
+        if (!bundleResult.ok) {
+          // Bundling failed - try TypeScript compilation check as fallback
+          return await this.runTypeScriptCompilationCheck(code, context.targetFile)
+        }
+
+        executableCode = bundleResult.value.bundled
+        bundleWarnings = bundleResult.value.warnings
       }
 
       // Create a temporary file for the code
@@ -599,14 +707,22 @@ export class SixGateValidator {
       const tempDir = path.join(os.tmpdir(), `gate4-${attemptId}`)
       fs.mkdirSync(tempDir, { recursive: true })
 
-      const tempFile = path.join(tempDir, 'test-code.ts')
-      fs.writeFileSync(tempFile, code)
+      // Use .js extension for bundled code, .ts for unbundled
+      const tempFile = needsBundling
+        ? path.join(tempDir, 'test-code.js')
+        : path.join(tempDir, 'test-code.ts')
+      fs.writeFileSync(tempFile, executableCode)
 
       // Build kernel-grade TestExecRequest
+      // Use node for bundled JS, tsx for unbundled TS
+      const command = needsBundling
+        ? ['node', tempFile]
+        : ['npx', 'tsx', tempFile]
+
       const request: TestExecRequest = {
         attempt_id: attemptId,
         cwd: process.cwd(),
-        command: ['npx', 'tsx', tempFile],
+        command,
         env_allowlist: ['NODE_ENV', 'HOME'],  // Minimal allowlist
         time_limit_ms: 10_000,
         capabilities: ['FS_READ', 'FS_WRITE_SANDBOX'],  // No NET by default
@@ -687,7 +803,9 @@ export class SixGateValidator {
           exitCode: testResult.exit_code,
           policyChecks: testResult.policy_checks,
           fingerprint: testResult.deterministic_fingerprint,
-          evidenceVerified: evidenceValid
+          evidenceVerified: evidenceValid,
+          bundled: needsBundling,
+          bundleWarnings: bundleWarnings.length > 0 ? bundleWarnings : undefined
         }
       }
 
@@ -703,7 +821,7 @@ export class SixGateValidator {
 
   /**
    * Run TypeScript compilation check for code with local imports
-   * This provides real verification instead of skipping
+   * This provides real verification instead of skipping (fallback when bundling fails)
    */
   private async runTypeScriptCompilationCheck(code: string, targetFile?: string): Promise<GateResult> {
     const attemptId = randomBytes(8).toString('hex')
