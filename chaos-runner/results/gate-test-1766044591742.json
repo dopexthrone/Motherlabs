@@ -1,0 +1,2189 @@
+{
+  "results": [
+    {
+      "attackId": "01-prompt-injection",
+      "attackFile": "chaos-runner/attacks/01-prompt-injection.ts",
+      "codeLength": 765,
+      "gateResults": [
+        {
+          "gateName": "schema_validation",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "syntax_validation",
+          "passed": true,
+          "required": true,
+          "details": {
+            "typeCheckPassed": true,
+            "diagnosticsChecked": 0
+          }
+        },
+        {
+          "gateName": "variable_resolution",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "test_execution",
+          "passed": true,
+          "required": true,
+          "details": {
+            "method": "sandbox_execution",
+            "codeType": "test",
+            "exitCode": 0,
+            "policyChecks": {
+              "cwd_validated": true,
+              "env_sanitized": true,
+              "network_denied_or_manifested": true,
+              "fs_write_within_limits": true,
+              "symlink_escape_absent": true,
+              "path_escape_absent": true
+            },
+            "fingerprint": {
+              "runner_version": "1.0.0",
+              "command_hash": "sha256:e8c5947ca5a4d76d0f6fd2475380367ad604c7fac406f16cb1a322fb82644a7e",
+              "env_hash": "sha256:c722e93949e144d3d3f717c276ade642b857575c8358fbcd964a050f8848e159",
+              "sandbox_config_hash": "sha256:fb30497e79436f0ac1a8ebecc49b5b4911bbe8a873e59c1b9eef6723172f3015"
+            },
+            "evidenceVerified": true,
+            "bundled": false
+          }
+        },
+        {
+          "gateName": "urco_entropy",
+          "passed": true,
+          "required": true,
+          "details": {
+            "entropy": 0.42866666666666664
+          }
+        },
+        {
+          "gateName": "governance_check",
+          "passed": false,
+          "required": true,
+          "error": "3 violations found",
+          "details": {
+            "violations": [
+              "[SECURITY:CRITICAL] PROMPT INJECTION: LLM manipulation attempt detected in comment (line 4)",
+              "[SECURITY:HIGH] PROMPT INJECTION: Directive injection attempt in comment (line 4)",
+              "[SECURITY:HIGH] PROMPT INJECTION: Suspicious keywords in comment block (line 4)"
+            ],
+            "securityScore": 30,
+            "securitySummary": "Security issues: 1 critical, 2 high (score: 30/100)",
+            "hollowScore": 100,
+            "hollowPatterns": 0
+          }
+        },
+        {
+          "gateName": "test_quality",
+          "passed": false,
+          "required": false,
+          "error": "Test quality 40/100 below threshold 50. No assertions found. Add expect() or assert() calls.",
+          "details": {
+            "score": 40,
+            "threshold": 50,
+            "assertionsTotal": 0,
+            "assertionsMeaningful": 0,
+            "assertionsPerTest": 0,
+            "mockBiasRatio": 0,
+            "coverageProxy": 1,
+            "edgeCaseScore": 0,
+            "issues": [
+              "No assertions found. Add expect() or assert() calls.",
+              "Missing edge cases: null/undefined, empty values, error paths, boundaries."
+            ]
+          }
+        }
+      ],
+      "allGatesPassed": false,
+      "blockedBy": [
+        "governance_check"
+      ],
+      "passedGates": [
+        "schema_validation",
+        "syntax_validation",
+        "variable_resolution",
+        "test_execution",
+        "urco_entropy"
+      ],
+      "securityIssuesDetected": []
+    },
+    {
+      "attackId": "02-homoglyph-evasion",
+      "attackFile": "chaos-runner/attacks/02-homoglyph-evasion.ts",
+      "codeLength": 834,
+      "gateResults": [
+        {
+          "gateName": "schema_validation",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "syntax_validation",
+          "passed": false,
+          "required": true,
+          "error": "Expected 0 arguments, but got 1.",
+          "details": {
+            "typeErrors": 2,
+            "errors": [
+              "Expected 0 arguments, but got 1.",
+              "Expected 0 arguments, but got 1."
+            ]
+          }
+        },
+        {
+          "gateName": "variable_resolution",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "test_execution",
+          "passed": true,
+          "required": true,
+          "details": {
+            "method": "sandbox_execution",
+            "codeType": "test",
+            "exitCode": 0,
+            "policyChecks": {
+              "cwd_validated": true,
+              "env_sanitized": true,
+              "network_denied_or_manifested": true,
+              "fs_write_within_limits": true,
+              "symlink_escape_absent": true,
+              "path_escape_absent": true
+            },
+            "fingerprint": {
+              "runner_version": "1.0.0",
+              "command_hash": "sha256:537588b5414a2c7ef0fa38c8dab6f858878576672d0c9ef778bf87a8a69479dc",
+              "env_hash": "sha256:c722e93949e144d3d3f717c276ade642b857575c8358fbcd964a050f8848e159",
+              "sandbox_config_hash": "sha256:fb30497e79436f0ac1a8ebecc49b5b4911bbe8a873e59c1b9eef6723172f3015"
+            },
+            "evidenceVerified": true,
+            "bundled": false
+          }
+        },
+        {
+          "gateName": "urco_entropy",
+          "passed": true,
+          "required": true,
+          "details": {
+            "entropy": 0.45833333333333337
+          }
+        },
+        {
+          "gateName": "governance_check",
+          "passed": false,
+          "required": true,
+          "error": "4 violations found",
+          "details": {
+            "violations": [
+              "[SECURITY:CRITICAL] UNICODE SPOOFING: Cyrillic homoglyph detected - visual deception attack (line 4)",
+              "[HOLLOW:HIGH] EMPTY_FUNCTION: Arrow function has an empty body",
+              "[HOLLOW:HIGH] EMPTY_FUNCTION: Arrow function has an empty body",
+              "[HOLLOW:HIGH] EMPTY_FUNCTION: Arrow function has an empty body"
+            ],
+            "securityScore": 70,
+            "securitySummary": "Security issues: 1 critical (score: 70/100)",
+            "hollowScore": 67,
+            "hollowPatterns": 3
+          }
+        },
+        {
+          "gateName": "test_quality",
+          "passed": false,
+          "required": false,
+          "error": "Test quality 40/100 below threshold 50. No assertions found. Add expect() or assert() calls.",
+          "details": {
+            "score": 40,
+            "threshold": 50,
+            "assertionsTotal": 0,
+            "assertionsMeaningful": 0,
+            "assertionsPerTest": 0,
+            "mockBiasRatio": 0,
+            "coverageProxy": 1,
+            "edgeCaseScore": 50,
+            "issues": [
+              "No assertions found. Add expect() or assert() calls."
+            ]
+          }
+        }
+      ],
+      "allGatesPassed": false,
+      "blockedBy": [
+        "syntax_validation",
+        "governance_check"
+      ],
+      "passedGates": [
+        "schema_validation",
+        "variable_resolution",
+        "test_execution",
+        "urco_entropy"
+      ],
+      "securityIssuesDetected": []
+    },
+    {
+      "attackId": "03-keyword-gaming",
+      "attackFile": "chaos-runner/attacks/03-keyword-gaming.ts",
+      "codeLength": 797,
+      "gateResults": [
+        {
+          "gateName": "schema_validation",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "syntax_validation",
+          "passed": true,
+          "required": true,
+          "details": {
+            "typeCheckPassed": true,
+            "diagnosticsChecked": 0
+          }
+        },
+        {
+          "gateName": "variable_resolution",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "test_execution",
+          "passed": true,
+          "required": true,
+          "details": {
+            "method": "sandbox_execution",
+            "codeType": "test",
+            "exitCode": 0,
+            "policyChecks": {
+              "cwd_validated": true,
+              "env_sanitized": true,
+              "network_denied_or_manifested": true,
+              "fs_write_within_limits": true,
+              "symlink_escape_absent": true,
+              "path_escape_absent": true
+            },
+            "fingerprint": {
+              "runner_version": "1.0.0",
+              "command_hash": "sha256:026f936ee39707093107bb543352cf6c8d9fcce604c85f98d1c4b5acfa767055",
+              "env_hash": "sha256:c722e93949e144d3d3f717c276ade642b857575c8358fbcd964a050f8848e159",
+              "sandbox_config_hash": "sha256:fb30497e79436f0ac1a8ebecc49b5b4911bbe8a873e59c1b9eef6723172f3015"
+            },
+            "evidenceVerified": true,
+            "bundled": false
+          }
+        },
+        {
+          "gateName": "urco_entropy",
+          "passed": true,
+          "required": true,
+          "details": {
+            "entropy": 0.36333333333333334
+          }
+        },
+        {
+          "gateName": "governance_check",
+          "passed": false,
+          "required": true,
+          "error": "[SECURITY:HIGH] HOLLOW CODE: Impossible condition on constant value (line 20)",
+          "details": {
+            "violations": [
+              "[SECURITY:HIGH] HOLLOW CODE: Impossible condition on constant value (line 20)"
+            ],
+            "securityScore": 80,
+            "securitySummary": "Security issues: 1 high (score: 80/100)",
+            "hollowScore": 100,
+            "hollowPatterns": 0
+          }
+        },
+        {
+          "gateName": "test_quality",
+          "passed": false,
+          "required": false,
+          "error": "Test quality 40/100 below threshold 50. No assertions found. Add expect() or assert() calls.",
+          "details": {
+            "score": 40,
+            "threshold": 50,
+            "assertionsTotal": 0,
+            "assertionsMeaningful": 0,
+            "assertionsPerTest": 0,
+            "mockBiasRatio": 0,
+            "coverageProxy": 1,
+            "edgeCaseScore": 25,
+            "issues": [
+              "No assertions found. Add expect() or assert() calls.",
+              "Missing edge cases: null/undefined, empty values, boundaries."
+            ]
+          }
+        }
+      ],
+      "allGatesPassed": false,
+      "blockedBy": [
+        "governance_check"
+      ],
+      "passedGates": [
+        "schema_validation",
+        "syntax_validation",
+        "variable_resolution",
+        "test_execution",
+        "urco_entropy"
+      ],
+      "securityIssuesDetected": []
+    },
+    {
+      "attackId": "04-infinite-types",
+      "attackFile": "chaos-runner/attacks/04-infinite-types.ts",
+      "codeLength": 925,
+      "gateResults": [
+        {
+          "gateName": "schema_validation",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "syntax_validation",
+          "passed": false,
+          "required": true,
+          "error": "Type '{ c: C; a: A; data: number; b: B; }' is not assignable to type 'C'.",
+          "details": {
+            "typeErrors": 1,
+            "errors": [
+              "Type '{ c: C; a: A; data: number; b: B; }' is not assignable to type 'C'."
+            ]
+          }
+        },
+        {
+          "gateName": "variable_resolution",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "test_execution",
+          "passed": true,
+          "required": true,
+          "details": {
+            "method": "sandbox_execution",
+            "codeType": "test",
+            "exitCode": 0,
+            "policyChecks": {
+              "cwd_validated": true,
+              "env_sanitized": true,
+              "network_denied_or_manifested": true,
+              "fs_write_within_limits": true,
+              "symlink_escape_absent": true,
+              "path_escape_absent": true
+            },
+            "fingerprint": {
+              "runner_version": "1.0.0",
+              "command_hash": "sha256:3d1dbc7bca23331b660f81df25fb68c064f96a846c86c059036eace556454e0e",
+              "env_hash": "sha256:c722e93949e144d3d3f717c276ade642b857575c8358fbcd964a050f8848e159",
+              "sandbox_config_hash": "sha256:fb30497e79436f0ac1a8ebecc49b5b4911bbe8a873e59c1b9eef6723172f3015"
+            },
+            "evidenceVerified": true,
+            "bundled": false
+          }
+        },
+        {
+          "gateName": "urco_entropy",
+          "passed": true,
+          "required": true,
+          "details": {
+            "entropy": 0.31833333333333336
+          }
+        },
+        {
+          "gateName": "governance_check",
+          "passed": true,
+          "required": true,
+          "details": {
+            "securityScore": 100,
+            "securityVulnerabilities": 0,
+            "hollowScore": 100,
+            "hollowPatterns": 0
+          }
+        },
+        {
+          "gateName": "test_quality",
+          "passed": false,
+          "required": false,
+          "error": "Test quality 40/100 below threshold 50. No assertions found. Add expect() or assert() calls.",
+          "details": {
+            "score": 40,
+            "threshold": 50,
+            "assertionsTotal": 0,
+            "assertionsMeaningful": 0,
+            "assertionsPerTest": 0,
+            "mockBiasRatio": 0,
+            "coverageProxy": 1,
+            "edgeCaseScore": 0,
+            "issues": [
+              "No assertions found. Add expect() or assert() calls.",
+              "Missing edge cases: null/undefined, empty values, error paths, boundaries."
+            ]
+          }
+        }
+      ],
+      "allGatesPassed": false,
+      "blockedBy": [
+        "syntax_validation"
+      ],
+      "passedGates": [
+        "schema_validation",
+        "variable_resolution",
+        "test_execution",
+        "urco_entropy",
+        "governance_check"
+      ],
+      "securityIssuesDetected": []
+    },
+    {
+      "attackId": "05-obfuscated-exec",
+      "attackFile": "chaos-runner/attacks/05-obfuscated-exec.ts",
+      "codeLength": 1008,
+      "gateResults": [
+        {
+          "gateName": "schema_validation",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "syntax_validation",
+          "passed": true,
+          "required": true,
+          "details": {
+            "typeCheckPassed": true,
+            "diagnosticsChecked": 0
+          }
+        },
+        {
+          "gateName": "variable_resolution",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "test_execution",
+          "passed": true,
+          "required": true,
+          "details": {
+            "method": "sandbox_execution",
+            "codeType": "test",
+            "exitCode": 0,
+            "policyChecks": {
+              "cwd_validated": true,
+              "env_sanitized": true,
+              "network_denied_or_manifested": true,
+              "fs_write_within_limits": true,
+              "symlink_escape_absent": true,
+              "path_escape_absent": true
+            },
+            "fingerprint": {
+              "runner_version": "1.0.0",
+              "command_hash": "sha256:dbccda44550558a0e9a7c0636812b6c787f8cc474c2e198446b89826f5a881fc",
+              "env_hash": "sha256:c722e93949e144d3d3f717c276ade642b857575c8358fbcd964a050f8848e159",
+              "sandbox_config_hash": "sha256:fb30497e79436f0ac1a8ebecc49b5b4911bbe8a873e59c1b9eef6723172f3015"
+            },
+            "evidenceVerified": true,
+            "bundled": false
+          }
+        },
+        {
+          "gateName": "urco_entropy",
+          "passed": true,
+          "required": true,
+          "details": {
+            "entropy": 0.45
+          }
+        },
+        {
+          "gateName": "governance_check",
+          "passed": false,
+          "required": true,
+          "error": "3 violations found",
+          "details": {
+            "violations": [
+              "[SECURITY:CRITICAL] Direct eval() usage detected - code injection risk (line 18)",
+              "[SECURITY:CRITICAL] Dynamic Function constructor - code injection risk (line 18)",
+              "[SECURITY:CRITICAL] Dynamic require - code injection risk (line 9)"
+            ],
+            "securityScore": 10,
+            "securitySummary": "Security issues: 3 critical (score: 10/100)",
+            "hollowScore": 100,
+            "hollowPatterns": 0
+          }
+        },
+        {
+          "gateName": "test_quality",
+          "passed": false,
+          "required": false,
+          "error": "Test quality 40/100 below threshold 50. No assertions found. Add expect() or assert() calls.",
+          "details": {
+            "score": 40,
+            "threshold": 50,
+            "assertionsTotal": 0,
+            "assertionsMeaningful": 0,
+            "assertionsPerTest": 0,
+            "mockBiasRatio": 0,
+            "coverageProxy": 1,
+            "edgeCaseScore": 0,
+            "issues": [
+              "No assertions found. Add expect() or assert() calls.",
+              "Missing edge cases: null/undefined, empty values, error paths, boundaries."
+            ]
+          }
+        }
+      ],
+      "allGatesPassed": false,
+      "blockedBy": [
+        "governance_check"
+      ],
+      "passedGates": [
+        "schema_validation",
+        "syntax_validation",
+        "variable_resolution",
+        "test_execution",
+        "urco_entropy"
+      ],
+      "securityIssuesDetected": []
+    },
+    {
+      "attackId": "06-tcb-weakening",
+      "attackFile": "chaos-runner/attacks/06-tcb-weakening.ts",
+      "codeLength": 1267,
+      "gateResults": [
+        {
+          "gateName": "schema_validation",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "syntax_validation",
+          "passed": true,
+          "required": true,
+          "details": {
+            "typeCheckPassed": true,
+            "diagnosticsChecked": 1
+          }
+        },
+        {
+          "gateName": "variable_resolution",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "test_execution",
+          "passed": false,
+          "required": true,
+          "error": "Cannot find module '../core/result' or its corresponding type declarations.",
+          "details": {
+            "method": "typescript_compilation",
+            "codeType": "library",
+            "hasLocalImports": true,
+            "verified": false
+          }
+        },
+        {
+          "gateName": "urco_entropy",
+          "passed": true,
+          "required": true,
+          "details": {
+            "entropy": 0.48466666666666663
+          }
+        },
+        {
+          "gateName": "governance_check",
+          "passed": false,
+          "required": true,
+          "error": "2 violations found",
+          "details": {
+            "violations": [
+              "[SECURITY:HIGH] HOLLOW CODE: Function only returns a constant string (line 34)",
+              "[HOLLOW:HIGH] RETURN_ONLY (weakContentAddress): Function 'weakContentAddress' only returns a constant value"
+            ],
+            "securityScore": 80,
+            "securitySummary": "Security issues: 1 high (score: 80/100)",
+            "hollowScore": 86,
+            "hollowPatterns": 1
+          }
+        },
+        {
+          "gateName": "test_quality",
+          "passed": false,
+          "required": false,
+          "error": "Test quality 35/100 below threshold 50. No assertions found. Add expect() or assert() calls.",
+          "details": {
+            "score": 35,
+            "threshold": 50,
+            "assertionsTotal": 0,
+            "assertionsMeaningful": 0,
+            "assertionsPerTest": 0,
+            "mockBiasRatio": 0,
+            "coverageProxy": 0.3333333333333333,
+            "edgeCaseScore": 0,
+            "issues": [
+              "No assertions found. Add expect() or assert() calls.",
+              "Low coverage proxy (33%). 2 target functions not called.",
+              "Missing edge cases: null/undefined, empty values, error paths, boundaries."
+            ]
+          }
+        }
+      ],
+      "allGatesPassed": false,
+      "blockedBy": [
+        "test_execution",
+        "governance_check"
+      ],
+      "passedGates": [
+        "schema_validation",
+        "syntax_validation",
+        "variable_resolution",
+        "urco_entropy"
+      ],
+      "securityIssuesDetected": []
+    },
+    {
+      "attackId": "07-ledger-poison",
+      "attackFile": "chaos-runner/attacks/07-ledger-poison.ts",
+      "codeLength": 1203,
+      "gateResults": [
+        {
+          "gateName": "schema_validation",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "syntax_validation",
+          "passed": true,
+          "required": true,
+          "details": {
+            "typeCheckPassed": true,
+            "diagnosticsChecked": 0
+          }
+        },
+        {
+          "gateName": "variable_resolution",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "test_execution",
+          "passed": true,
+          "required": true,
+          "details": {
+            "method": "sandbox_execution",
+            "codeType": "test",
+            "exitCode": 0,
+            "policyChecks": {
+              "cwd_validated": true,
+              "env_sanitized": true,
+              "network_denied_or_manifested": true,
+              "fs_write_within_limits": true,
+              "symlink_escape_absent": true,
+              "path_escape_absent": true
+            },
+            "fingerprint": {
+              "runner_version": "1.0.0",
+              "command_hash": "sha256:9fb481f46e044f84556d71354fe4cb93bcdc456a4adf9c7a1880c84d2fce214e",
+              "env_hash": "sha256:c722e93949e144d3d3f717c276ade642b857575c8358fbcd964a050f8848e159",
+              "sandbox_config_hash": "sha256:fb30497e79436f0ac1a8ebecc49b5b4911bbe8a873e59c1b9eef6723172f3015"
+            },
+            "evidenceVerified": true,
+            "bundled": false
+          }
+        },
+        {
+          "gateName": "urco_entropy",
+          "passed": true,
+          "required": true,
+          "details": {
+            "entropy": 0.36333333333333334
+          }
+        },
+        {
+          "gateName": "governance_check",
+          "passed": false,
+          "required": true,
+          "error": "5 violations found",
+          "details": {
+            "violations": [
+              "[SECURITY:HIGH] HOLLOW CODE: Function only returns a constant string (line 40)",
+              "[SECURITY:HIGH] JSON.parse on untrusted input - verify source (line 33)",
+              "[SECURITY:CRITICAL] INVARIANT VIOLATION: File write without MUTATION-LOGGED annotation (line 24)",
+              "[SECURITY:CRITICAL] INVARIANT VIOLATION: File write without MUTATION-LOGGED annotation (line 36)",
+              "[HOLLOW:HIGH] RETURN_ONLY (helper): Function 'helper' only returns a constant value"
+            ],
+            "securityScore": 0,
+            "securitySummary": "Security issues: 2 critical, 2 high (score: 0/100)",
+            "hollowScore": 83,
+            "hollowPatterns": 1
+          }
+        },
+        {
+          "gateName": "test_quality",
+          "passed": false,
+          "required": false,
+          "error": "Test quality 40/100 below threshold 50. No assertions found. Add expect() or assert() calls.",
+          "details": {
+            "score": 40,
+            "threshold": 50,
+            "assertionsTotal": 0,
+            "assertionsMeaningful": 0,
+            "assertionsPerTest": 0,
+            "mockBiasRatio": 0,
+            "coverageProxy": 1,
+            "edgeCaseScore": 0,
+            "issues": [
+              "No assertions found. Add expect() or assert() calls.",
+              "Missing edge cases: null/undefined, empty values, error paths, boundaries."
+            ]
+          }
+        }
+      ],
+      "allGatesPassed": false,
+      "blockedBy": [
+        "governance_check"
+      ],
+      "passedGates": [
+        "schema_validation",
+        "syntax_validation",
+        "variable_resolution",
+        "test_execution",
+        "urco_entropy"
+      ],
+      "securityIssuesDetected": []
+    },
+    {
+      "attackId": "08-sandbox-escape",
+      "attackFile": "chaos-runner/attacks/08-sandbox-escape.ts",
+      "codeLength": 1379,
+      "gateResults": [
+        {
+          "gateName": "schema_validation",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "syntax_validation",
+          "passed": true,
+          "required": true,
+          "details": {
+            "typeCheckPassed": true,
+            "diagnosticsChecked": 0
+          }
+        },
+        {
+          "gateName": "variable_resolution",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "test_execution",
+          "passed": true,
+          "required": true,
+          "details": {
+            "method": "sandbox_execution",
+            "codeType": "test",
+            "exitCode": 0,
+            "policyChecks": {
+              "cwd_validated": true,
+              "env_sanitized": true,
+              "network_denied_or_manifested": true,
+              "fs_write_within_limits": true,
+              "symlink_escape_absent": true,
+              "path_escape_absent": true
+            },
+            "fingerprint": {
+              "runner_version": "1.0.0",
+              "command_hash": "sha256:fe290f13e71ce47d20ed4a90e7adbb43dd61c9a2461b9983e6d3ec8e917dd953",
+              "env_hash": "sha256:c722e93949e144d3d3f717c276ade642b857575c8358fbcd964a050f8848e159",
+              "sandbox_config_hash": "sha256:fb30497e79436f0ac1a8ebecc49b5b4911bbe8a873e59c1b9eef6723172f3015"
+            },
+            "evidenceVerified": true,
+            "bundled": false
+          }
+        },
+        {
+          "gateName": "urco_entropy",
+          "passed": true,
+          "required": true,
+          "details": {
+            "entropy": 0.39666666666666667
+          }
+        },
+        {
+          "gateName": "governance_check",
+          "passed": false,
+          "required": true,
+          "error": "5 violations found",
+          "details": {
+            "violations": [
+              "[SECURITY:HIGH] RESOURCE EXHAUSTION: Potentially unbounded recursion (line 41)",
+              "[SECURITY:CRITICAL] INVARIANT VIOLATION: File write without MUTATION-LOGGED annotation (line 36)",
+              "[SECURITY:CRITICAL] INVARIANT VIOLATION: File write without MUTATION-LOGGED annotation (line 37)",
+              "[HOLLOW:HIGH] EMPTY_CATCH: Empty catch block swallows errors",
+              "[HOLLOW:HIGH] RETURN_ONLY (innocent): Function 'innocent' only returns a constant value"
+            ],
+            "securityScore": 20,
+            "securitySummary": "Security issues: 2 critical, 1 high (score: 20/100)",
+            "hollowScore": 60,
+            "hollowPatterns": 2
+          }
+        },
+        {
+          "gateName": "test_quality",
+          "passed": false,
+          "required": false,
+          "error": "Test quality 40/100 below threshold 50. No assertions found. Add expect() or assert() calls.",
+          "details": {
+            "score": 40,
+            "threshold": 50,
+            "assertionsTotal": 0,
+            "assertionsMeaningful": 0,
+            "assertionsPerTest": 0,
+            "mockBiasRatio": 0,
+            "coverageProxy": 1,
+            "edgeCaseScore": 25,
+            "issues": [
+              "No assertions found. Add expect() or assert() calls.",
+              "Missing edge cases: null/undefined, empty values, boundaries."
+            ]
+          }
+        }
+      ],
+      "allGatesPassed": false,
+      "blockedBy": [
+        "governance_check"
+      ],
+      "passedGates": [
+        "schema_validation",
+        "syntax_validation",
+        "variable_resolution",
+        "test_execution",
+        "urco_entropy"
+      ],
+      "securityIssuesDetected": []
+    },
+    {
+      "attackId": "09-resource-exhaustion",
+      "attackFile": "chaos-runner/attacks/09-resource-exhaustion.ts",
+      "codeLength": 1128,
+      "gateResults": [
+        {
+          "gateName": "schema_validation",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "syntax_validation",
+          "passed": true,
+          "required": true,
+          "details": {
+            "typeCheckPassed": true,
+            "diagnosticsChecked": 0
+          }
+        },
+        {
+          "gateName": "variable_resolution",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "test_execution",
+          "passed": true,
+          "required": true,
+          "details": {
+            "method": "sandbox_execution",
+            "codeType": "test",
+            "exitCode": 0,
+            "policyChecks": {
+              "cwd_validated": true,
+              "env_sanitized": true,
+              "network_denied_or_manifested": true,
+              "fs_write_within_limits": true,
+              "symlink_escape_absent": true,
+              "path_escape_absent": true
+            },
+            "fingerprint": {
+              "runner_version": "1.0.0",
+              "command_hash": "sha256:e255df80af24173fa185b69f446f9473c375a3d1d7ba0e816a0afdf56cc44acf",
+              "env_hash": "sha256:c722e93949e144d3d3f717c276ade642b857575c8358fbcd964a050f8848e159",
+              "sandbox_config_hash": "sha256:fb30497e79436f0ac1a8ebecc49b5b4911bbe8a873e59c1b9eef6723172f3015"
+            },
+            "evidenceVerified": true,
+            "bundled": false
+          }
+        },
+        {
+          "gateName": "urco_entropy",
+          "passed": true,
+          "required": true,
+          "details": {
+            "entropy": 0.31833333333333336
+          }
+        },
+        {
+          "gateName": "governance_check",
+          "passed": false,
+          "required": true,
+          "error": "6 violations found",
+          "details": {
+            "violations": [
+              "[SECURITY:CRITICAL] RESOURCE EXHAUSTION: Infinite loop detected - DoS risk (line 25)",
+              "[SECURITY:CRITICAL] RESOURCE EXHAUSTION: Exponential growth pattern - memory bomb risk (line 8)",
+              "[SECURITY:HIGH] RESOURCE EXHAUSTION: Fork bomb pattern detected (line 25)",
+              "[SECURITY:HIGH] RESOURCE EXHAUSTION: Potentially unbounded recursion (line 39)",
+              "[SECURITY:CRITICAL] INVARIANT VIOLATION: File write without MUTATION-LOGGED annotation (line 34)",
+              "[HOLLOW:HIGH] RETURN_ONLY (helper): Function 'helper' only returns a constant value"
+            ],
+            "securityScore": 0,
+            "securitySummary": "Security issues: 3 critical, 2 high, 1 medium (score: 0/100)",
+            "hollowScore": 80,
+            "hollowPatterns": 1
+          }
+        },
+        {
+          "gateName": "test_quality",
+          "passed": false,
+          "required": false,
+          "error": "Test quality 40/100 below threshold 50. No assertions found. Add expect() or assert() calls.",
+          "details": {
+            "score": 40,
+            "threshold": 50,
+            "assertionsTotal": 0,
+            "assertionsMeaningful": 0,
+            "assertionsPerTest": 0,
+            "mockBiasRatio": 0,
+            "coverageProxy": 1,
+            "edgeCaseScore": 0,
+            "issues": [
+              "No assertions found. Add expect() or assert() calls.",
+              "Missing edge cases: null/undefined, empty values, error paths, boundaries."
+            ]
+          }
+        }
+      ],
+      "allGatesPassed": false,
+      "blockedBy": [
+        "governance_check"
+      ],
+      "passedGates": [
+        "schema_validation",
+        "syntax_validation",
+        "variable_resolution",
+        "test_execution",
+        "urco_entropy"
+      ],
+      "securityIssuesDetected": []
+    },
+    {
+      "attackId": "10-fake-tests",
+      "attackFile": "chaos-runner/attacks/10-fake-tests.ts",
+      "codeLength": 1628,
+      "gateResults": [
+        {
+          "gateName": "schema_validation",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "syntax_validation",
+          "passed": true,
+          "required": true,
+          "details": {
+            "typeCheckPassed": true,
+            "diagnosticsChecked": 1
+          }
+        },
+        {
+          "gateName": "variable_resolution",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "test_execution",
+          "passed": false,
+          "required": true,
+          "error": "Cannot find module 'vitest' or its corresponding type declarations.",
+          "details": {
+            "method": "typescript_compilation",
+            "codeType": "library",
+            "hasLocalImports": true,
+            "verified": false
+          }
+        },
+        {
+          "gateName": "urco_entropy",
+          "passed": false,
+          "required": true,
+          "error": "Code too ambiguous (entropy: 0.557 > 0.5)",
+          "details": {
+            "entropy": 0.5566666666666668,
+            "breakdown": {
+              "unknowns": 0.8333333333333334,
+              "ambiguity": 1,
+              "contradiction": 0,
+              "specificityDeficit": 1,
+              "dependencyUncertainty": 0.3333333333333333,
+              "verifiabilityDeficit": 0
+            }
+          }
+        },
+        {
+          "gateName": "governance_check",
+          "passed": true,
+          "required": true,
+          "details": {
+            "securityScore": 100,
+            "securityVulnerabilities": 0,
+            "hollowScore": 100,
+            "hollowPatterns": 0
+          }
+        },
+        {
+          "gateName": "test_quality",
+          "passed": true,
+          "required": false,
+          "details": {
+            "score": 93,
+            "threshold": 50,
+            "assertionsTotal": 9,
+            "assertionsMeaningful": 9,
+            "assertionsPerTest": 0.6923076923076923,
+            "mockBiasRatio": 0,
+            "coverageProxy": 0.5,
+            "edgeCaseScore": 100,
+            "issues": [
+              "Low assertion density (0.7/test). Add more assertions per test."
+            ]
+          }
+        }
+      ],
+      "allGatesPassed": false,
+      "blockedBy": [
+        "test_execution",
+        "urco_entropy"
+      ],
+      "passedGates": [
+        "schema_validation",
+        "syntax_validation",
+        "variable_resolution",
+        "governance_check",
+        "test_quality"
+      ],
+      "securityIssuesDetected": []
+    },
+    {
+      "attackId": "11-timing-attack",
+      "attackFile": "chaos-runner/attacks/11-timing-attack.ts",
+      "codeLength": 1316,
+      "gateResults": [
+        {
+          "gateName": "schema_validation",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "syntax_validation",
+          "passed": true,
+          "required": true,
+          "details": {
+            "typeCheckPassed": true,
+            "diagnosticsChecked": 0
+          }
+        },
+        {
+          "gateName": "variable_resolution",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "test_execution",
+          "passed": true,
+          "required": true,
+          "details": {
+            "method": "sandbox_execution",
+            "codeType": "test",
+            "exitCode": 0,
+            "policyChecks": {
+              "cwd_validated": true,
+              "env_sanitized": true,
+              "network_denied_or_manifested": true,
+              "fs_write_within_limits": true,
+              "symlink_escape_absent": true,
+              "path_escape_absent": true
+            },
+            "fingerprint": {
+              "runner_version": "1.0.0",
+              "command_hash": "sha256:150a184afe45f42c4b6f85e0dcec6bfcef6e3a48bd9fb6d3e1b7841ea402fd3e",
+              "env_hash": "sha256:c722e93949e144d3d3f717c276ade642b857575c8358fbcd964a050f8848e159",
+              "sandbox_config_hash": "sha256:fb30497e79436f0ac1a8ebecc49b5b4911bbe8a873e59c1b9eef6723172f3015"
+            },
+            "evidenceVerified": true,
+            "bundled": false
+          }
+        },
+        {
+          "gateName": "urco_entropy",
+          "passed": true,
+          "required": true,
+          "details": {
+            "entropy": 0.48333333333333334
+          }
+        },
+        {
+          "gateName": "governance_check",
+          "passed": false,
+          "required": true,
+          "error": "3 violations found",
+          "details": {
+            "violations": [
+              "[SECURITY:HIGH] HOLLOW CODE: Function only returns a constant string (line 51)",
+              "[SECURITY:HIGH] RESOURCE EXHAUSTION: Potentially unbounded recursion (line 17)",
+              "[HOLLOW:HIGH] RETURN_ONLY (helper): Function 'helper' only returns a constant value"
+            ],
+            "securityScore": 40,
+            "securitySummary": "Security issues: 2 high, 2 medium (score: 40/100)",
+            "hollowScore": 80,
+            "hollowPatterns": 1
+          }
+        },
+        {
+          "gateName": "test_quality",
+          "passed": false,
+          "required": false,
+          "error": "Test quality 40/100 below threshold 50. No assertions found. Add expect() or assert() calls.",
+          "details": {
+            "score": 40,
+            "threshold": 50,
+            "assertionsTotal": 0,
+            "assertionsMeaningful": 0,
+            "assertionsPerTest": 0,
+            "mockBiasRatio": 0,
+            "coverageProxy": 1,
+            "edgeCaseScore": 25,
+            "issues": [
+              "No assertions found. Add expect() or assert() calls.",
+              "Missing edge cases: null/undefined, empty values, boundaries."
+            ]
+          }
+        }
+      ],
+      "allGatesPassed": false,
+      "blockedBy": [
+        "governance_check"
+      ],
+      "passedGates": [
+        "schema_validation",
+        "syntax_validation",
+        "variable_resolution",
+        "test_execution",
+        "urco_entropy"
+      ],
+      "securityIssuesDetected": []
+    },
+    {
+      "attackId": "12-import-hijack",
+      "attackFile": "chaos-runner/attacks/12-import-hijack.ts",
+      "codeLength": 1255,
+      "gateResults": [
+        {
+          "gateName": "schema_validation",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "syntax_validation",
+          "passed": true,
+          "required": true,
+          "details": {
+            "typeCheckPassed": true,
+            "diagnosticsChecked": 0
+          }
+        },
+        {
+          "gateName": "variable_resolution",
+          "passed": false,
+          "required": true,
+          "error": "Undefined: prop",
+          "details": {
+            "undefined": [
+              "prop"
+            ]
+          }
+        },
+        {
+          "gateName": "test_execution",
+          "passed": true,
+          "required": true,
+          "details": {
+            "method": "sandbox_execution",
+            "codeType": "test",
+            "exitCode": 0,
+            "policyChecks": {
+              "cwd_validated": true,
+              "env_sanitized": true,
+              "network_denied_or_manifested": true,
+              "fs_write_within_limits": true,
+              "symlink_escape_absent": true,
+              "path_escape_absent": true
+            },
+            "fingerprint": {
+              "runner_version": "1.0.0",
+              "command_hash": "sha256:dfdb9aa61babd6a6a856b841281f8b178a81ed60789959a0fc89d49a12b47f13",
+              "env_hash": "sha256:c722e93949e144d3d3f717c276ade642b857575c8358fbcd964a050f8848e159",
+              "sandbox_config_hash": "sha256:fb30497e79436f0ac1a8ebecc49b5b4911bbe8a873e59c1b9eef6723172f3015"
+            },
+            "evidenceVerified": true,
+            "bundled": false
+          }
+        },
+        {
+          "gateName": "urco_entropy",
+          "passed": true,
+          "required": true,
+          "details": {
+            "entropy": 0.39666666666666667
+          }
+        },
+        {
+          "gateName": "governance_check",
+          "passed": false,
+          "required": true,
+          "error": "4 violations found",
+          "details": {
+            "violations": [
+              "[SECURITY:CRITICAL] INVARIANT VIOLATION: File write without MUTATION-LOGGED annotation (line 17)",
+              "[SECURITY:HIGH] Untrusted input flows to DOM manipulation: write() (line 17)",
+              "[HOLLOW:HIGH] RETURN_ONLY (<anonymous>): Function '<anonymous>' only returns a constant value",
+              "[HOLLOW:HIGH] RETURN_ONLY (helper): Function 'helper' only returns a constant value"
+            ],
+            "securityScore": 50,
+            "securitySummary": "Security issues: 1 critical, 1 high (score: 50/100)",
+            "hollowScore": 60,
+            "hollowPatterns": 2
+          }
+        },
+        {
+          "gateName": "test_quality",
+          "passed": false,
+          "required": false,
+          "error": "Test quality 40/100 below threshold 50. No assertions found. Add expect() or assert() calls.",
+          "details": {
+            "score": 40,
+            "threshold": 50,
+            "assertionsTotal": 0,
+            "assertionsMeaningful": 0,
+            "assertionsPerTest": 0,
+            "mockBiasRatio": 0,
+            "coverageProxy": 0.5,
+            "edgeCaseScore": 25,
+            "issues": [
+              "No assertions found. Add expect() or assert() calls.",
+              "Missing edge cases: null/undefined, empty values, boundaries."
+            ]
+          }
+        }
+      ],
+      "allGatesPassed": false,
+      "blockedBy": [
+        "variable_resolution",
+        "governance_check"
+      ],
+      "passedGates": [
+        "schema_validation",
+        "syntax_validation",
+        "test_execution",
+        "urco_entropy"
+      ],
+      "securityIssuesDetected": []
+    },
+    {
+      "attackId": "13-prompt-injection-v2",
+      "attackFile": "chaos-runner/attacks/13-prompt-injection-v2.ts",
+      "codeLength": 1058,
+      "gateResults": [
+        {
+          "gateName": "schema_validation",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "syntax_validation",
+          "passed": true,
+          "required": true,
+          "details": {
+            "typeCheckPassed": true,
+            "diagnosticsChecked": 0
+          }
+        },
+        {
+          "gateName": "variable_resolution",
+          "passed": false,
+          "required": true,
+          "error": "Undefined: description, author",
+          "details": {
+            "undefined": [
+              "description",
+              "author"
+            ]
+          }
+        },
+        {
+          "gateName": "test_execution",
+          "passed": true,
+          "required": true,
+          "details": {
+            "method": "sandbox_execution",
+            "codeType": "test",
+            "exitCode": 0,
+            "policyChecks": {
+              "cwd_validated": true,
+              "env_sanitized": true,
+              "network_denied_or_manifested": true,
+              "fs_write_within_limits": true,
+              "symlink_escape_absent": true,
+              "path_escape_absent": true
+            },
+            "fingerprint": {
+              "runner_version": "1.0.0",
+              "command_hash": "sha256:6d2e26fc7be4cc0a7333316a64c5e6990234362fb5aafe2672a275306afe82df",
+              "env_hash": "sha256:c722e93949e144d3d3f717c276ade642b857575c8358fbcd964a050f8848e159",
+              "sandbox_config_hash": "sha256:fb30497e79436f0ac1a8ebecc49b5b4911bbe8a873e59c1b9eef6723172f3015"
+            },
+            "evidenceVerified": true,
+            "bundled": false
+          }
+        },
+        {
+          "gateName": "urco_entropy",
+          "passed": true,
+          "required": true,
+          "details": {
+            "entropy": 0.3836666666666667
+          }
+        },
+        {
+          "gateName": "governance_check",
+          "passed": true,
+          "required": true,
+          "details": {
+            "securityScore": 100,
+            "securityVulnerabilities": 0,
+            "hollowScore": 100,
+            "hollowPatterns": 0
+          }
+        },
+        {
+          "gateName": "test_quality",
+          "passed": false,
+          "required": false,
+          "error": "Test quality 40/100 below threshold 50. No assertions found. Add expect() or assert() calls.",
+          "details": {
+            "score": 40,
+            "threshold": 50,
+            "assertionsTotal": 0,
+            "assertionsMeaningful": 0,
+            "assertionsPerTest": 0,
+            "mockBiasRatio": 0,
+            "coverageProxy": 1,
+            "edgeCaseScore": 0,
+            "issues": [
+              "No assertions found. Add expect() or assert() calls.",
+              "Missing edge cases: null/undefined, empty values, error paths, boundaries."
+            ]
+          }
+        }
+      ],
+      "allGatesPassed": false,
+      "blockedBy": [
+        "variable_resolution"
+      ],
+      "passedGates": [
+        "schema_validation",
+        "syntax_validation",
+        "test_execution",
+        "urco_entropy",
+        "governance_check"
+      ],
+      "securityIssuesDetected": []
+    },
+    {
+      "attackId": "14-eval-obfuscation-v2",
+      "attackFile": "chaos-runner/attacks/14-eval-obfuscation-v2.ts",
+      "codeLength": 1196,
+      "gateResults": [
+        {
+          "gateName": "schema_validation",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "syntax_validation",
+          "passed": true,
+          "required": true,
+          "details": {
+            "typeCheckPassed": true,
+            "diagnosticsChecked": 0
+          }
+        },
+        {
+          "gateName": "variable_resolution",
+          "passed": false,
+          "required": true,
+          "error": "Undefined: _target, prop",
+          "details": {
+            "undefined": [
+              "_target",
+              "prop"
+            ]
+          }
+        },
+        {
+          "gateName": "test_execution",
+          "passed": true,
+          "required": true,
+          "details": {
+            "method": "sandbox_execution",
+            "codeType": "test",
+            "exitCode": 0,
+            "policyChecks": {
+              "cwd_validated": true,
+              "env_sanitized": true,
+              "network_denied_or_manifested": true,
+              "fs_write_within_limits": true,
+              "symlink_escape_absent": true,
+              "path_escape_absent": true
+            },
+            "fingerprint": {
+              "runner_version": "1.0.0",
+              "command_hash": "sha256:a4e895d8d4d754afc5471efeb2e86ad05a9d8936e228383cb86ee8db1efec79f",
+              "env_hash": "sha256:c722e93949e144d3d3f717c276ade642b857575c8358fbcd964a050f8848e159",
+              "sandbox_config_hash": "sha256:fb30497e79436f0ac1a8ebecc49b5b4911bbe8a873e59c1b9eef6723172f3015"
+            },
+            "evidenceVerified": true,
+            "bundled": false
+          }
+        },
+        {
+          "gateName": "urco_entropy",
+          "passed": true,
+          "required": true,
+          "details": {
+            "entropy": 0.39666666666666667
+          }
+        },
+        {
+          "gateName": "governance_check",
+          "passed": false,
+          "required": true,
+          "error": "[SECURITY:CRITICAL] Dynamic require - code injection risk (line 16)",
+          "details": {
+            "violations": [
+              "[SECURITY:CRITICAL] Dynamic require - code injection risk (line 16)"
+            ],
+            "securityScore": 70,
+            "securitySummary": "Security issues: 1 critical (score: 70/100)",
+            "hollowScore": 100,
+            "hollowPatterns": 0
+          }
+        },
+        {
+          "gateName": "test_quality",
+          "passed": false,
+          "required": false,
+          "error": "Test quality 40/100 below threshold 50. No assertions found. Add expect() or assert() calls.",
+          "details": {
+            "score": 40,
+            "threshold": 50,
+            "assertionsTotal": 0,
+            "assertionsMeaningful": 0,
+            "assertionsPerTest": 0,
+            "mockBiasRatio": 0,
+            "coverageProxy": 0.5,
+            "edgeCaseScore": 0,
+            "issues": [
+              "No assertions found. Add expect() or assert() calls.",
+              "Missing edge cases: null/undefined, empty values, error paths, boundaries."
+            ]
+          }
+        }
+      ],
+      "allGatesPassed": false,
+      "blockedBy": [
+        "variable_resolution",
+        "governance_check"
+      ],
+      "passedGates": [
+        "schema_validation",
+        "syntax_validation",
+        "test_execution",
+        "urco_entropy"
+      ],
+      "securityIssuesDetected": []
+    },
+    {
+      "attackId": "15-hollow-evasion",
+      "attackFile": "chaos-runner/attacks/15-hollow-evasion.ts",
+      "codeLength": 1630,
+      "gateResults": [
+        {
+          "gateName": "schema_validation",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "syntax_validation",
+          "passed": true,
+          "required": true,
+          "details": {
+            "typeCheckPassed": true,
+            "diagnosticsChecked": 0
+          }
+        },
+        {
+          "gateName": "variable_resolution",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "test_execution",
+          "passed": true,
+          "required": true,
+          "details": {
+            "method": "sandbox_execution",
+            "codeType": "test",
+            "exitCode": 0,
+            "policyChecks": {
+              "cwd_validated": true,
+              "env_sanitized": true,
+              "network_denied_or_manifested": true,
+              "fs_write_within_limits": true,
+              "symlink_escape_absent": true,
+              "path_escape_absent": true
+            },
+            "fingerprint": {
+              "runner_version": "1.0.0",
+              "command_hash": "sha256:a4b9ee67c64046faea54ac682f9cfac5f5eddafc0a066aa42d7a64652a3bd2b1",
+              "env_hash": "sha256:c722e93949e144d3d3f717c276ade642b857575c8358fbcd964a050f8848e159",
+              "sandbox_config_hash": "sha256:fb30497e79436f0ac1a8ebecc49b5b4911bbe8a873e59c1b9eef6723172f3015"
+            },
+            "evidenceVerified": true,
+            "bundled": false
+          }
+        },
+        {
+          "gateName": "urco_entropy",
+          "passed": true,
+          "required": true,
+          "details": {
+            "entropy": 0.4783333333333334
+          }
+        },
+        {
+          "gateName": "governance_check",
+          "passed": true,
+          "required": true,
+          "details": {
+            "securityScore": 90,
+            "securityVulnerabilities": 1,
+            "hollowScore": 100,
+            "hollowPatterns": 0
+          }
+        },
+        {
+          "gateName": "test_quality",
+          "passed": false,
+          "required": false,
+          "error": "Test quality 40/100 below threshold 50. No assertions found. Add expect() or assert() calls.",
+          "details": {
+            "score": 40,
+            "threshold": 50,
+            "assertionsTotal": 0,
+            "assertionsMeaningful": 0,
+            "assertionsPerTest": 0,
+            "mockBiasRatio": 0,
+            "coverageProxy": 1,
+            "edgeCaseScore": 25,
+            "issues": [
+              "No assertions found. Add expect() or assert() calls.",
+              "Missing edge cases: null/undefined, empty values, boundaries."
+            ]
+          }
+        }
+      ],
+      "allGatesPassed": true,
+      "blockedBy": [],
+      "passedGates": [
+        "schema_validation",
+        "syntax_validation",
+        "variable_resolution",
+        "test_execution",
+        "urco_entropy",
+        "governance_check"
+      ],
+      "securityIssuesDetected": []
+    },
+    {
+      "attackId": "16-test-quality-v2",
+      "attackFile": "chaos-runner/attacks/16-test-quality-v2.ts",
+      "codeLength": 2812,
+      "gateResults": [
+        {
+          "gateName": "schema_validation",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "syntax_validation",
+          "passed": true,
+          "required": true,
+          "details": {
+            "typeCheckPassed": true,
+            "diagnosticsChecked": 1
+          }
+        },
+        {
+          "gateName": "variable_resolution",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "test_execution",
+          "passed": false,
+          "required": true,
+          "error": "Cannot find module 'vitest' or its corresponding type declarations.",
+          "details": {
+            "method": "typescript_compilation",
+            "codeType": "library",
+            "hasLocalImports": true,
+            "verified": false
+          }
+        },
+        {
+          "gateName": "urco_entropy",
+          "passed": false,
+          "required": true,
+          "error": "Code too ambiguous (entropy: 0.557 > 0.5)",
+          "details": {
+            "entropy": 0.5566666666666668,
+            "breakdown": {
+              "unknowns": 0.8333333333333334,
+              "ambiguity": 1,
+              "contradiction": 0,
+              "specificityDeficit": 1,
+              "dependencyUncertainty": 0.3333333333333333,
+              "verifiabilityDeficit": 0
+            }
+          }
+        },
+        {
+          "gateName": "governance_check",
+          "passed": true,
+          "required": true,
+          "details": {
+            "securityScore": 100,
+            "securityVulnerabilities": 0,
+            "hollowScore": 100,
+            "hollowPatterns": 0
+          }
+        },
+        {
+          "gateName": "test_quality",
+          "passed": true,
+          "required": false,
+          "details": {
+            "score": 86,
+            "threshold": 50,
+            "assertionsTotal": 23,
+            "assertionsMeaningful": 20,
+            "assertionsPerTest": 1.2777777777777777,
+            "mockBiasRatio": 0,
+            "coverageProxy": 0.5,
+            "edgeCaseScore": 75,
+            "issues": [
+              "Low assertion density (1.3/test). Add more assertions per test."
+            ]
+          }
+        }
+      ],
+      "allGatesPassed": false,
+      "blockedBy": [
+        "test_execution",
+        "urco_entropy"
+      ],
+      "passedGates": [
+        "schema_validation",
+        "syntax_validation",
+        "variable_resolution",
+        "governance_check",
+        "test_quality"
+      ],
+      "securityIssuesDetected": []
+    },
+    {
+      "attackId": "17-unicode-advanced",
+      "attackFile": "chaos-runner/attacks/17-unicode-advanced.ts",
+      "codeLength": 1287,
+      "gateResults": [
+        {
+          "gateName": "schema_validation",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "syntax_validation",
+          "passed": true,
+          "required": true,
+          "details": {
+            "typeCheckPassed": true,
+            "diagnosticsChecked": 0
+          }
+        },
+        {
+          "gateName": "variable_resolution",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "test_execution",
+          "passed": true,
+          "required": true,
+          "details": {
+            "method": "sandbox_execution",
+            "codeType": "test",
+            "exitCode": 0,
+            "policyChecks": {
+              "cwd_validated": true,
+              "env_sanitized": true,
+              "network_denied_or_manifested": true,
+              "fs_write_within_limits": true,
+              "symlink_escape_absent": true,
+              "path_escape_absent": true
+            },
+            "fingerprint": {
+              "runner_version": "1.0.0",
+              "command_hash": "sha256:c244c72f3f193a0d1485cddd4a423740bf9f389f4e822ce15b605f7ab277b7f4",
+              "env_hash": "sha256:c722e93949e144d3d3f717c276ade642b857575c8358fbcd964a050f8848e159",
+              "sandbox_config_hash": "sha256:fb30497e79436f0ac1a8ebecc49b5b4911bbe8a873e59c1b9eef6723172f3015"
+            },
+            "evidenceVerified": true,
+            "bundled": false
+          }
+        },
+        {
+          "gateName": "urco_entropy",
+          "passed": true,
+          "required": true,
+          "details": {
+            "entropy": 0.3836666666666667
+          }
+        },
+        {
+          "gateName": "governance_check",
+          "passed": true,
+          "required": true,
+          "details": {
+            "securityScore": 100,
+            "securityVulnerabilities": 0,
+            "hollowScore": 100,
+            "hollowPatterns": 0
+          }
+        },
+        {
+          "gateName": "test_quality",
+          "passed": false,
+          "required": false,
+          "error": "Test quality 40/100 below threshold 50. No assertions found. Add expect() or assert() calls.",
+          "details": {
+            "score": 40,
+            "threshold": 50,
+            "assertionsTotal": 0,
+            "assertionsMeaningful": 0,
+            "assertionsPerTest": 0,
+            "mockBiasRatio": 0,
+            "coverageProxy": 0.5,
+            "edgeCaseScore": 0,
+            "issues": [
+              "No assertions found. Add expect() or assert() calls.",
+              "Missing edge cases: null/undefined, empty values, error paths, boundaries."
+            ]
+          }
+        }
+      ],
+      "allGatesPassed": true,
+      "blockedBy": [],
+      "passedGates": [
+        "schema_validation",
+        "syntax_validation",
+        "variable_resolution",
+        "test_execution",
+        "urco_entropy",
+        "governance_check"
+      ],
+      "securityIssuesDetected": []
+    },
+    {
+      "attackId": "18-resource-evasion",
+      "attackFile": "chaos-runner/attacks/18-resource-evasion.ts",
+      "codeLength": 1524,
+      "gateResults": [
+        {
+          "gateName": "schema_validation",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "syntax_validation",
+          "passed": true,
+          "required": true,
+          "details": {
+            "typeCheckPassed": true,
+            "diagnosticsChecked": 0
+          }
+        },
+        {
+          "gateName": "variable_resolution",
+          "passed": false,
+          "required": true,
+          "error": "Undefined: leak",
+          "details": {
+            "undefined": [
+              "leak"
+            ]
+          }
+        },
+        {
+          "gateName": "test_execution",
+          "passed": true,
+          "required": true,
+          "details": {
+            "method": "sandbox_execution",
+            "codeType": "test",
+            "exitCode": 0,
+            "policyChecks": {
+              "cwd_validated": true,
+              "env_sanitized": true,
+              "network_denied_or_manifested": true,
+              "fs_write_within_limits": true,
+              "symlink_escape_absent": true,
+              "path_escape_absent": true
+            },
+            "fingerprint": {
+              "runner_version": "1.0.0",
+              "command_hash": "sha256:13a0efc2ee5fc0042a06d584ff323d82f9156c392eaed6431d4e54a94f1c7e73",
+              "env_hash": "sha256:c722e93949e144d3d3f717c276ade642b857575c8358fbcd964a050f8848e159",
+              "sandbox_config_hash": "sha256:fb30497e79436f0ac1a8ebecc49b5b4911bbe8a873e59c1b9eef6723172f3015"
+            },
+            "evidenceVerified": true,
+            "bundled": false
+          }
+        },
+        {
+          "gateName": "urco_entropy",
+          "passed": true,
+          "required": true,
+          "details": {
+            "entropy": 0.31833333333333336
+          }
+        },
+        {
+          "gateName": "governance_check",
+          "passed": false,
+          "required": true,
+          "error": "4 violations found",
+          "details": {
+            "violations": [
+              "[SECURITY:HIGH] HOLLOW CODE: Function only returns a constant string (line 54)",
+              "[SECURITY:CRITICAL] RESOURCE EXHAUSTION: Infinite loop detected - DoS risk (line 21)",
+              "[SECURITY:HIGH] RESOURCE EXHAUSTION: Potentially unbounded recursion (line 5)",
+              "[HOLLOW:HIGH] RETURN_ONLY (helper): Function 'helper' only returns a constant value"
+            ],
+            "securityScore": 20,
+            "securitySummary": "Security issues: 1 critical, 2 high, 1 medium (score: 20/100)",
+            "hollowScore": 80,
+            "hollowPatterns": 1
+          }
+        },
+        {
+          "gateName": "test_quality",
+          "passed": false,
+          "required": false,
+          "error": "Test quality 40/100 below threshold 50. No assertions found. Add expect() or assert() calls.",
+          "details": {
+            "score": 40,
+            "threshold": 50,
+            "assertionsTotal": 0,
+            "assertionsMeaningful": 0,
+            "assertionsPerTest": 0,
+            "mockBiasRatio": 0,
+            "coverageProxy": 1,
+            "edgeCaseScore": 0,
+            "issues": [
+              "No assertions found. Add expect() or assert() calls.",
+              "Missing edge cases: null/undefined, empty values, error paths, boundaries."
+            ]
+          }
+        }
+      ],
+      "allGatesPassed": false,
+      "blockedBy": [
+        "variable_resolution",
+        "governance_check"
+      ],
+      "passedGates": [
+        "schema_validation",
+        "syntax_validation",
+        "test_execution",
+        "urco_entropy"
+      ],
+      "securityIssuesDetected": []
+    },
+    {
+      "attackId": "19-polyglot",
+      "attackFile": "chaos-runner/attacks/19-polyglot.ts",
+      "codeLength": 1124,
+      "gateResults": [
+        {
+          "gateName": "schema_validation",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "syntax_validation",
+          "passed": true,
+          "required": true,
+          "details": {
+            "typeCheckPassed": true,
+            "diagnosticsChecked": 0
+          }
+        },
+        {
+          "gateName": "variable_resolution",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "test_execution",
+          "passed": true,
+          "required": true,
+          "details": {
+            "method": "sandbox_execution",
+            "codeType": "test",
+            "exitCode": 0,
+            "policyChecks": {
+              "cwd_validated": true,
+              "env_sanitized": true,
+              "network_denied_or_manifested": true,
+              "fs_write_within_limits": true,
+              "symlink_escape_absent": true,
+              "path_escape_absent": true
+            },
+            "fingerprint": {
+              "runner_version": "1.0.0",
+              "command_hash": "sha256:e5469acacb4fdac6a14c5fc6b9c065918575d8d856e6645725ba139054af2e81",
+              "env_hash": "sha256:c722e93949e144d3d3f717c276ade642b857575c8358fbcd964a050f8848e159",
+              "sandbox_config_hash": "sha256:fb30497e79436f0ac1a8ebecc49b5b4911bbe8a873e59c1b9eef6723172f3015"
+            },
+            "evidenceVerified": true,
+            "bundled": false
+          }
+        },
+        {
+          "gateName": "urco_entropy",
+          "passed": true,
+          "required": true,
+          "details": {
+            "entropy": 0.3953333333333333
+          }
+        },
+        {
+          "gateName": "governance_check",
+          "passed": false,
+          "required": true,
+          "error": "3 violations found",
+          "details": {
+            "violations": [
+              "[SECURITY:HIGH] HOLLOW CODE: Function only returns a constant string (line 11)",
+              "[SECURITY:CRITICAL] Direct eval() usage detected - code injection risk (line 47)",
+              "[SECURITY:HIGH] document.write() usage - XSS risk (line 33)"
+            ],
+            "securityScore": 30,
+            "securitySummary": "Security issues: 1 critical, 2 high (score: 30/100)",
+            "hollowScore": 100,
+            "hollowPatterns": 0
+          }
+        },
+        {
+          "gateName": "test_quality",
+          "passed": false,
+          "required": false,
+          "error": "Test quality 40/100 below threshold 50. No assertions found. Add expect() or assert() calls.",
+          "details": {
+            "score": 40,
+            "threshold": 50,
+            "assertionsTotal": 0,
+            "assertionsMeaningful": 0,
+            "assertionsPerTest": 0,
+            "mockBiasRatio": 0,
+            "coverageProxy": 1,
+            "edgeCaseScore": 0,
+            "issues": [
+              "No assertions found. Add expect() or assert() calls.",
+              "Missing edge cases: null/undefined, empty values, error paths, boundaries."
+            ]
+          }
+        }
+      ],
+      "allGatesPassed": false,
+      "blockedBy": [
+        "governance_check"
+      ],
+      "passedGates": [
+        "schema_validation",
+        "syntax_validation",
+        "variable_resolution",
+        "test_execution",
+        "urco_entropy"
+      ],
+      "securityIssuesDetected": []
+    },
+    {
+      "attackId": "20-prototype-chain",
+      "attackFile": "chaos-runner/attacks/20-prototype-chain.ts",
+      "codeLength": 1411,
+      "gateResults": [
+        {
+          "gateName": "schema_validation",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "syntax_validation",
+          "passed": true,
+          "required": true,
+          "details": {
+            "typeCheckPassed": true,
+            "diagnosticsChecked": 0
+          }
+        },
+        {
+          "gateName": "variable_resolution",
+          "passed": true,
+          "required": true
+        },
+        {
+          "gateName": "test_execution",
+          "passed": true,
+          "required": true,
+          "details": {
+            "method": "sandbox_execution",
+            "codeType": "test",
+            "exitCode": 0,
+            "policyChecks": {
+              "cwd_validated": true,
+              "env_sanitized": true,
+              "network_denied_or_manifested": true,
+              "fs_write_within_limits": true,
+              "symlink_escape_absent": true,
+              "path_escape_absent": true
+            },
+            "fingerprint": {
+              "runner_version": "1.0.0",
+              "command_hash": "sha256:ac3e7e0fce3248e4a52f79baed2c04e612ec694a2068a186de71a7edea426a9b",
+              "env_hash": "sha256:c722e93949e144d3d3f717c276ade642b857575c8358fbcd964a050f8848e159",
+              "sandbox_config_hash": "sha256:fb30497e79436f0ac1a8ebecc49b5b4911bbe8a873e59c1b9eef6723172f3015"
+            },
+            "evidenceVerified": true,
+            "bundled": false
+          }
+        },
+        {
+          "gateName": "urco_entropy",
+          "passed": true,
+          "required": true,
+          "details": {
+            "entropy": 0.36333333333333334
+          }
+        },
+        {
+          "gateName": "governance_check",
+          "passed": false,
+          "required": true,
+          "error": "4 violations found",
+          "details": {
+            "violations": [
+              "[SECURITY:HIGH] RESOURCE EXHAUSTION: Potentially unbounded recursion (line 14)",
+              "[SECURITY:HIGH] Dynamic constructor access - prototype pollution risk (line 28)",
+              "[SECURITY:HIGH] JSON.parse on untrusted input - verify source (line 16)",
+              "[HOLLOW:HIGH] EMPTY_FUNCTION (set): Function 'set' has an empty body"
+            ],
+            "securityScore": 30,
+            "securitySummary": "Security issues: 3 high, 1 medium (score: 30/100)",
+            "hollowScore": 80,
+            "hollowPatterns": 1
+          }
+        },
+        {
+          "gateName": "test_quality",
+          "passed": false,
+          "required": false,
+          "error": "Test quality 40/100 below threshold 50. No assertions found. Add expect() or assert() calls.",
+          "details": {
+            "score": 40,
+            "threshold": 50,
+            "assertionsTotal": 0,
+            "assertionsMeaningful": 0,
+            "assertionsPerTest": 0,
+            "mockBiasRatio": 0,
+            "coverageProxy": 1,
+            "edgeCaseScore": 25,
+            "issues": [
+              "No assertions found. Add expect() or assert() calls.",
+              "Missing edge cases: null/undefined, error paths, boundaries."
+            ]
+          }
+        }
+      ],
+      "allGatesPassed": false,
+      "blockedBy": [
+        "governance_check"
+      ],
+      "passedGates": [
+        "schema_validation",
+        "syntax_validation",
+        "variable_resolution",
+        "test_execution",
+        "urco_entropy"
+      ],
+      "securityIssuesDetected": []
+    }
+  ],
+  "gateStats": {
+    "schema_validation": {
+      "blocked": 0,
+      "passed": 20
+    },
+    "syntax_validation": {
+      "blocked": 2,
+      "passed": 18
+    },
+    "variable_resolution": {
+      "blocked": 4,
+      "passed": 16
+    },
+    "test_execution": {
+      "blocked": 3,
+      "passed": 17
+    },
+    "urco_entropy": {
+      "blocked": 2,
+      "passed": 18
+    },
+    "governance_check": {
+      "blocked": 14,
+      "passed": 6
+    },
+    "test_quality": {
+      "blocked": 18,
+      "passed": 2
+    }
+  }
+}
