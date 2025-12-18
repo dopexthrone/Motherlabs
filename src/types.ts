@@ -17,7 +17,7 @@ export type Task = {
 export type Evidence = {
   id: string
   taskId: string
-  type: 'task_created' | 'llm_decompose' | 'llm_generate' | 'validation' | 'completion'
+  type: 'task_created' | 'llm_decompose' | 'llm_generate' | 'validation' | 'completion' | 'task_error'
   timestamp: number
   data: unknown
 }

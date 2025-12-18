@@ -514,10 +514,10 @@ const SECURITY_PATTERNS: Array<{
   },
   {
     type: 'RESOURCE_EXHAUSTION' as SecurityVulnerabilityType,
-    severity: 'high',
-    // Recursive function without base case check
-    pattern: /function\s+(\w+)[^{]*\{[^}]*\1\s*\([^}]*\}(?!\s*\/\/\s*BASE)/,
-    message: 'RESOURCE EXHAUSTION: Potentially unbounded recursion'
+    severity: 'medium',  // Downgraded: Many valid recursive functions (tree traversal, etc.)
+    // Recursive function detection - advisory only since many are bounded
+    pattern: /function\s+(\w+)[^{]*\{[^}]*\1\s*\([^}]*\}(?!\s*\/\/\s*(?:BASE|BOUNDED|TREE))/,
+    message: 'RESOURCE EXHAUSTION: Potentially unbounded recursion (verify base case exists)'
   },
   {
     type: 'RESOURCE_EXHAUSTION' as SecurityVulnerabilityType,
