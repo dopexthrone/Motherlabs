@@ -334,6 +334,31 @@ const SAFE_PATTERNS: RegExp[] = [
   /MUTATION-LOGGED|BOOTSTRAP-MODE|INVARIANT-EXEMPT/,
 ]
 
+// FIX 2: Check if JSON.parse is inside a safe wrapper (try/catch)
+function isJsonParseSafe(code: string): boolean {
+  // Pattern 1: safeJsonParse function that wraps JSON.parse in try/catch
+  const hasSafeWrapper = /function\s+safeJsonParse[^{]*\{[^}]*try\s*\{[^}]*JSON\.parse/.test(code)
+  if (hasSafeWrapper) {
+    // Count how many JSON.parse calls exist
+    const totalParses = (code.match(/JSON\.parse/g) || []).length
+    // Count how many are inside safeJsonParse
+    const safeParseMatch = code.match(/function\s+safeJsonParse[^}]+JSON\.parse/g) || []
+
+    // If all JSON.parse calls are inside safe wrappers, it's safe
+    if (safeParseMatch.length >= totalParses) {
+      return true
+    }
+  }
+
+  // Pattern 2: JSON.parse directly inside try block
+  // Match: try { ... JSON.parse ... } catch
+  const tryBlocks = code.match(/try\s*\{[^}]*JSON\.parse[^}]*\}\s*catch/g) || []
+  const totalParses = (code.match(/JSON\.parse/g) || []).length
+
+  // If all JSON.parse are inside try blocks, it's safe
+  return tryBlocks.length >= totalParses && totalParses > 0
+}
+
 /**
  * Scan code for security vulnerabilities
  *
@@ -348,12 +373,22 @@ export function scanForVulnerabilities(code: string): SecurityScanResult {
   // Check if code matches any safe patterns (e.g., test files)
   const isSafeContext = SAFE_PATTERNS.some(p => p.test(code))
 
+  // FIX 2: Check if JSON.parse is wrapped safely
+  const jsonParseSafe = isJsonParseSafe(code)
+
   // ═══════════════════════════════════════════════════════════
   // TIER 1: Fast regex-based scanning
   // ═══════════════════════════════════════════════════════════
   for (const patternDef of SECURITY_PATTERNS) {
     // Skip some patterns in safe contexts
     if (isSafeContext && patternDef.severity !== 'critical') {
+      continue
+    }
+
+    // FIX 2: Skip JSON.parse check if it's wrapped safely
+    if (patternDef.type === 'UNSAFE_DESERIALIZATION' &&
+        patternDef.pattern.source.includes('JSON') &&
+        jsonParseSafe) {
       continue
     }
 

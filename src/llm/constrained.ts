@@ -11,8 +11,68 @@ import { Result, Ok, Err } from '../core/result'
 import { JSONLLedger } from '../persistence/jsonlLedger'
 import { globalTimeProvider } from '../core/ids'
 import { sanitizeInput, validateSanitized } from '../core/sanitize'
+import { getRelevantTypes, getCoreProjectTypes, formatTypesForPrompt, getRelevantFunctions, formatFunctionsForPrompt, getRelevantClasses, formatClassesForPrompt } from './typeExtractor'
 import type { CodeIssue } from '../analysis/codeAnalyzer'
 import type { LLMProvider, LLMProviderType } from './types'
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FIX 2: Helper to extract identifiers from existing code
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Extract function/method/variable names from code
+ * This helps the LLM know what's available to use
+ */
+function extractCodeIdentifiers(code: string): {
+  functions: string[]
+  variables: string[]
+  imports: string[]
+} {
+  const functions: string[] = []
+  const variables: string[] = []
+  const imports: string[] = []
+
+  // Extract function names: function foo(...) or async function foo(...)
+  const funcMatches = code.matchAll(/(?:async\s+)?function\s+(\w+)\s*\(/g)
+  for (const match of funcMatches) {
+    functions.push(match[1])
+  }
+
+  // Extract arrow functions: const foo = (...) => or const foo = async (...) =>
+  const arrowMatches = code.matchAll(/(?:const|let)\s+(\w+)\s*=\s*(?:async\s*)?\([^)]*\)\s*=>/g)
+  for (const match of arrowMatches) {
+    functions.push(match[1])
+  }
+
+  // Extract method calls that might be available: this.method or obj.method
+  const methodMatches = code.matchAll(/(?:this|await\s+this)\.(\w+)\s*\(/g)
+  for (const match of methodMatches) {
+    if (!functions.includes(match[1])) {
+      functions.push(match[1])
+    }
+  }
+
+  // Extract const/let declarations
+  const varMatches = code.matchAll(/(?:const|let)\s+(\w+)\s*[=:]/g)
+  for (const match of varMatches) {
+    if (!functions.includes(match[1])) {
+      variables.push(match[1])
+    }
+  }
+
+  // Extract import names
+  const importMatches = code.matchAll(/import\s+(?:type\s+)?\{([^}]+)\}\s+from/g)
+  for (const match of importMatches) {
+    const names = match[1].split(',').map(s => s.trim().split(/\s+as\s+/)[0].trim())
+    imports.push(...names)
+  }
+
+  return {
+    functions: [...new Set(functions)],
+    variables: [...new Set(variables)],
+    imports: [...new Set(imports)]
+  }
+}
 
 export type GenerateCodeRequest = {
   issue: CodeIssue
@@ -152,8 +212,27 @@ export class ConstrainedLLM {
 
   /**
    * Build prompt for specific issue type
+   * FIX 2: Enhanced with better context injection
    */
   private buildPrompt(issue: CodeIssue, filepath: string, existingCode: string, attempt: number): string {
+    // Extract type definitions from imports and core project types
+    const relevantTypes = getRelevantTypes(filepath, 8)
+    const coreTypes = getCoreProjectTypes('src')
+    const allTypes = [...relevantTypes, ...coreTypes.slice(0, 5)]
+    const typeContext = formatTypesForPrompt(allTypes)
+
+    // Extract function signatures from imports
+    const relevantFunctions = getRelevantFunctions(filepath, 8)
+    const funcContext = formatFunctionsForPrompt(relevantFunctions)
+
+    // Extract class definitions from imports
+    const relevantClasses = getRelevantClasses(filepath, 5)
+    const classContext = formatClassesForPrompt(relevantClasses)
+
+    // FIX 2: Extract identifiers from existing code
+    const identifiers = extractCodeIdentifiers(existingCode)
+    const identifierContext = this.formatIdentifierContext(identifiers)
+
     // DETERMINISM-EXEMPT: Prompt strings reference forbidden patterns to instruct LLM what NOT to use
     const basePrompt = `You are generating TypeScript code for Motherlabs Runtime.
 
@@ -163,7 +242,52 @@ MANDATORY REQUIREMENTS:
 1. MUST use 'export' keyword - e.g. 'export function', 'export const', 'export class'
 2. MUST compile with strict TypeScript (no implicit any)
 3. MUST be clear and unambiguous
+4. MUST use ONLY the identifiers listed below - do NOT invent new function/method names
 
+═══════════════════════════════════════════════════════════════════════════
+IDENTIFIERS FROM EXISTING CODE (use these EXACTLY):
+═══════════════════════════════════════════════════════════════════════════
+${identifierContext}
+
+═══════════════════════════════════════════════════════════════════════════
+SECURITY PATTERNS (code WILL BE REJECTED if you violate these):
+═══════════════════════════════════════════════════════════════════════════
+
+✗ FORBIDDEN - Will fail Gate 6:
+  - JSON.parse(untrustedInput)
+  - eval(), new Function()
+  - exec(), spawn() with string concatenation
+
+✓ SAFE PATTERNS - Use these instead:
+  // Safe JSON parsing:
+  function safeJsonParse<T>(input: string): Result<T, Error> {
+    try {
+      const data = JSON.parse(input) as T;
+      return Ok(data);
+    } catch (e) {
+      return Err(e instanceof Error ? e : new Error(String(e)));
+    }
+  }
+
+  // Safe async operations:
+  try {
+    const result = await operation();
+    return Ok(result);
+  } catch (error) {
+    return Err(error instanceof Error ? error : new Error(String(error)));
+  }
+
+═══════════════════════════════════════════════════════════════════════════
+PATTERNS THAT WILL FAIL VALIDATION:
+═══════════════════════════════════════════════════════════════════════════
+- Using undefined variables/functions (Gate 3 fails)
+- Using JSON.parse without try/catch (Gate 6 fails)
+- Missing 'export' keyword (Gate 1 fails)
+- Type errors (Gate 2 fails)
+
+${typeContext}
+${funcContext}
+${classContext}
 `
 
     const issuePrompts: Record<string, string> = {
@@ -205,7 +329,9 @@ Requirements:
 - Import from the source file using relative paths like '../src/...'
 - Include success cases with meaningful assertions
 - Include failure/error cases
-- Test actual return values, not just that functions exist`,
+- Test actual return values, not just that functions exist
+- Use ONLY types that exist (see AVAILABLE TYPE DEFINITIONS above)
+- For union types like Evidence.type, use ONLY the valid values listed`,
 
       'HIGH_COMPLEXITY': `Refactor this complex function to reduce cyclomatic complexity.
 
@@ -217,11 +343,18 @@ Current code:
 ${existingCode.slice(0, 2000)}
 \`\`\`
 
+CRITICAL CONSTRAINTS:
+- Do NOT add new properties to existing types (like Config, Evidence, etc.)
+- Do NOT change the types of existing variables
+- Use ONLY the types shown in AVAILABLE TYPE DEFINITIONS above
+- If a type doesn't have a property, you CANNOT add it
+
 Requirements:
 - Break into smaller, focused functions
 - Each function should have complexity < 10
-- Maintain same external interface
-- Add clear function names`,
+- Maintain same external interface (same parameters, same return type)
+- Add clear function names
+- Keep all existing imports and type usage`,
 
       'NO_ERROR_HANDLING': `Add proper error handling to this async function.
 
@@ -233,16 +366,29 @@ Current code:
 ${existingCode.slice(0, 2000)}
 \`\`\`
 
-IMPORTANT: This project uses the Result<T, Error> pattern from '../core/result':
+IMPORTANT: This project uses the Result<T, Error> pattern from '../core/result'.
+
+COMPLETE THE CODE BELOW - Keep the EXACT same function name and logic:
 \`\`\`typescript
 import { Result, Ok, Err } from '../core/result';
 
-// Success: return Ok(value)
-// Failure: return Err(new Error('message'))
-
-export async function example(): Promise<Result<string, Error>> {
+// SAFE JSON PARSING - Use this pattern instead of raw JSON.parse:
+function safeJsonParse<T>(input: string): Result<T, Error> {
   try {
-    const result = await someOperation();
+    const data = JSON.parse(input) as T;
+    return Ok(data);
+  } catch (e) {
+    return Err(e instanceof Error ? e : new Error(String(e)));
+  }
+}
+
+// SAFE ASYNC FUNCTION TEMPLATE:
+export async function yourFunction(param: ParamType): Promise<Result<ReturnType, Error>> {
+  try {
+    // Your logic here
+    // If parsing JSON, use: const parsed = safeJsonParse<YourType>(jsonString);
+    // If parsed.ok is false, return parsed (propagates error)
+
     return Ok(result);
   } catch (error) {
     return Err(error instanceof Error ? error : new Error(String(error)));
@@ -250,12 +396,14 @@ export async function example(): Promise<Result<string, Error>> {
 }
 \`\`\`
 
-Requirements:
-- Import Result, Ok, Err from '../core/result'
-- Change return type to Promise<Result<T, Error>> where T is the success type
-- Wrap async operations in try/catch
-- Return Ok(value) on success, Err(error) on failure
-- Preserve the original function signature and exports`,
+CRITICAL REQUIREMENTS:
+1. Import Result, Ok, Err from '../core/result'
+2. Change return type to Promise<Result<T, Error>>
+3. Wrap ALL async operations in try/catch
+4. If the code uses JSON.parse, wrap it in a helper like safeJsonParse shown above
+5. Return Ok(value) on success, Err(error) on failure
+6. Use ONLY the function names from the IDENTIFIERS section above
+7. MUST export the function`,
 
       'DUPLICATE_CODE': `Refactor to eliminate duplicate code.
 
@@ -354,5 +502,34 @@ Requirements:
     })
     // Return record_hash as the evidence ID
     return result.ok ? result.value.record_hash : `evidence-${globalTimeProvider.now()}`
+  }
+
+  /**
+   * FIX 2: Format extracted identifiers for prompt context
+   */
+  private formatIdentifierContext(identifiers: {
+    functions: string[]
+    variables: string[]
+    imports: string[]
+  }): string {
+    const lines: string[] = []
+
+    if (identifiers.functions.length > 0) {
+      lines.push(`Functions available: ${identifiers.functions.join(', ')}`)
+    }
+
+    if (identifiers.variables.length > 0) {
+      lines.push(`Variables defined: ${identifiers.variables.join(', ')}`)
+    }
+
+    if (identifiers.imports.length > 0) {
+      lines.push(`Imports available: ${identifiers.imports.join(', ')}`)
+    }
+
+    if (lines.length === 0) {
+      return '(No identifiers extracted - define your own)'
+    }
+
+    return lines.join('\n')
   }
 }

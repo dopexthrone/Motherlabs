@@ -657,10 +657,43 @@ export class SixGateValidator {
   }
 
   /**
-   * Gate 4: Test Execution (Kernel-grade)
-   * Executes code in sandbox with full evidence production.
+   * Detect if code is test code (should be executed) or library code (just compile)
    *
-   * SECURITY: Uses kernel-grade sandbox with:
+   * Test code patterns:
+   * - Jest/Mocha: describe(), test(), it()
+   * - Custom project pattern: assert() + runTests() + runTests().catch()
+   * - Vitest: describe(), test(), it(), expect()
+   *
+   * Library code: everything else (exports functions/types but doesn't run)
+   */
+  private isTestCode(code: string): boolean {
+    // Jest/Mocha/Vitest patterns
+    const hasJestPattern = /\b(describe|test|it)\s*\(/.test(code)
+
+    // Custom test pattern used in this project
+    const hasCustomTestPattern = /function\s+assert\s*\(/.test(code) &&
+                                 /function\s+runTests\s*\(/.test(code) &&
+                                 /runTests\s*\(\s*\)/.test(code)
+
+    // Check if code has executable statements at module level
+    // (not just exports/declarations)
+    const hasModuleLevelExecution = /runTests\s*\(\s*\)/.test(code) ||
+                                    /^\s*(?!export|import|type|interface|const\s+\w+\s*[=:]|let\s+\w+\s*[=:]|function\s+\w+|class\s+\w+|\/\/|\/\*|\*)/m.test(code)
+
+    return hasJestPattern || hasCustomTestPattern || hasModuleLevelExecution
+  }
+
+  /**
+   * Gate 4: Test Execution / Compilation Check
+   *
+   * SPLIT BEHAVIOR (Fix 1):
+   * - TEST CODE: Execute in sandbox, verify exit code 0
+   * - LIBRARY CODE: Just verify TypeScript compilation
+   *
+   * This fixes the issue where library code with imports would fail
+   * because it can't execute in isolation (no side effects to run).
+   *
+   * SECURITY: For test execution, uses kernel-grade sandbox with:
    * - Command as argv array (not shell string)
    * - Snapshot/diff-based file manifests
    * - Evidence bundles with SHA-256 hashes
@@ -669,14 +702,21 @@ export class SixGateValidator {
    * - Path escape protection
    * - Timeout enforcement (10s default)
    * - Output limits per sandbox config
-   *
-   * For code with local imports (./  ../):
-   * - Runs TypeScript compilation check against the project
-   * - Verifies types, import resolution, and catches real errors
-   * - This is a REQUIRED gate (no longer advisory/skipped)
    */
   private async gate4_testExecution(code: string, context: CodeValidationContext): Promise<GateResult> {
     try {
+      // ═══════════════════════════════════════════════════════════
+      // FIX 1: Split behavior by code type
+      // ═══════════════════════════════════════════════════════════
+      const isTest = this.isTestCode(code)
+
+      // For LIBRARY CODE: Just verify compilation, don't execute
+      // Library code has no side effects to test - it just defines exports
+      if (!isTest) {
+        return await this.runTypeScriptCompilationCheck(code, context.targetFile)
+      }
+
+      // For TEST CODE: Continue with full execution
       // Check for local imports that need bundling
       const needsBundling = hasLocalImports(code)
 
@@ -800,6 +840,8 @@ export class SixGateValidator {
         passed: true,
         required: true,
         details: {
+          method: 'sandbox_execution',
+          codeType: 'test',  // Test code - full execution
           exitCode: testResult.exit_code,
           policyChecks: testResult.policy_checks,
           fingerprint: testResult.deterministic_fingerprint,
@@ -880,7 +922,8 @@ export class SixGateValidator {
           required: true,
           details: {
             method: 'typescript_compilation',
-            hasLocalImports: true,
+            codeType: 'library',  // Not test code - compilation-only check
+            hasLocalImports: hasLocalImports(code),
             verified: true
           }
         }
@@ -896,7 +939,8 @@ export class SixGateValidator {
           error: errorMessage.slice(0, 200),
           details: {
             method: 'typescript_compilation',
-            hasLocalImports: true,
+            codeType: 'library',
+            hasLocalImports: hasLocalImports(code),
             verified: false
           }
         }

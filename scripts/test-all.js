@@ -803,7 +803,8 @@ export function stub() {
   check('Self-Improve: proposer creates without LLM', proposer !== null);
 
   // Test proposer refuses without LLM
-  const proposeResult = await proposer.proposeImprovement('src/cli.ts');
+  // Note: cli.ts is excluded (entry point), so use evidence.ts which has NO_TESTS issue
+  const proposeResult = await proposer.proposeImprovement('src/evidence.ts');
   check('Self-Improve: proposer refuses without LLM (AXIOM 5)', !proposeResult.ok);
   if (!proposeResult.ok) {
     check('Self-Improve: error mentions AXIOM 5',

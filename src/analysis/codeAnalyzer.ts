@@ -166,8 +166,22 @@ function detectIssues(sourceFile: SourceFile, filepath: string): CodeIssue[] {
   const functions = sourceFile.getFunctions()
   const methods = sourceFile.getClasses().flatMap(c => c.getMethods())
 
+  // Detect if this is an entry point file (has non-exported main function and main() call)
+  const fileText = sourceFile.getFullText()
+  const hasMainCall = /main\(\)\.catch/.test(fileText)
+  const basename = path.basename(filepath)
+  const isEntryPoint = hasMainCall && (basename === 'cli.ts' || basename === 'main.ts' || basename === 'index.ts')
+
   for (const func of [...functions, ...methods]) {
     const complexity = calculateFunctionComplexity(func)
+    const funcName = func.getName() || 'anonymous'
+
+    // Skip complexity issues for main functions in entry point files
+    // These are orchestration functions that don't need to be exported
+    const isExported = 'isExported' in func ? (func as { isExported(): boolean }).isExported() : false
+    if (isEntryPoint && funcName === 'main' && !isExported) {
+      continue
+    }
 
     if (complexity > 10) {
       const line = func.getStartLineNumber()
@@ -175,7 +189,7 @@ function detectIssues(sourceFile: SourceFile, filepath: string): CodeIssue[] {
         type: 'HIGH_COMPLEXITY',
         severity: complexity > 20 ? 'high' : 'medium',
         line,
-        message: `Function "${func.getName() || 'anonymous'}" has complexity ${complexity} (>10)`,
+        message: `Function "${funcName}" has complexity ${complexity} (>10)`,
         fixable: true
       })
     }
