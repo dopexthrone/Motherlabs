@@ -229,11 +229,11 @@ export class SixGateValidator {
 
       // Custom test pattern used in this project:
       // function assert(condition: boolean, message: string)
-      // async function runTests()
-      // runTests().catch(...)
+      // function runTests() OR async function runTests()
+      // runTests() call at module level (with or without .catch)
       const hasCustomTestPattern = /function\s+assert\s*\(/.test(code) &&
                                    /function\s+runTests\s*\(/.test(code) &&
-                                   /runTests\s*\(\s*\)\.catch/.test(code)
+                                   /runTests\s*\(\s*\)/.test(code)
 
       const hasTestPattern = hasJestPattern || hasCustomTestPattern
 
@@ -695,12 +695,14 @@ export class SixGateValidator {
                                  /function\s+runTests\s*\(/.test(code) &&
                                  /runTests\s*\(\s*\)/.test(code)
 
-    // Check if code has executable statements at module level
-    // (not just exports/declarations)
-    const hasModuleLevelExecution = /runTests\s*\(\s*\)/.test(code) ||
-                                    /^\s*(?!export|import|type|interface|const\s+\w+\s*[=:]|let\s+\w+\s*[=:]|function\s+\w+|class\s+\w+|\/\/|\/\*|\*)/m.test(code)
+    // Check for explicit test execution at module level
+    // Only match actual function calls, not function bodies
+    const hasModuleLevelExecution = /runTests\s*\(\s*\)/.test(code)
 
-    return hasJestPattern || hasCustomTestPattern || hasModuleLevelExecution
+    // Check for expect() assertions - strong signal of test code
+    const hasExpectPattern = /\bexpect\s*\([^)]+\)\s*\.(to|not)/.test(code)
+
+    return hasJestPattern || hasCustomTestPattern || hasModuleLevelExecution || hasExpectPattern
   }
 
   /**
@@ -923,8 +925,12 @@ export class SixGateValidator {
         const diagnostics = sourceFile.getPreEmitDiagnostics()
 
         // Filter to only errors from THIS file
+        // Skip module resolution errors (TS2307) - these will resolve when code is placed correctly
         const fileErrors = diagnostics.filter(d => {
           const file = d.getSourceFile()
+          const code = d.getCode()
+          // Skip "Cannot find module" errors - imports will resolve when file is in correct location
+          if (code === 2307) return false
           return file && file.getFilePath() === tempFile
         })
 

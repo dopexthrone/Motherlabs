@@ -92,7 +92,22 @@ export class SelfImprovementProposer {
       }
 
       // 2. Get highest priority issue
+      // Prioritize by: 1) issue type (prefer simpler fixes), 2) severity
+      // This order ensures LLM can succeed with simpler tasks first
       const sortedIssues = analysis.value.issues.sort((a, b) => {
+        // Issue type priority - simpler fixes first
+        // NO_ERROR_HANDLING: Just add try/catch to existing function
+        // MISSING_TYPES: Add type annotations
+        // NO_TESTS: Requires generating entire test file with correct types
+        const typeOrder: Record<string, number> = {
+          'NO_ERROR_HANDLING': 0,  // Easiest - just add try/catch
+          'MISSING_TYPES': 1,       // Add type annotations
+          'NO_TESTS': 2,            // Hardest - requires new test file
+        }
+        const typeDiff = (typeOrder[a.type] ?? 5) - (typeOrder[b.type] ?? 5)
+        if (typeDiff !== 0) return typeDiff
+
+        // Within same type, prefer higher severity
         const severityOrder = { critical: 0, high: 1, medium: 2, low: 3 }
         return severityOrder[a.severity] - severityOrder[b.severity]
       })

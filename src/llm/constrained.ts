@@ -468,8 +468,30 @@ Requirements:
       return codeMatch[1].trim()
     }
 
-    // No code block - return as-is (might be raw code)
-    return raw.trim()
+    // No code block - strip common preambles and return
+    let code = raw.trim()
+
+    // Strip common LLM preamble patterns
+    const preamblePatterns = [
+      /^Here (?:is|are) (?:the |a )?(?:TypeScript|code|utility|function|implementation)[^:]*:\s*/i,
+      /^(?:Sure|Certainly|Of course)[,!]?\s*(?:here (?:is|are)[^:]*:)?\s*/i,
+      /^(?:The following|Below is)[^:]*:\s*/i,
+      /^I'?(?:ll|ve) (?:create|generate|write)[^:]*:\s*/i,
+    ]
+
+    for (const pattern of preamblePatterns) {
+      code = code.replace(pattern, '')
+    }
+
+    // If code still doesn't start with import/export/type/const/function, try to find where it starts
+    if (!/^(?:import|export|type|interface|const|let|var|function|class|\/\/|\/\*)/.test(code)) {
+      const codeStart = code.search(/(?:^|\n)(import|export|type|interface|const|let|function|class)\s/)
+      if (codeStart > 0) {
+        code = code.slice(codeStart).trim()
+      }
+    }
+
+    return code
   }
 
   /**
