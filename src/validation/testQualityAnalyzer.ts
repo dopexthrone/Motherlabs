@@ -202,11 +202,14 @@ function analyzeCoverageProxy(
   targetExports: string[]
 ): CoverageMetrics {
   if (targetExports.length === 0) {
+    // SECURITY FIX: Don't assume 100% coverage when no exports provided
+    // Attack files passed by having no target exports to check
+    // Return 50% as neutral - can't verify either way
     return {
       targetFunctionsUsed: [],
       targetFunctionsCovered: 0,
       targetFunctionsTotal: 0,
-      coverageProxy: 1.0  // No exports to check = assume covered
+      coverageProxy: 0.5  // Unknown coverage = 50%
     }
   }
 
@@ -249,36 +252,52 @@ function analyzeCoverageProxy(
 // EDGE CASE DETECTION
 // ============================================================================
 
+/**
+ * Strip comments from code to prevent keyword gaming
+ * Removes both single-line (//) and multi-line (/* *\/) comments
+ */
+function stripComments(code: string): string {
+  // Remove multi-line comments
+  let stripped = code.replace(/\/\*[\s\S]*?\*\//g, '')
+  // Remove single-line comments (but preserve strings)
+  stripped = stripped.replace(/\/\/[^\n]*/g, '')
+  return stripped
+}
+
 function detectEdgeCases(code: string): EdgeCaseMetrics {
-  // Null/undefined checks in test context
-  const hasNullCheck = /\b(null|undefined)\b/.test(code) &&
-    (/assert.*\b(null|undefined)\b/.test(code) ||
-     /expect.*\b(null|undefined)\b/.test(code) ||
-     /\b(null|undefined)\b.*assert/.test(code))
+  // CRITICAL: Strip comments to prevent keyword gaming attack
+  // Attack 03 gamed edge case detection by putting keywords in comments
+  const codeWithoutComments = stripComments(code)
 
-  // Empty value checks
+  // Null/undefined checks in test context - must be in actual code
+  const hasNullCheck = /\b(null|undefined)\b/.test(codeWithoutComments) &&
+    (/assert.*\b(null|undefined)\b/.test(codeWithoutComments) ||
+     /expect.*\b(null|undefined)\b/.test(codeWithoutComments) ||
+     /\b(null|undefined)\b.*assert/.test(codeWithoutComments))
+
+  // Empty value checks - must be in actual code, not comments
   const hasEmptyCheck = (
-    /['"]\s*['"]/.test(code) ||           // Empty string ''
-    /\[\s*\]/.test(code) ||               // Empty array []
-    /\{\s*\}/.test(code) ||               // Empty object {}
-    /\.length\s*===?\s*0/.test(code) ||   // length === 0
-    /\bempty\b/i.test(code)               // Word "empty"
-  ) && (/assert|expect|check/.test(code))
+    /['"]\s*['"]/.test(codeWithoutComments) ||           // Empty string ''
+    /\[\s*\]/.test(codeWithoutComments) ||               // Empty array []
+    /\{\s*\}/.test(codeWithoutComments) ||               // Empty object {}
+    /\.length\s*===?\s*0/.test(codeWithoutComments) ||   // length === 0
+    /\bempty\b/i.test(codeWithoutComments)               // Word "empty"
+  ) && (/assert|expect|check/.test(codeWithoutComments))
 
-  // Error path testing
+  // Error path testing - must be in actual code
   const hasErrorPath =
-    /\.catch\s*\(/.test(code) ||
-    /try\s*\{[^}]*\}\s*catch/.test(code) ||
-    /\.rejects/.test(code) ||
-    /\.toThrow/.test(code) ||
-    /throws/.test(code) ||
-    /Error\s*\(/.test(code)
+    /\.catch\s*\(/.test(codeWithoutComments) ||
+    /try\s*\{[^}]*\}\s*catch/.test(codeWithoutComments) ||
+    /\.rejects/.test(codeWithoutComments) ||
+    /\.toThrow/.test(codeWithoutComments) ||
+    /throws/.test(codeWithoutComments) ||
+    /Error\s*\(/.test(codeWithoutComments)
 
-  // Boundary checks
+  // Boundary checks - must be in actual code
   const hasBoundaryCheck =
-    /\b(zero|negative|max|min|boundary|edge|limit|overflow|underflow)\b/i.test(code) ||
-    /\b0\b.*assert|assert.*\b0\b/.test(code) ||
-    /\b-\d+\b.*assert|assert.*\b-\d+\b/.test(code)
+    /\b(zero|negative|max|min|boundary|edge|limit|overflow|underflow)\b/i.test(codeWithoutComments) ||
+    /\b0\b.*assert|assert.*\b0\b/.test(codeWithoutComments) ||
+    /\b-\d+\b.*assert|assert.*\b-\d+\b/.test(codeWithoutComments)
 
   // Calculate score: 25 points per check, max 100
   let score = 0
@@ -339,12 +358,19 @@ function calculateQualityScore(metrics: TestQualityMetrics): number {
   const edgeCaseScore = metrics.edgeCases.score
 
   // Weighted average
-  const score = (
+  let score = (
     assertionScore * 0.35 +
     mockBiasScore * 0.25 +
     coverageScore * 0.25 +
     edgeCaseScore * 0.15
   )
+
+  // CRITICAL: Cap score at 40 if no assertions found
+  // This prevents attacks that game other metrics without actual testing
+  // Attack 03 (keyword-gaming) passed by boosting edge case score without any assertions
+  if (metrics.assertions.total === 0) {
+    score = Math.min(score, 40)
+  }
 
   return Math.round(score)
 }

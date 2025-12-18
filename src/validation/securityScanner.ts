@@ -37,6 +37,12 @@ export type SecurityVulnerabilityType =
   | 'HOLLOW_TEST'
   | 'HOLLOW_PLACEHOLDER'
   | 'HOLLOW_FUNCTION'
+  // LLM-targeted attacks
+  | 'PROMPT_INJECTION'
+  // Unicode/visual deception
+  | 'UNICODE_SPOOFING'
+  // DoS/resource attacks
+  | 'RESOURCE_EXHAUSTION'
 
 export type SecurityScanResult = {
   passed: boolean
@@ -319,6 +325,133 @@ const SECURITY_PATTERNS: Array<{
     severity: 'high',
     pattern: /(?:export\s+)?function\s+\w+\s*\([^)]*\)\s*(?::\s*void)?\s*\{\s*(?:\/\/[^\n]*)?\s*\}/,
     message: 'HOLLOW CODE: Function with empty body'
+  },
+  // Functions that only return a constant string
+  {
+    type: 'HOLLOW_FUNCTION',
+    severity: 'high',
+    pattern: /function\s+\w+\s*\([^)]*\)\s*(?::\s*\w+)?\s*\{[^}]*return\s+['"][^'"]+['"]\s*;?\s*\}/,
+    message: 'HOLLOW CODE: Function only returns a constant string'
+  },
+  // Dead code patterns - impossible conditions
+  {
+    type: 'HOLLOW_FUNCTION',
+    severity: 'high',
+    pattern: /if\s*\(\s*(?:true\s*!==?\s*true|false\s*===?\s*true|true\s*===?\s*false)\s*\)/,
+    message: 'HOLLOW CODE: Impossible condition (dead code)'
+  },
+  // Dead code - result !== true when result = true
+  {
+    type: 'HOLLOW_FUNCTION',
+    severity: 'high',
+    pattern: /const\s+(\w+)\s*=\s*true\s*[\s\S]*if\s*\(\s*\1\s*!==?\s*true\s*\)/,
+    message: 'HOLLOW CODE: Impossible condition on constant value'
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // PROMPT INJECTION DETECTION - LLM-targeted attacks in comments
+  // ═══════════════════════════════════════════════════════════
+  {
+    type: 'PROMPT_INJECTION' as SecurityVulnerabilityType,
+    severity: 'critical',
+    pattern: /\/\*[\s\S]*?(SYSTEM\s+OVERRIDE|IGNORE\s+(?:ALL\s+)?PREVIOUS|INSTRUCTIONS?\s+(?:ARE\s+)?SUSPENDED|SECURITY\s+(?:GATES?\s+)?(?:HAS\s+BEEN\s+)?DISABLED|MAINTENANCE\s+MODE|ADMIN(?:ISTRATOR)?\s+(?:HAS\s+)?AUTHORIZED)[\s\S]*?\*\//i,
+    message: 'PROMPT INJECTION: LLM manipulation attempt detected in comment'
+  },
+  {
+    type: 'PROMPT_INJECTION' as SecurityVulnerabilityType,
+    severity: 'critical',
+    pattern: /\/\/.*?(SYSTEM\s+OVERRIDE|IGNORE\s+PREVIOUS|INSTRUCTIONS?\s+SUSPENDED|OVERRIDE\s+ALL)/i,
+    message: 'PROMPT INJECTION: LLM manipulation attempt in single-line comment'
+  },
+  {
+    type: 'PROMPT_INJECTION' as SecurityVulnerabilityType,
+    severity: 'high',
+    pattern: /\/\*[\s\S]*?(your\s+task\s*:|generate\s+the\s+following|output\s+exactly|do\s+not\s+add\s+any\s+validation)[\s\S]*?\*\//i,
+    message: 'PROMPT INJECTION: Directive injection attempt in comment'
+  },
+  {
+    type: 'PROMPT_INJECTION' as SecurityVulnerabilityType,
+    severity: 'high',
+    pattern: /\/\*[\s\S]*(backdoor|malicious|bypass\s+security|disable\s+check)[\s\S]*?\*\//i,
+    message: 'PROMPT INJECTION: Suspicious keywords in comment block'
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // HOMOGLYPH/UNICODE SPOOFING - Visual deception attacks
+  // ═══════════════════════════════════════════════════════════
+  {
+    type: 'UNICODE_SPOOFING' as SecurityVulnerabilityType,
+    severity: 'critical',
+    // Cyrillic lookalikes: а(U+0430), е(U+0435), о(U+043E), р(U+0440), с(U+0441), х(U+0445)
+    pattern: /[\u0430\u0435\u043E\u0440\u0441\u0445]/,
+    message: 'UNICODE SPOOFING: Cyrillic homoglyph detected - visual deception attack'
+  },
+  {
+    type: 'UNICODE_SPOOFING' as SecurityVulnerabilityType,
+    severity: 'critical',
+    // Greek lookalikes: α(U+03B1), ε(U+03B5), ο(U+03BF)
+    pattern: /[\u03B1\u03B5\u03BF]/,
+    message: 'UNICODE SPOOFING: Greek homoglyph detected - visual deception attack'
+  },
+  {
+    type: 'UNICODE_SPOOFING' as SecurityVulnerabilityType,
+    severity: 'high',
+    // Zero-width characters used for invisible code injection
+    pattern: /[\u200B\u200C\u200D\uFEFF]/,
+    message: 'UNICODE SPOOFING: Zero-width character detected - invisible code injection'
+  },
+  {
+    type: 'UNICODE_SPOOFING' as SecurityVulnerabilityType,
+    severity: 'high',
+    // Right-to-left override characters
+    pattern: /[\u202A\u202B\u202C\u202D\u202E\u2066\u2067\u2068\u2069]/,
+    message: 'UNICODE SPOOFING: Bidirectional text override - code display manipulation'
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // RESOURCE EXHAUSTION - DoS attacks
+  // ═══════════════════════════════════════════════════════════
+  {
+    type: 'RESOURCE_EXHAUSTION' as SecurityVulnerabilityType,
+    severity: 'critical',
+    // Infinite loop patterns
+    pattern: /while\s*\(\s*true\s*\)|for\s*\(\s*;\s*;\s*\)/,
+    message: 'RESOURCE EXHAUSTION: Infinite loop detected - DoS risk'
+  },
+  {
+    type: 'RESOURCE_EXHAUSTION' as SecurityVulnerabilityType,
+    severity: 'critical',
+    // Memory bomb - exponential string growth
+    pattern: /(\w+)\s*=\s*\1\s*\+\s*\1|(\w+)\s*\+=\s*\2/,
+    message: 'RESOURCE EXHAUSTION: Exponential growth pattern - memory bomb risk'
+  },
+  {
+    type: 'RESOURCE_EXHAUSTION' as SecurityVulnerabilityType,
+    severity: 'high',
+    // Fork bomb via Worker
+    pattern: /while\s*\([^)]*\)\s*\{[^}]*new\s+Worker/,
+    message: 'RESOURCE EXHAUSTION: Fork bomb pattern detected'
+  },
+  {
+    type: 'RESOURCE_EXHAUSTION' as SecurityVulnerabilityType,
+    severity: 'high',
+    // Recursive function without base case check
+    pattern: /function\s+(\w+)[^{]*\{[^}]*\1\s*\([^}]*\}(?!\s*\/\/\s*BASE)/,
+    message: 'RESOURCE EXHAUSTION: Potentially unbounded recursion'
+  },
+  {
+    type: 'RESOURCE_EXHAUSTION' as SecurityVulnerabilityType,
+    severity: 'medium',
+    // Evil regex (ReDoS) - nested quantifiers
+    pattern: /\/[^/]*\([^)]*[+*][^)]*\)[+*]/,
+    message: 'RESOURCE EXHAUSTION: Catastrophic backtracking regex pattern'
+  },
+  {
+    type: 'RESOURCE_EXHAUSTION' as SecurityVulnerabilityType,
+    severity: 'high',
+    // Large loop iterations
+    pattern: /for\s*\([^)]*;\s*\w+\s*<\s*1e[89]|for\s*\([^)]*;\s*\w+\s*<\s*10{8,}/,
+    message: 'RESOURCE EXHAUSTION: Extremely large loop iteration count'
   }
 ]
 
@@ -377,9 +510,51 @@ export function scanForVulnerabilities(code: string): SecurityScanResult {
   const jsonParseSafe = isJsonParseSafe(code)
 
   // ═══════════════════════════════════════════════════════════
-  // TIER 1: Fast regex-based scanning
+  // TIER 0: Full-code scan for multi-line patterns
+  // These patterns MUST check entire code including comments
+  // (prompt injection, unicode spoofing are comment-based attacks)
+  // ═══════════════════════════════════════════════════════════
+  // Patterns that need to scan full code (not line-by-line)
+  // - PROMPT_INJECTION: multi-line comment blocks
+  // - UNICODE_SPOOFING: can be anywhere in code
+  // - RESOURCE_EXHAUSTION: multi-line patterns like while(true) { ... }
+  // - HOLLOW_FUNCTION: function bodies span multiple lines
+  const FULL_CODE_TYPES = ['PROMPT_INJECTION', 'UNICODE_SPOOFING', 'RESOURCE_EXHAUSTION', 'HOLLOW_FUNCTION']
+
+  for (const patternDef of SECURITY_PATTERNS) {
+    // Only process patterns that need full-code scanning
+    if (!FULL_CODE_TYPES.includes(patternDef.type)) {
+      continue
+    }
+
+    // Test against full code (including comments)
+    if (patternDef.pattern.test(code)) {
+      // Find approximate line number by finding the match
+      const match = code.match(patternDef.pattern)
+      let lineNum = 1
+      if (match && match.index !== undefined) {
+        lineNum = code.substring(0, match.index).split('\n').length
+      }
+
+      vulnerabilities.push({
+        type: patternDef.type,
+        severity: patternDef.severity,
+        line: lineNum,
+        message: patternDef.message,
+        pattern: patternDef.pattern.source.substring(0, 50) + '...'
+      })
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // TIER 1: Fast regex-based scanning (line by line)
   // ═══════════════════════════════════════════════════════════
   for (const patternDef of SECURITY_PATTERNS) {
+    // Skip patterns already handled in full-code scan
+    if (FULL_CODE_TYPES.includes(patternDef.type)) {
+      continue
+    }
+
     // Skip some patterns in safe contexts
     if (isSafeContext && patternDef.severity !== 'critical') {
       continue
@@ -396,7 +571,7 @@ export function scanForVulnerabilities(code: string): SecurityScanResult {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]
 
-      // Skip comments
+      // Skip comments for most patterns (but not security-critical ones)
       if (/^\s*\/\//.test(line) || /^\s*\*/.test(line)) {
         continue
       }
