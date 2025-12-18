@@ -34,6 +34,13 @@ jobs:
         run: npm run audit:determinism
 
       # ═══════════════════════════════════════════════════════════════
+      # SCHEMA VERIFICATION - Enforces schema-before-behavior (P4.1)
+      # ═══════════════════════════════════════════════════════════════
+      - name: Schema verification
+        run: npm run verify:schemas
+        continue-on-error: true  # Advisory for now, will become blocking
+
+      # ═══════════════════════════════════════════════════════════════
       # TYPE CHECK - Ensures TypeScript compiles
       # ═══════════════════════════════════════════════════════════════
       - name: TypeScript type-check
@@ -46,10 +53,17 @@ jobs:
         run: npx tsc
 
       # ═══════════════════════════════════════════════════════════════
-      # TEST SUITE - Run all 119+ tests
+      # TEST SUITE WITH COVERAGE - Run all tests with coverage (P4.2)
       # ═══════════════════════════════════════════════════════════════
-      - name: Run tests
-        run: node scripts/test-all.js
+      - name: Run tests with coverage
+        run: npm run test:coverage
+
+      # ═══════════════════════════════════════════════════════════════
+      # COVERAGE THRESHOLD CHECK - Enforce minimum coverage (P4.2)
+      # ═══════════════════════════════════════════════════════════════
+      - name: Check coverage thresholds
+        run: npm run coverage:check
+        continue-on-error: true  # Advisory until baseline established
 
       # ═══════════════════════════════════════════════════════════════
       # HARDENING TESTS - Verify security gates
@@ -58,36 +72,10 @@ jobs:
         run: npx tsx tests/hardening.test.ts
 
       # ═══════════════════════════════════════════════════════════════
-      # HASH CHAIN VERIFICATION - Verify ledger integrity
+      # EVIDENCE REPLAY VALIDATION - Verify all evidence (P4.3)
       # ═══════════════════════════════════════════════════════════════
-      - name: Verify hash chain integrity
-        run: |
-          echo "Verifying hash chain integrity..."
-          node -e "
-            const { JSONLLedger } = require('./dist/persistence/jsonlLedger');
-            const fs = require('fs');
-            const path = require('path');
-
-            // Check if any test ledgers exist
-            const evidenceDir = 'evidence';
-            if (fs.existsSync(evidenceDir)) {
-              const files = fs.readdirSync(evidenceDir).filter(f => f.endsWith('.jsonl'));
-              console.log('Found', files.length, 'ledger files');
-
-              for (const file of files.slice(0, 3)) {  // Check first 3
-                const ledger = new JSONLLedger(path.join(evidenceDir, file));
-                const result = ledger.verifyChain();
-                if (result.ok) {
-                  console.log('  ✓', file, '- chain valid');
-                } else {
-                  console.error('  ✗', file, '-', result.error.message);
-                  process.exit(1);
-                }
-              }
-            } else {
-              console.log('No evidence directory - skipping');
-            }
-          "
+      - name: Evidence replay validation
+        run: npm run verify:evidence
 
       # ═══════════════════════════════════════════════════════════════
       # UPLOAD BUILD ARTIFACTS
@@ -99,6 +87,22 @@ jobs:
           name: build-dist
           path: dist/
           retention-days: 7
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: matrix.node-version == '20.x'
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 30
+
+      - name: Upload evidence
+        uses: actions/upload-artifact@v4
+        if: matrix.node-version == '20.x' && always()
+        with:
+          name: evidence-${{ github.sha }}
+          path: evidence/
+          retention-days: 30
 
   # ═══════════════════════════════════════════════════════════════════
   # SECURITY SCAN - Check for vulnerabilities in dependencies

@@ -1,0 +1,17 @@
+{
+  "check-coverage": true,
+  "lines": 80,
+  "branches": 70,
+  "functions": 75,
+  "statements": 80,
+  "reporter": ["text", "html", "lcov"],
+  "exclude": [
+    "tests/**",
+    "scripts/**",
+    "dist/**",
+    "node_modules/**",
+    "coverage/**"
+  ],
+  "include": ["src/**/*.ts"],
+  "all": true
+}

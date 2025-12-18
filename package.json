@@ -9,10 +9,15 @@
     "start": "node dist/cli.js",
     "audit:determinism": "node scripts/check-determinism.js",
     "test": "npm run build && node scripts/test-all.js",
+    "test:coverage": "npm run build && c8 node scripts/test-all.js",
+    "coverage:check": "c8 check-coverage",
+    "coverage:report": "c8 report --reporter=html",
     "test:quick": "npm run build && npx tsx tests/urco.test.ts && npx tsx tests/urco-failures.test.ts && npx tsx tests/llm-deterministic.test.ts && npx tsx tests/state-corruption.test.ts && npx tsx tests/serialization.test.ts",
     "test:urco": "npm run build && npx tsx tests/urco.test.ts",
     "test:failures": "npm run build && npx tsx tests/urco-failures.test.ts",
     "test:deterministic": "npm run build && npx tsx tests/llm-deterministic.test.ts",
+    "verify:schemas": "node scripts/verify-schemas.js",
+    "verify:evidence": "node scripts/verify-evidence-replay.js",
     "benchmark": "npm run build && node dist/benchmark/cli.js",
     "benchmark:warmup": "npm run benchmark -- --warmup",
     "benchmark:full": "npm run benchmark -- --full",
@@ -26,6 +31,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "c8": "^10.1.3",
     "ts-morph": "^27.0.2",
     "typescript": "^5.3.0"
   }
