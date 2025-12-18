@@ -347,6 +347,44 @@ const SECURITY_PATTERNS: Array<{
     pattern: /const\s+(\w+)\s*=\s*true\s*[\s\S]*if\s*\(\s*\1\s*!==?\s*true\s*\)/,
     message: 'HOLLOW CODE: Impossible condition on constant value'
   },
+  // ═══════════════════════════════════════════════════════════
+  // HOLLOW EVASION DETECTION - Complex-looking but constant output
+  // ═══════════════════════════════════════════════════════════
+  // Pattern: void result; return CONSTANT - discards computation
+  {
+    type: 'HOLLOW_FUNCTION',
+    severity: 'critical',
+    pattern: /void\s+\w+\s*;?\s*\n?\s*return\s+(?:\d+|['"][^'"]*['"]|true|false|null|undefined)/,
+    message: 'HOLLOW CODE: Computation discarded (void), returns constant'
+  },
+  // Pattern: All if/else branches return true - validation theater
+  {
+    type: 'HOLLOW_FUNCTION',
+    severity: 'high',
+    pattern: /function\s+\w*(?:valid|check|verify)\w*\s*\([^)]*\)\s*(?::\s*boolean)?\s*\{[^}]*return\s+true[^}]*return\s+true[^}]*return\s+true/i,
+    message: 'HOLLOW CODE: All validation branches return true'
+  },
+  // Pattern: try/catch both return success
+  {
+    type: 'HOLLOW_FUNCTION',
+    severity: 'high',
+    pattern: /try\s*\{[^}]*return\s*\{\s*success:\s*true[^}]*\}\s*catch[^{]*\{[^}]*return\s*\{\s*success:\s*true/,
+    message: 'HOLLOW CODE: Both try and catch return success'
+  },
+  // Pattern: async function always returns string constant
+  {
+    type: 'HOLLOW_FUNCTION',
+    severity: 'high',
+    pattern: /async\s+function\s+\w+\s*\([^)]*\)\s*(?::\s*Promise<[^>]+>)?\s*\{[^}]*return\s+['"][^'"]+['"]\s*;?\s*\}/,
+    message: 'HOLLOW CODE: Async function always returns constant string'
+  },
+  // Pattern: Complex loop followed by constant return
+  {
+    type: 'HOLLOW_FUNCTION',
+    severity: 'high',
+    pattern: /for\s*\([^)]+\)\s*\{[^}]+\}[^}]*return\s+(?:\d+|true|false|null|['"][^'"]+['"])\s*;?\s*\}/,
+    message: 'HOLLOW CODE: Loop computation followed by constant return'
+  },
 
   // ═══════════════════════════════════════════════════════════
   // PROMPT INJECTION DETECTION - LLM-targeted attacks in comments
@@ -406,6 +444,48 @@ const SECURITY_PATTERNS: Array<{
     // Right-to-left override characters
     pattern: /[\u202A\u202B\u202C\u202D\u202E\u2066\u2067\u2068\u2069]/,
     message: 'UNICODE SPOOFING: Bidirectional text override - code display manipulation'
+  },
+  {
+    type: 'UNICODE_SPOOFING' as SecurityVulnerabilityType,
+    severity: 'critical',
+    // Variation selectors (U+FE00-U+FE0F) - invisible modifiers
+    pattern: /[\uFE00-\uFE0F]/,
+    message: 'UNICODE SPOOFING: Variation selector detected - character disguise attack'
+  },
+  {
+    type: 'UNICODE_SPOOFING' as SecurityVulnerabilityType,
+    severity: 'critical',
+    // Fullwidth Latin letters (U+FF01-U+FF5E) - look like ASCII but aren't
+    pattern: /[\uFF01-\uFF5E]/,
+    message: 'UNICODE SPOOFING: Fullwidth character detected - ASCII lookalike attack'
+  },
+  {
+    type: 'UNICODE_SPOOFING' as SecurityVulnerabilityType,
+    severity: 'critical',
+    // Non-breaking space in code (U+00A0) - hides in identifiers
+    pattern: /\u00A0/,
+    message: 'UNICODE SPOOFING: Non-breaking space detected - hidden space attack'
+  },
+  {
+    type: 'UNICODE_SPOOFING' as SecurityVulnerabilityType,
+    severity: 'critical',
+    // Tag characters (U+E0000-U+E007F) - invisible text markers
+    pattern: /[\u{E0000}-\u{E007F}]/u,
+    message: 'UNICODE SPOOFING: Tag character detected - invisible text injection'
+  },
+  {
+    type: 'UNICODE_SPOOFING' as SecurityVulnerabilityType,
+    severity: 'high',
+    // Combining diacritical marks abuse (multiple combining chars)
+    pattern: /[\u0300-\u036F]{2,}/,
+    message: 'UNICODE SPOOFING: Multiple combining marks detected - character obfuscation'
+  },
+  {
+    type: 'UNICODE_SPOOFING' as SecurityVulnerabilityType,
+    severity: 'high',
+    // Mathematical Alphanumeric Symbols (U+1D400-U+1D7FF) - fancy letters
+    pattern: /[\u{1D400}-\u{1D7FF}]/u,
+    message: 'UNICODE SPOOFING: Mathematical letter detected - fancy text attack'
   },
 
   // ═══════════════════════════════════════════════════════════
