@@ -18,6 +18,7 @@ const { OllamaAdapter, createCodeLlamaAdapter, createDeepSeekCoderAdapter, creat
 const { DogfoodingLoop } = require('../dist/dogfood/loop');
 const { SelfImprovementProposer } = require('../dist/selfbuild/proposer');
 const { ConstrainedLLM } = require('../dist/llm/constrained');
+const { analyzeTestQuality, extractExportsFromCode } = require('../dist/validation/testQualityAnalyzer');
 const { randomBytes } = require('crypto');
 const fs = require('fs');
 const path = require('path');
@@ -761,6 +762,147 @@ export function stub() {
 
   // Test that adapter is instance of OllamaAdapter
   check('Ollama: factory returns OllamaAdapter', defaultCodellama instanceof OllamaAdapter);
+
+  // ═══════════════════════════════════════════════════════════
+  console.log('');
+  console.log('=== TEST QUALITY ANALYZER TESTS ===');
+  console.log('');
+
+  // Test 1: High quality test code
+  const highQualityTest = `
+import { decomposeTask } from '../src/decompose'
+
+async function runTests() {
+  const result = await decomposeTask('Main\\nSub1\\nSub2', 'task-1', ledger, config)
+
+  assert(result.id === 'task-1', 'Task ID matches')
+  assert(result.subtasks.length === 2, 'Correct subtask count')
+  assert(result.subtasks[0].input === 'Sub1', 'First subtask correct')
+
+  // Edge cases
+  const empty = await decomposeTask('', 'empty', ledger, config)
+  assert(empty.subtasks.length === 0, 'Empty input = no subtasks')
+  assert(empty.status === 'done', 'Empty task marked done')
+
+  try {
+    await decomposeTask(null, 'null', ledger, config)
+    assert(false, 'Should throw on null')
+  } catch (e) {
+    assert(true, 'Throws on null input')
+  }
+}
+
+runTests().catch(console.error)
+`;
+  const tq1 = analyzeTestQuality(highQualityTest, ['decomposeTask']);
+  check('TestQuality: high quality test scores well', tq1.ok && tq1.value.score >= 60);
+  check('TestQuality: detects edge cases', tq1.ok && tq1.value.metrics.edgeCases.score >= 50);
+
+  // Test 2: Trivial assertions
+  const trivialTest = `
+function runTests() {
+  assert(true, 'test passed')
+  assert(true, 'another pass')
+  check('works', true)
+}
+runTests()
+`;
+  const tq2 = analyzeTestQuality(trivialTest, []);
+  check('TestQuality: trivial assertions detected', tq2.ok && tq2.value.metrics.assertions.trivial >= 2);
+  check('TestQuality: trivial test generates issues', tq2.ok && tq2.value.issues.some(i => i.includes('trivial')));
+
+  // Test 3: Mock-heavy test
+  const mockHeavyTest = `
+class MockLLM { decompose() { return Ok(['a']) } }
+class MockLedger { append() {} query() { return [] } }
+class MockConfig {}
+
+const mock = new MockLLM()
+const ledger = new MockLedger()
+assert(mock !== null, 'mock exists')
+`;
+  const tq3 = analyzeTestQuality(mockHeavyTest, []);
+  check('TestQuality: mock classes detected', tq3.ok && tq3.value.metrics.mocks.mockClasses.length >= 2);
+  check('TestQuality: high mock bias detected', tq3.ok && tq3.value.metrics.mocks.mockBiasRatio > 0.5);
+
+  // Test 4: Coverage proxy - tests that call target functions
+  const goodCoverageTest = `
+import { validateInput, processData, saveResult } from '../src/processor'
+
+async function test() {
+  const v = validateInput('test')
+  assert(v.ok, 'validates')
+
+  const p = await processData(v.value)
+  assert(p.length > 0, 'processes')
+
+  const s = await saveResult(p)
+  assert(s.saved, 'saves')
+}
+test()
+`;
+  const tq4 = analyzeTestQuality(goodCoverageTest, ['validateInput', 'processData', 'saveResult']);
+  check('TestQuality: coverage proxy detects called functions', tq4.ok && tq4.value.metrics.coverage.targetFunctionsCovered === 3);
+  check('TestQuality: full coverage = high score', tq4.ok && tq4.value.metrics.coverage.coverageProxy === 1.0);
+
+  // Test 5: Low coverage - missing target functions
+  const lowCoverageTest = `
+import { validateInput } from '../src/processor'
+
+async function test() {
+  const v = validateInput('test')
+  assert(v.ok, 'validates')
+}
+test()
+`;
+  const tq5 = analyzeTestQuality(lowCoverageTest, ['validateInput', 'processData', 'saveResult']);
+  check('TestQuality: detects missing coverage', tq5.ok && tq5.value.metrics.coverage.targetFunctionsCovered === 1);
+  check('TestQuality: low coverage generates issue', tq5.ok && tq5.value.issues.some(i => i.includes('coverage')));
+
+  // Test 6: Extract exports helper
+  const sourceCode = `
+export function processData(input: string): Result<Data, Error> {
+  return Ok({ input })
+}
+
+export const CONFIG = { timeout: 5000 }
+
+export class DataProcessor {
+  process() {}
+}
+
+function privateHelper() {}
+`;
+  const exports = extractExportsFromCode(sourceCode);
+  check('TestQuality: extracts exported functions', exports.includes('processData'));
+  check('TestQuality: extracts exported consts', exports.includes('CONFIG'));
+  check('TestQuality: extracts exported classes', exports.includes('DataProcessor'));
+  check('TestQuality: ignores private functions', !exports.includes('privateHelper'));
+
+  // Test 7: Edge case detection patterns
+  const edgeCaseTest = `
+function test() {
+  // Null check
+  const nullResult = process(null)
+  assert(nullResult === undefined, 'handles null')
+
+  // Empty check
+  const emptyResult = process('')
+  assert(emptyResult.length === 0, 'handles empty')
+
+  // Error path
+  try {
+    process(-1)
+  } catch (e) {
+    assert(e.message.includes('negative'), 'throws on negative')
+  }
+}
+test()
+`;
+  const tq7 = analyzeTestQuality(edgeCaseTest, []);
+  check('TestQuality: detects null check', tq7.ok && tq7.value.metrics.edgeCases.hasNullCheck);
+  check('TestQuality: detects empty check', tq7.ok && tq7.value.metrics.edgeCases.hasEmptyCheck);
+  check('TestQuality: detects error path', tq7.ok && tq7.value.metrics.edgeCases.hasErrorPath);
 
   // ═══════════════════════════════════════════════════════════
   console.log('');

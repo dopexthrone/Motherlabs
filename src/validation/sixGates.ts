@@ -12,6 +12,7 @@ import { detectContradictions } from '../urco/contradictions'
 import { runTestExec, verifyEvidence, cleanupRunDir } from '../sandbox/runner'
 import { scanForVulnerabilities, getVulnerabilitySummary } from './securityScanner'
 import { detectHollowPatterns, passesHollowDetection } from './hollowDetector'
+import { analyzeTestQuality } from './testQualityAnalyzer'
 import type { TestExecRequest } from '../sandbox/types'
 import { contentAddress } from '../core/contentAddress'
 import { createGateDecision, createGateDecisionScope, GateDecision, ValidationGateType } from '../core/gateDecision'
@@ -31,6 +32,12 @@ export type CodeValidationContext = {
   ledger?: JSONLLedger
   /** Optional target file path for gate decisions */
   targetFile?: string
+  /** Gate 7: Make test quality gate required (blocks validation) */
+  strictTestQuality?: boolean
+  /** Gate 7: Score threshold for passing (default 60) */
+  testQualityThreshold?: number
+  /** Gate 7: Exported functions from target file for coverage analysis */
+  targetExports?: string[]
 }
 
 export type GateResult = {
@@ -108,6 +115,15 @@ export class SixGateValidator {
     gateResults.push(g6)
     await this.recordGateDecision(g6, codeId, code, context)
 
+    // ═══════════════════════════════════════════════════════════
+    // GATE 7: Test Quality (only for test code)
+    // ═══════════════════════════════════════════════════════════
+    if (this.isTestCode(code)) {
+      const g7 = this.gate7_testQuality(code, context)
+      gateResults.push(g7)
+      await this.recordGateDecision(g7, codeId, code, context)
+    }
+
     // Determine overall validity
     const requiredGatesFailed = gateResults.filter(g => g.required && !g.passed)
     const valid = requiredGatesFailed.length === 0
@@ -180,6 +196,10 @@ export class SixGateValidator {
       case 'governance_check':
         // Governance check grants code modification effects if passed
         return ['CODE_MODIFY', 'GIT_COMMIT', 'LEDGER_APPEND']
+
+      case 'test_quality':
+        // Test quality is pure validation - no effects granted
+        return ['NONE']
 
       default:
         return ['NONE']
@@ -1095,6 +1115,56 @@ export class SixGateValidator {
         gateName: 'governance_check',
         passed: false,
         required: true,
+        error: error instanceof Error ? error.message : String(error)
+      }
+    }
+  }
+
+  /**
+   * Gate 7: Test Quality Validation
+   * Analyzes test code quality: assertion density, mock bias, coverage, edge cases
+   * Progressive strictness: advisory for first test, required after
+   */
+  private gate7_testQuality(code: string, context: CodeValidationContext): GateResult {
+    try {
+      const targetExports = context.targetExports || []
+      const result = analyzeTestQuality(code, targetExports)
+
+      if (!result.ok) {
+        return {
+          gateName: 'test_quality',
+          passed: false,
+          required: context.strictTestQuality ?? false,
+          error: result.error.message
+        }
+      }
+
+      const { score, metrics, issues } = result.value
+      const threshold = context.testQualityThreshold ?? 60
+      const passed = score >= threshold
+
+      return {
+        gateName: 'test_quality',
+        passed,
+        required: context.strictTestQuality ?? false,
+        error: passed ? undefined : `Test quality ${score}/100 below threshold ${threshold}. ${issues[0] || 'Improve test coverage and assertions.'}`,
+        details: {
+          score,
+          threshold,
+          assertionsTotal: metrics.assertions.total,
+          assertionsMeaningful: metrics.assertions.meaningful,
+          assertionsPerTest: metrics.assertions.perTest,
+          mockBiasRatio: metrics.mocks.mockBiasRatio,
+          coverageProxy: metrics.coverage.coverageProxy,
+          edgeCaseScore: metrics.edgeCases.score,
+          issues
+        }
+      }
+    } catch (error) {
+      return {
+        gateName: 'test_quality',
+        passed: false,
+        required: context.strictTestQuality ?? false,
         error: error instanceof Error ? error.message : String(error)
       }
     }

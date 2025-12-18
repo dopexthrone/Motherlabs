@@ -7,6 +7,7 @@ import { OpenAIAdapter } from '../adapters/openaiAdapter'
 import { AnthropicAdapter } from '../adapters/anthropicAdapter'
 import { OllamaAdapter } from '../adapters/ollamaAdapter'
 import { SixGateValidator, CodeValidationContext, CodeValidationResult } from '../validation/sixGates'
+import { extractExportsFromCode } from '../validation/testQualityAnalyzer'
 import { Result, Ok, Err } from '../core/result'
 import { JSONLLedger } from '../persistence/jsonlLedger'
 import { globalTimeProvider } from '../core/ids'
@@ -170,8 +171,13 @@ export class ConstrainedLLM {
         continue
       }
 
-      // CRITICAL: Pass through 6 gates
-      const validation = await this.validator.validate(code, context)
+      // CRITICAL: Pass through all gates (including Gate 7 for test quality)
+      // Enhance context with target exports for coverage analysis
+      const enhancedContext: CodeValidationContext = {
+        ...context,
+        targetExports: context.targetExports ?? extractExportsFromCode(existingCode)
+      }
+      const validation = await this.validator.validate(code, enhancedContext)
 
       if (!validation.ok) {
         await this.logRejection('VALIDATION_ERROR', attempt, validation.error.message)

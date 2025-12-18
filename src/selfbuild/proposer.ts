@@ -6,6 +6,7 @@
 // Integrated with governance system - records GATE_DECISION and EVIDENCE_ARTIFACT
 
 import * as fs from 'fs'
+import * as path from 'path'
 import { analyzeFile } from '../analysis/codeAnalyzer'
 import { SixGateValidator, CodeValidationContext } from '../validation/sixGates'
 import { ConstrainedLLM } from '../llm/constrained'
@@ -107,11 +108,19 @@ export class SelfImprovementProposer {
       }
 
       // 4. Build validation context (with ledger for governance tracking)
+      // Gate 7: Progressive strictness - advisory for first test, required after
+      const basename = path.basename(filepath, '.ts')
+      const testFilePath = `tests/${basename}.test.ts`
+      const hasExistingTest = fs.existsSync(testFilePath)
+
       const context: CodeValidationContext = {
         existingImports: this.extractImports(existingCode),
         existingTypes: this.extractTypes(existingCode),
         ledger: this.ledger || undefined,
-        targetFile: filepath
+        targetFile: filepath,
+        // Gate 7: Test Quality settings
+        strictTestQuality: hasExistingTest,  // Required if test exists, advisory otherwise
+        testQualityThreshold: hasExistingTest ? 60 : 50  // Higher bar for subsequent tests
       }
 
       // NOTE: proposal_admission gate decision is now handled by ProposalBridge
