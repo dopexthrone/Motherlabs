@@ -19,6 +19,9 @@ const { DogfoodingLoop } = require('../dist/dogfood/loop');
 const { SelfImprovementProposer } = require('../dist/selfbuild/proposer');
 const { ConstrainedLLM } = require('../dist/llm/constrained');
 const { analyzeTestQuality, extractExportsFromCode } = require('../dist/validation/testQualityAnalyzer');
+const { createTextURCO, createURCO, textPhaseProcessor, urcoText } = require('../dist/core/urco');
+const { createCollapseChain, createDefaultCritic, createDefaultVerifier, createDefaultExecutor, collapse } = require('../dist/core/collapseChain');
+const { createProposalURCO, createProposalCollapseChain, proposalPhaseProcessor } = require('../dist/dogfood/processors');
 const { randomBytes } = require('crypto');
 const fs = require('fs');
 const path = require('path');
@@ -963,6 +966,232 @@ test()
 
   // Cleanup
   fs.rmSync(selfImproveTempDir, { recursive: true, force: true });
+
+  // ═══════════════════════════════════════════════════════════
+  console.log('');
+  console.log('=== URCO ENGINE TESTS ===');
+  console.log('');
+
+  // Test 1: Create text URCO engine
+  const textUrco = createTextURCO();
+  check('URCO: createTextURCO works', textUrco !== null);
+
+  // Test 2: Process text through URCO
+  const urcoTextResult = await urcoText('This is a test   with extra   spaces.', {});
+  check('URCO: urcoText processes text', urcoTextResult.ok);
+  check('URCO: reduces entropy', urcoTextResult.ok && urcoTextResult.value.entropyReduction >= 0);
+
+  // Test 3: URCO has all four phases
+  if (urcoTextResult.ok) {
+    const phases = urcoTextResult.value.phases;
+    check('URCO: has expand phase', phases.expand !== undefined);
+    check('URCO: has examine phase', phases.examine !== undefined);
+    check('URCO: has remove phase', phases.remove !== undefined);
+    check('URCO: has synthesize phase', phases.synthesize !== undefined);
+  }
+
+  // Test 4: Phase artifacts are generated
+  if (urcoTextResult.ok) {
+    check('URCO: generates artifacts', urcoTextResult.value.artifacts.length > 0);
+    check('URCO: artifacts have observations',
+          urcoTextResult.value.artifacts.every(a => a.observation && a.observation.length > 0));
+  }
+
+  // Test 5: Entropy tracking
+  if (urcoTextResult.ok) {
+    check('URCO: tracks initial entropy', typeof urcoTextResult.value.initialEntropy === 'number');
+    check('URCO: tracks final entropy', typeof urcoTextResult.value.finalEntropy === 'number');
+    check('URCO: entropy is between 0 and 1',
+          urcoTextResult.value.finalEntropy >= 0 && urcoTextResult.value.finalEntropy <= 1);
+  }
+
+  // Test 6: Custom phase processor
+  const customProcessor = {
+    expand: async (input, ctx) => ({ output: input.toUpperCase(), entropy: 0.5, artifacts: [], metadata: {} }),
+    examine: async (input, ctx) => ({ output: input, entropy: 0.4, artifacts: [], metadata: {} }),
+    remove: async (input, ctx) => ({ output: input.trim(), entropy: 0.3, artifacts: [], metadata: {} }),
+    synthesize: async (input, ctx) => ({ output: input, entropy: 0.1, artifacts: [], metadata: {} })
+  };
+  const customUrco = createURCO(customProcessor);
+  const customResult = await customUrco.process({ subject: 'test', context: {} });
+  check('URCO: custom processor works', customResult.ok && customResult.value.output === 'TEST');
+
+  // Test 7: Text phase processor cleans whitespace
+  const dirtyText = '  hello   world  ';
+  const urcoCleanResult = await textPhaseProcessor.remove(dirtyText, {});
+  check('URCO: text processor removes extra whitespace', urcoCleanResult.output === 'hello world');
+
+  // ═══════════════════════════════════════════════════════════
+  console.log('');
+  console.log('=== COLLAPSE CHAIN TESTS ===');
+  console.log('');
+
+  // Test 1: Default roles work
+  const defaultCritic = createDefaultCritic();
+  const defaultVerifier = createDefaultVerifier();
+  const defaultExecutor = createDefaultExecutor();
+  check('CollapseChain: default critic created', defaultCritic !== null);
+  check('CollapseChain: default verifier created', defaultVerifier !== null);
+  check('CollapseChain: default executor created', defaultExecutor !== null);
+
+  // Test 2: Create collapse chain
+  const ccChain = createCollapseChain(defaultCritic, defaultVerifier, defaultExecutor);
+  check('CollapseChain: chain created', ccChain !== null);
+
+  // Test 3: Collapse with valid input
+  const validInput = { value: 42, validated: true };
+  const collapseResult = await ccChain.collapse(validInput, {});
+  check('CollapseChain: collapse returns result', collapseResult.ok);
+
+  // Test 4: Chain has critique result
+  if (collapseResult.ok) {
+    check('CollapseChain: has critique', collapseResult.value.critique !== null);
+    check('CollapseChain: critique has weaknesses array',
+          Array.isArray(collapseResult.value.critique.weaknesses));
+    check('CollapseChain: critique has counts',
+          typeof collapseResult.value.critique.fatalCount === 'number');
+  }
+
+  // Test 5: Chain has verification result when critic approves
+  if (collapseResult.ok && collapseResult.value.critique.approved) {
+    check('CollapseChain: has verification when critic approves',
+          collapseResult.value.verification !== null);
+  }
+
+  // Test 6: Chain has final state
+  if (collapseResult.ok) {
+    check('CollapseChain: has finalState',
+          ['rejected_by_critic', 'rejected_by_verifier', 'execution_failed', 'collapsed']
+            .includes(collapseResult.value.finalState));
+  }
+
+  // Test 7: Chain tracks duration
+  if (collapseResult.ok) {
+    check('CollapseChain: tracks total duration', collapseResult.value.totalDurationMs >= 0);
+    check('CollapseChain: has timestamp', collapseResult.value.timestamp > 0);
+  }
+
+  // Test 8: Quick collapse function
+  const quickResult = await collapse(validInput, {});
+  check('CollapseChain: quick collapse works', quickResult.ok);
+
+  // ═══════════════════════════════════════════════════════════
+  console.log('');
+  console.log('=== PROPOSAL PROCESSORS TESTS ===');
+  console.log('');
+
+  // Mock proposal for testing
+  const urcoMockProposal = {
+    id: 'test-proposal-123',
+    targetFile: 'src/test/example.ts',
+    issue: {
+      type: 'MISSING_ERROR_HANDLING',
+      severity: 'medium',
+      message: 'Function lacks try-catch',
+      line: 10
+    },
+    proposedChange: {
+      type: 'modify_function',
+      code: 'function test() { try { doSomething(); } catch (e) { console.error(e); } }'
+    },
+    rationale: 'Adding error handling',
+    timestamp: Date.now(),
+    gateValidation: {
+      valid: true,
+      gateResults: [
+        { gateName: 'Gate 1', passed: true },
+        { gateName: 'Gate 2', passed: true },
+        { gateName: 'Gate 3', passed: true },
+        { gateName: 'Gate 4', passed: true },
+        { gateName: 'Gate 5', passed: true },
+        { gateName: 'Gate 6', passed: true }
+      ]
+    },
+    source: 'llm'
+  };
+
+  // Test 1: Proposal URCO processor
+  const proposalUrco = createProposalURCO();
+  check('Processors: proposal URCO created', proposalUrco !== null);
+
+  // Test 2: Process proposal through URCO
+  const proposalUrcoResult = await proposalUrco.process({
+    subject: { proposal: urcoMockProposal },
+    context: {}
+  });
+  check('Processors: proposal URCO processes', proposalUrcoResult.ok);
+
+  // Test 3: URCO expand detects non-TCB
+  if (proposalUrcoResult.ok) {
+    const expandArtifacts = proposalUrcoResult.value.phases.expand.artifacts;
+    check('Processors: URCO expand detects non-TCB target',
+          expandArtifacts.some(a => a.observation.includes('non-TCB')));
+  }
+
+  // Test 4: URCO synthesize indicates readiness
+  if (proposalUrcoResult.ok) {
+    const isReady = proposalUrcoResult.value.phases.synthesize.metadata.isReady;
+    check('Processors: URCO synthesize indicates ready', isReady === true);
+  }
+
+  // Test 5: Proposal Collapse Chain
+  const proposalChain = createProposalCollapseChain();
+  check('Processors: proposal collapse chain created', proposalChain !== null);
+
+  // Test 6: Valid proposal passes critic
+  const proposalCollapseResult = await proposalChain.collapse(
+    { proposal: urcoMockProposal },
+    { proposal: urcoMockProposal, dryRun: true }
+  );
+  check('Processors: valid proposal passes critic',
+        proposalCollapseResult.ok && proposalCollapseResult.value.critique.approved);
+
+  // Test 7: TCB file rejected by critic
+  const urcoTcbProposal = { ...urcoMockProposal, targetFile: 'src/validation/sixGates.ts' };
+  const tcbResult = await proposalChain.collapse(
+    { proposal: urcoTcbProposal },
+    { proposal: urcoTcbProposal, dryRun: true }
+  );
+  check('Processors: TCB file rejected by critic',
+        tcbResult.ok && !tcbResult.value.critique.approved);
+  check('Processors: TCB rejection is fatal',
+        tcbResult.ok && tcbResult.value.critique.fatalCount > 0);
+
+  // Test 8: Failed gates rejected by critic
+  const failedGatesProposal = {
+    ...urcoMockProposal,
+    gateValidation: {
+      valid: false,
+      gateResults: [
+        { gateName: 'Gate 1', passed: true },
+        { gateName: 'Gate 2', passed: false, error: 'Syntax error' }
+      ]
+    }
+  };
+  const failedGatesResult = await proposalChain.collapse(
+    { proposal: failedGatesProposal },
+    { proposal: failedGatesProposal, dryRun: true }
+  );
+  check('Processors: failed gates rejected by critic',
+        failedGatesResult.ok && !failedGatesResult.value.critique.approved);
+
+  // Test 9: Dry run executor works
+  if (proposalCollapseResult.ok && proposalCollapseResult.value.execution) {
+    check('Processors: dry run executor executed',
+          proposalCollapseResult.value.execution.executed);
+    check('Processors: dry run action is dry_run',
+          proposalCollapseResult.value.execution.action === 'dry_run');
+  }
+
+  // Test 10: Verifier checks URCO provenance
+  const urcoProvResult = await proposalChain.collapse(
+    { proposal: urcoMockProposal },
+    { proposal: urcoMockProposal, dryRun: true, urcoResult: proposalUrcoResult.value }
+  );
+  if (urcoProvResult.ok && urcoProvResult.value.verification) {
+    const urcoCheck = urcoProvResult.value.verification.checks.find(c => c.name === 'urco_provenance');
+    check('Processors: verifier checks URCO provenance', urcoCheck && urcoCheck.passed);
+  }
 
   // ═══════════════════════════════════════════════════════════
   console.log('');
