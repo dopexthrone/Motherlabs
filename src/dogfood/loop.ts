@@ -23,6 +23,7 @@ import type { LLMProviderType } from '../llm/types'
 import { isTCBPath } from '../core/decisionClassifier'
 import { AuthorizationRouter, initializeAuthorizationRouter, type AuthorizationToken } from '../authorization/router'
 import { createProposalBridge, ProposalBridge, type BridgeResult } from '../proposal/proposalBridge'
+import { createProposalURCO, createProposalCollapseChain, type ProposalCollapseContext } from './processors'
 
 export type DogfoodingConfig = {
   cycleInterval: number  // ms between improvement attempts
@@ -265,6 +266,41 @@ export class DogfoodingLoop {
       console.log(`  ✓ Passed ${passedGates}/${totalGates} gates`)
 
       // ═══════════════════════════════════════════════════════════════════════
+      // URCO PROCESSING - Reduce entropy, increase clarity
+      // EXPAND → EXAMINE → REMOVE → SYNTHESIZE
+      // ═══════════════════════════════════════════════════════════════════════
+      console.log('[3.5/6] URCO processing...')
+      const urcoEngine = createProposalURCO()
+      const urcoResult = await urcoEngine.process({
+        subject: { proposal: proposal.value },
+        context: {}
+      })
+
+      if (!urcoResult.ok) {
+        const error = `URCO processing failed: ${urcoResult.error.message}`
+        await this.logFailure('urco_failed', error)
+        return { success: false, error, proposal: proposal.value }
+      }
+
+      const urcoOutput = urcoResult.value
+      console.log(`  Entropy: ${(urcoOutput.initialEntropy * 100).toFixed(1)}% → ${(urcoOutput.finalEntropy * 100).toFixed(1)}%`)
+      console.log(`  Reduction: ${(urcoOutput.entropyReduction * 100).toFixed(1)}%`)
+      console.log(`  Cycles: ${urcoOutput.totalCycles}`)
+
+      // Check if URCO found readiness issues
+      const urcoReady = urcoOutput.phases.synthesize.metadata.isReady
+      if (!urcoReady) {
+        const reason = urcoOutput.artifacts
+          .filter(a => a.phase === 'synthesize')
+          .map(a => a.observation)
+          .join('; ')
+        console.log(`  ✗ URCO indicates NOT ready: ${reason}`)
+        await this.logRejection(proposal.value, `urco_not_ready: ${reason}`)
+        return { success: false, error: `URCO not ready: ${reason}`, proposal: proposal.value }
+      }
+      console.log('  ✓ URCO indicates ready for collapse')
+
+      // ═══════════════════════════════════════════════════════════════════════
       // TCB PROTECTION - UNCONDITIONAL, CANNOT BE BYPASSED
       // AXIOM: The verifier cannot modify itself autonomously
       // This check runs regardless of requireHumanApproval setting
@@ -375,17 +411,70 @@ export class DogfoodingLoop {
 
       console.log('  Authorization token obtained')
 
-      const applyResult = await this.applier.apply(proposal.value, authTokenResult.value)
+      // ═══════════════════════════════════════════════════════════════════════
+      // COLLAPSE CHAIN: Critic → Verifier → Executor
+      // Final reduction of uncertainty before action
+      // ═══════════════════════════════════════════════════════════════════════
+      console.log('[5.5/6] Collapse Chain processing...')
+      const collapseChain = createProposalCollapseChain()
+      const collapseContext: ProposalCollapseContext = {
+        proposal: proposal.value,
+        authToken: authTokenResult.value,
+        applier: this.applier,
+        dryRun: false
+      }
 
-      if (!applyResult.ok) {
-        const error = `Apply failed: ${applyResult.error.message}`
-        await this.logFailure('apply_failed', error)
+      const collapseResult = await collapseChain.collapse(
+        { proposal: proposal.value },
+        { ...collapseContext, urcoResult: urcoOutput }
+      )
+
+      if (!collapseResult.ok) {
+        const error = `Collapse Chain failed: ${collapseResult.error.message}`
+        await this.logFailure('collapse_chain_failed', error)
         return { success: false, error, proposal: proposal.value }
       }
 
-      if (!applyResult.value.success) {
+      const collapse = collapseResult.value
+      console.log(`  Critic: ${collapse.critique.approved ? 'APPROVED' : 'REJECTED'} (${collapse.critique.fatalCount} fatal, ${collapse.critique.majorCount} major)`)
+      if (collapse.verification) {
+        console.log(`  Verifier: ${collapse.verification.approved ? 'VERIFIED' : 'REJECTED'} (${collapse.verification.passedCount}/${collapse.verification.passedCount + collapse.verification.failedCount} checks)`)
+      }
+
+      // Check if collapse chain rejected
+      if (!collapse.collapsed) {
+        let reason: string
+        switch (collapse.finalState) {
+          case 'rejected_by_critic':
+            reason = `Rejected by Critic: ${collapse.critique.summary}`
+            break
+          case 'rejected_by_verifier':
+            reason = `Rejected by Verifier: ${collapse.verification?.summary || 'Unknown'}`
+            break
+          case 'execution_failed':
+            reason = `Execution failed: ${collapse.execution?.error || 'Unknown'}`
+            break
+          default:
+            reason = 'Unknown rejection reason'
+        }
+        console.log(`  ✗ Collapse Chain rejected: ${reason}`)
+        await this.logRejection(proposal.value, `collapse_rejected: ${reason}`)
+        return { success: false, error: reason, proposal: proposal.value }
+      }
+
+      console.log(`  Executor: ${collapse.execution?.executed ? 'EXECUTED' : 'NOT EXECUTED'}`)
+
+      // Get the apply result from the executor
+      const executionResult = collapse.execution?.result as ApplyResult | null
+      if (!executionResult || !collapse.execution?.executed) {
+        const error = collapse.execution?.error || 'Executor did not execute'
+        await this.logFailure('executor_failed', error)
+        return { success: false, error, proposal: proposal.value }
+      }
+
+      if (!executionResult.success) {
         console.log('  ✗ Applied but tests failed - rolled back')
-        await this.logRollback(proposal.value, applyResult.value)
+        await this.logRollback(proposal.value, executionResult)
         return {
           success: false,
           error: 'Tests failed after apply - rolled back',
@@ -396,10 +485,10 @@ export class DogfoodingLoop {
       // 6. VERIFY IMPROVEMENT
       console.log('[6/6] Verifying improvement...')
 
-      await this.logSuccess(proposal.value, applyResult.value)
+      await this.logSuccess(proposal.value, executionResult)
 
       console.log('  ✓ Improvement applied successfully')
-      console.log(`  Commit: ${applyResult.value.afterCommit?.slice(0, 8)}`)
+      console.log(`  Commit: ${executionResult.afterCommit?.slice(0, 8)}`)
       console.log('')
 
       // Track successful improvement for cooldown

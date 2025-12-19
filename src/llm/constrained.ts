@@ -1,6 +1,7 @@
 // Constrained LLM - All code generation passes through 6 gates
 // NO CODE ESCAPES WITHOUT VERIFICATION
 // Supports Anthropic, OpenAI, and Ollama (local) providers
+// AXIOM 9: Self-awareness precedes self-improvement
 
 import { LLMAdapter } from '../llm'
 import { OpenAIAdapter } from '../adapters/openaiAdapter'
@@ -13,8 +14,18 @@ import { JSONLLedger } from '../persistence/jsonlLedger'
 import { globalTimeProvider } from '../core/ids'
 import { sanitizeInput, validateSanitized } from '../core/sanitize'
 import { getRelevantTypes, getCoreProjectTypes, formatTypesForPrompt, getRelevantFunctions, formatFunctionsForPrompt, getRelevantClasses, formatClassesForPrompt } from './typeExtractor'
+import { loadIdentity, formatIdentityCompact, isIdentityLoaded } from '../core/identity'
 import type { CodeIssue } from '../analysis/codeAnalyzer'
 import type { LLMProvider, LLMProviderType } from './types'
+
+// Load identity at module initialization
+// The system must know itself before generating any code
+if (!isIdentityLoaded()) {
+  const identityResult = loadIdentity()
+  if (!identityResult.ok) {
+    console.warn('[IDENTITY] Warning: Could not load identity:', identityResult.error.message)
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // FIX 2: Helper to extract identifiers from existing code
@@ -267,7 +278,12 @@ export class ConstrainedLLM {
     const identifierContext = this.formatIdentifierContext(identifiers)
 
     // DETERMINISM-EXEMPT: Prompt strings reference forbidden patterns to instruct LLM what NOT to use
-    const basePrompt = `You are generating TypeScript code for Motherlabs Runtime.
+    // Inject identity context so the LLM knows WHO it is generating code for
+    const identityContext = formatIdentityCompact()
+
+    const basePrompt = `${identityContext}
+
+You are generating TypeScript code for Motherlabs Runtime.
 
 CRITICAL: Return ONLY raw TypeScript code. NO markdown code blocks. NO \`\`\`typescript. Just the code.
 
@@ -323,6 +339,14 @@ ${funcContext}
 ${classContext}
 `
 
+    // Calculate correct import path for test files
+    // Source: /project/src/core/context.ts → Test: /project/tests/core/context.test.ts
+    // Import path from tests/core/ to src/core/ is ../../src/core/
+    const srcMatch = filepath.match(/\/src\/(.*)\.ts$/)
+    const relativeSrcPath = srcMatch ? srcMatch[1] : filepath.replace(/\.ts$/, '')
+    // From tests/X/ to src/X/, we need ../../src/X/
+    const testImportPath = `../../src/${relativeSrcPath}`
+
     const issuePrompts: Record<string, string> = {
       'NO_TESTS': `Generate a comprehensive test file for: ${filepath}
 
@@ -357,9 +381,18 @@ runTests().catch(err => {
 });
 \`\`\`
 
+CRITICAL - IMPORT PATH:
+The test file will be placed at: tests/${relativeSrcPath}.test.ts
+You MUST import from the source using this EXACT path: '${testImportPath}'
+
+Example import statement:
+\`\`\`typescript
+import { functionName } from '${testImportPath}';
+\`\`\`
+
 Requirements:
 - Use the assert(condition, message) pattern shown above
-- Import from the source file using relative paths like '../src/...'
+- Import from '${testImportPath}' (NOT '../core/...' or '../src/...')
 - Include success cases with meaningful assertions
 - Include failure/error cases
 - Test actual return values, not just that functions exist
