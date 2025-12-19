@@ -36,6 +36,8 @@ export type DogfoodingConfig = {
   openaiModel?: OpenAIModel   // Optional - defaults to gpt-4o
   ollamaEnabled?: boolean     // Optional - enables local Ollama LLM
   ollamaConfig?: Partial<OllamaConfig>  // Optional - Ollama configuration
+  fileCooldownMs?: number     // Default 600000 (10 min) - skip recently improved files
+  failureBackoffMs?: number   // Default 2000 (2s, exponential) - backoff on failures
 }
 
 /** Default: requireHumanApproval = true (safe default) */
@@ -55,6 +57,8 @@ export class DogfoodingLoop {
   private llmModel: string | null = null
   private authRouter: AuthorizationRouter
   private proposalBridge: ProposalBridge
+  private improvedFiles: Map<string, number> = new Map()  // filepath → timestamp
+  private consecutiveFailures: number = 0
 
   constructor(config: DogfoodingConfig) {
     // Apply defaults - requireHumanApproval defaults to true (safe default)
@@ -216,10 +220,22 @@ export class DogfoodingLoop {
       // 2. PROPOSE FIX (for highest priority issue)
       console.log('[2/6] Proposing improvement...')
 
-      // Get file with highest priority issue
-      const fileWithIssues = analysis.value.find(a => a.issues.length > 0)
+      // Get file with highest priority issue, respecting cooldown
+      const cooldownMs = this.config.fileCooldownMs ?? 600000  // 10 min default
+      const now = globalTimeProvider.now()
+
+      const fileWithIssues = analysis.value.find(a => {
+        if (a.issues.length === 0) return false
+        const lastImproved = this.improvedFiles.get(a.filepath)
+        if (lastImproved && now - lastImproved < cooldownMs) {
+          console.log(`  Skipping ${a.filepath} (cooldown: ${Math.round((cooldownMs - (now - lastImproved)) / 1000)}s remaining)`)
+          return false
+        }
+        return true
+      })
 
       if (!fileWithIssues) {
+        console.log('  All files with issues are on cooldown')
         return { success: true }
       }
 
@@ -386,11 +402,23 @@ export class DogfoodingLoop {
       console.log(`  Commit: ${applyResult.value.afterCommit?.slice(0, 8)}`)
       console.log('')
 
+      // Track successful improvement for cooldown
+      this.improvedFiles.set(proposal.value.targetFile, globalTimeProvider.now())
+      this.consecutiveFailures = 0
+
       return { success: true, proposal: proposal.value }
 
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error)
       await this.logFailure('cycle_error', errorMsg)
+
+      // Exponential backoff on failure
+      this.consecutiveFailures++
+      const backoffMs = (this.config.failureBackoffMs ?? 2000) * Math.pow(2, this.consecutiveFailures - 1)
+      const cappedBackoff = Math.min(backoffMs, 60000)  // Cap at 60s
+      console.log(`  Backing off for ${Math.round(cappedBackoff / 1000)}s after ${this.consecutiveFailures} consecutive failure(s)`)
+      await this.sleep(cappedBackoff)
+
       return { success: false, error: errorMsg }
     }
   }

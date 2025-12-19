@@ -1140,7 +1140,7 @@ export class SixGateValidator {
         return {
           gateName: 'test_quality',
           passed: false,
-          required: context.strictTestQuality ?? false,
+          required: true,  // Test quality is mandatory for test code
           error: result.error.message
         }
       }
@@ -1152,7 +1152,7 @@ export class SixGateValidator {
       return {
         gateName: 'test_quality',
         passed,
-        required: context.strictTestQuality ?? false,
+        required: true,  // Test quality is mandatory for test code
         error: passed ? undefined : `Test quality ${score}/100 below threshold ${threshold}. ${issues[0] || 'Improve test coverage and assertions.'}`,
         details: {
           score,
@@ -1170,7 +1170,7 @@ export class SixGateValidator {
       return {
         gateName: 'test_quality',
         passed: false,
-        required: context.strictTestQuality ?? false,
+        required: true,  // Test quality is mandatory for test code
         error: error instanceof Error ? error.message : String(error)
       }
     }

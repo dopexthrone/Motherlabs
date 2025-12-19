@@ -98,6 +98,8 @@ export class ConstrainedLLM {
   private providerType: LLMProviderType
   private validator: SixGateValidator
   private ledger: JSONLLedger
+  private callTimestamps: number[] = []
+  private readonly maxCallsPerMinute: number = 20
 
   constructor(llm: LLMAdapter | OpenAIAdapter | AnthropicAdapter | OllamaAdapter, ledgerPath: string = 'evidence/llm-generations.jsonl') {
     this.llm = llm
@@ -125,11 +127,36 @@ export class ConstrainedLLM {
   }
 
   /**
+   * Enforce rate limiting - max 20 calls per minute
+   * Blocks if rate limit exceeded
+   */
+  private async enforceRateLimit(): Promise<void> {
+    const now = globalTimeProvider.now()
+    const oneMinuteAgo = now - 60000
+
+    // Remove old timestamps
+    this.callTimestamps = this.callTimestamps.filter(t => t > oneMinuteAgo)
+
+    // Check if at limit
+    if (this.callTimestamps.length >= this.maxCallsPerMinute) {
+      const oldestInWindow = this.callTimestamps[0]
+      const waitMs = oldestInWindow + 60000 - now
+      console.log(`  Rate limit: waiting ${Math.round(waitMs / 1000)}s`)
+      await new Promise(r => setTimeout(r, waitMs))
+    }
+
+    this.callTimestamps.push(now)
+  }
+
+  /**
    * Generate code that MUST pass all 6 gates
    * Retries up to MAX_ATTEMPTS times
    * Returns Err if all attempts fail gates
    */
   async generateCode(request: GenerateCodeRequest): Promise<Result<GenerateCodeResult, Error>> {
+    // Enforce rate limiting before making LLM call
+    await this.enforceRateLimit()
+
     const { issue, filepath, existingCode, context } = request
 
     // Sanitize inputs
