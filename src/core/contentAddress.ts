@@ -17,24 +17,33 @@ export function contentAddress(content: unknown): string {
  * - Keys sorted alphabetically
  * - No whitespace
  * - Consistent formatting
+ * - Depth-limited to prevent stack overflow on circular/deep objects
  */
-export function canonicalJSON(obj: unknown): string {
+export function canonicalJSON(obj: unknown, maxDepth: number = 50, seen: WeakSet<object> = new WeakSet()): string {
   if (obj === null) return 'null'
   if (obj === undefined) return 'null'  // undefined becomes null in JSON
   if (typeof obj === 'string') return JSON.stringify(obj)
   if (typeof obj === 'number') return String(obj)
   if (typeof obj === 'boolean') return String(obj)
 
+  if (maxDepth <= 0) {
+    return '"[MAX_DEPTH_EXCEEDED]"'
+  }
+
   if (Array.isArray(obj)) {
-    const items = obj.map(item => canonicalJSON(item))
+    if (seen.has(obj)) return '"[CIRCULAR]"'
+    seen.add(obj)
+    const items = obj.map(item => canonicalJSON(item, maxDepth - 1, seen))
     return `[${items.join(',')}]`
   }
 
   if (typeof obj === 'object') {
+    if (seen.has(obj)) return '"[CIRCULAR]"'
+    seen.add(obj)
     const keys = Object.keys(obj).sort()
     const pairs = keys.map(key => {
       const value = (obj as Record<string, unknown>)[key]
-      return `${JSON.stringify(key)}:${canonicalJSON(value)}`
+      return `${JSON.stringify(key)}:${canonicalJSON(value, maxDepth - 1, seen)}`
     })
     return `{${pairs.join(',')}}`
   }

@@ -207,7 +207,7 @@ function detectIssues(sourceFile: SourceFile, filepath: string): CodeIssue[] {
     if (hasAsync && !hasErrorHandling) {
       issues.push({
         type: 'NO_ERROR_HANDLING',
-        severity: 'medium',
+        severity: 'high',  // Elevated: unhandled async errors cause crashes
         line: func.getStartLineNumber(),
         message: `Async function "${func.getName()}" lacks error handling`,
         fixable: true

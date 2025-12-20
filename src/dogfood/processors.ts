@@ -224,14 +224,28 @@ export const proposalPhaseProcessor: PhaseProcessor<ProposalURCOInput> = {
     const { proposal } = input
 
     // Summarize readiness
+    // Only HIGH confidence prematurity is blocking (matches AXIOM 5 in proposer.ts)
+    const isHighConfidencePremature = proposal.prematurityCheck?.premature &&
+      proposal.prematurityCheck.confidence === 'high'
+
     const isReady = proposal.gateValidation?.valid &&
       !isTCBPath(proposal.targetFile) &&
-      !proposal.prematurityCheck?.premature
+      !isHighConfidencePremature
+
+    // Determine the blocking reason
+    let blockingReason = ''
+    if (!proposal.gateValidation?.valid) {
+      blockingReason = 'gates failed'
+    } else if (isTCBPath(proposal.targetFile)) {
+      blockingReason = 'TCB protected'
+    } else if (isHighConfidencePremature) {
+      blockingReason = 'premature (high confidence)'
+    }
 
     artifacts.push(createArtifact('synthesize',
       isReady
         ? `Proposal ready for collapse chain: ${proposal.issue.type} fix`
-        : `Proposal NOT ready: ${!proposal.gateValidation?.valid ? 'gates failed' : isTCBPath(proposal.targetFile) ? 'TCB protected' : 'premature'}`,
+        : `Proposal NOT ready: ${blockingReason}`,
       isReady ? 0.1 : 0.8
     ))
 
