@@ -165,8 +165,15 @@ export class AutoApplier {
         // Append to existing file
         const existing = fs.readFileSync(targetFile, 'utf-8')
         fs.writeFileSync(targetFile, existing + '\n' + proposedChange.code, 'utf-8')
+      } else if (proposedChange.type === 'modify_function') {
+        // Replace the file with the modified code
+        // The LLM is expected to provide the FULL file content with the modification
+        // This is a simple approach - a more sophisticated one would use AST-based replacement
+        fs.writeFileSync(targetFile, proposedChange.code, 'utf-8')
+      } else if (proposedChange.type === 'refactor') {
+        // Refactor: replace file content
+        fs.writeFileSync(targetFile, proposedChange.code, 'utf-8')
       }
-      // Other types would be implemented here
 
       return Ok(void 0)
 

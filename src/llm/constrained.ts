@@ -422,54 +422,45 @@ Requirements:
 - Add clear function names
 - Keep all existing imports and type usage`,
 
-      'NO_ERROR_HANDLING': `Add proper error handling to this async function.
+      'NO_ERROR_HANDLING': `Add proper error handling to the async function mentioned in the issue.
 
 File: ${filepath}
 Issue: ${issue.message}
 
-Current code:
+Current FULL file:
 \`\`\`typescript
-${existingCode.slice(0, 2000)}
+${existingCode}
 \`\`\`
 
 IMPORTANT: This project uses the Result<T, Error> pattern from '../core/result'.
 
-COMPLETE THE CODE BELOW - Keep the EXACT same function name and logic:
+YOUR TASK: Output the FULL FILE with the function modified to include error handling.
+Keep ALL existing imports, functions, and code. Only modify the function mentioned in the issue.
+
+For the function that needs error handling:
+1. Add try/catch around the async operations
+2. Keep the same function signature and behavior
+3. Log or handle errors appropriately
+
+Example of adding try/catch to an async function:
 \`\`\`typescript
-import { Result, Ok, Err } from '../core/result';
-
-// SAFE JSON PARSING - Use this pattern instead of raw JSON.parse:
-function safeJsonParse<T>(input: string): Result<T, Error> {
+export async function someAsyncFunc(param: string): Promise<void> {
   try {
-    const data = JSON.parse(input) as T;
-    return Ok(data);
-  } catch (e) {
-    return Err(e instanceof Error ? e : new Error(String(e)));
-  }
-}
-
-// SAFE ASYNC FUNCTION TEMPLATE:
-export async function yourFunction(param: ParamType): Promise<Result<ReturnType, Error>> {
-  try {
-    // Your logic here
-    // If parsing JSON, use: const parsed = safeJsonParse<YourType>(jsonString);
-    // If parsed.ok is false, return parsed (propagates error)
-
-    return Ok(result);
+    // existing logic here
+    await someOperation()
   } catch (error) {
-    return Err(error instanceof Error ? error : new Error(String(error)));
+    console.error('Error in someAsyncFunc:', error instanceof Error ? error.message : error)
+    throw error  // Re-throw or handle as appropriate
   }
 }
 \`\`\`
 
 CRITICAL REQUIREMENTS:
-1. Import Result, Ok, Err from '../core/result'
-2. Change return type to Promise<Result<T, Error>>
-3. Wrap ALL async operations in try/catch
-4. If the code uses JSON.parse, wrap it in a helper like safeJsonParse shown above
-5. Return Ok(value) on success, Err(error) on failure
-6. Use ONLY the function names from the IDENTIFIERS section above
-7. MUST export the function`,
+1. Output the COMPLETE file content, not just the modified function
+2. Keep ALL existing imports, types, and other functions unchanged
+3. Only add try/catch to the function specified in the issue
+4. Maintain the exact same function signature
+5. Use ONLY the function names from the IDENTIFIERS section above`,
 
       'DUPLICATE_CODE': `Refactor to eliminate duplicate code.
 

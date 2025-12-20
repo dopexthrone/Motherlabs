@@ -11,55 +11,62 @@ export async function decomposeTask(
   config: Config,
   llm?: LLMAdapter
 ): Promise<Task> {
+  try {
+    // Log task creation
+    ledger.append(createEvidence(taskId, 'task_created', { input }))
 
-  // Log task creation
-  ledger.append(createEvidence(taskId, 'task_created', { input }))
+    let subtaskStrings: string[]
 
-  let subtaskStrings: string[]
+    if (llm) {
+      // LLM-based intelligent decomposition
+      const result = await llm.decompose(input)
 
-  if (llm) {
-    // LLM-based intelligent decomposition
-    const result = await llm.decompose(input)
-
-    if (result.ok) {
-      subtaskStrings = result.value
-      ledger.append(createEvidence(taskId, 'llm_decompose', {
-        input,
-        subtasks: subtaskStrings,
-        count: subtaskStrings.length,
-        model: 'claude-sonnet-4-5',
-        success: true
-      }))
+      if (result.ok) {
+        subtaskStrings = result.value
+        ledger.append(createEvidence(taskId, 'llm_decompose', {
+          input,
+          subtasks: subtaskStrings,
+          count: subtaskStrings.length,
+          model: 'claude-sonnet-4-5',
+          success: true
+        }))
+      } else {
+        // FIXED: Structured error handling instead of swallowing
+        ledger.append(createEvidence(taskId, 'llm_decompose', {
+          error: result.error.message,
+          fallback: 'heuristic',
+          success: false
+        }))
+        subtaskStrings = heuristicDecompose(input)
+      }
     } else {
-      // FIXED: Structured error handling instead of swallowing
-      ledger.append(createEvidence(taskId, 'llm_decompose', {
-        error: result.error.message,
-        fallback: 'heuristic',
-        success: false
-      }))
+      // Fallback to simple heuristic
       subtaskStrings = heuristicDecompose(input)
     }
-  } else {
-    // Fallback to simple heuristic
-    subtaskStrings = heuristicDecompose(input)
-  }
 
-  const subtasks: Task[] = subtaskStrings
-    .slice(0, config.maxSubtasks)
-    .map((line, i) => ({
-      id: `${taskId}.${i}`,
-      input: line,
-      subtasks: [],
-      status: 'pending' as const,
-      evidence: []
+    const subtasks: Task[] = subtaskStrings
+      .slice(0, config.maxSubtasks)
+      .map((line, i) => ({
+        id: `${taskId}.${i}`,
+        input: line,
+        subtasks: [],
+        status: 'pending' as const,
+        evidence: []
+      }))
+
+    return {
+      id: taskId,
+      input,
+      subtasks,
+      status: subtasks.length > 0 ? 'active' : 'done',
+      evidence: ledger.query(taskId)
+    }
+  } catch (error) {
+    ledger.append(createEvidence(taskId, 'task_error', {
+      error: error instanceof Error ? error.message : String(error),
+      input
     }))
-
-  return {
-    id: taskId,
-    input,
-    subtasks,
-    status: subtasks.length > 0 ? 'active' : 'done',
-    evidence: ledger.query(taskId)
+    throw error
   }
 }
 
