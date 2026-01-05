@@ -17,6 +17,20 @@
 export type ExecutionMode = 'plan-only' | 'execute-sandbox';
 
 /**
+ * Model mode for the harness.
+ * Controls how model adapters are used.
+ *
+ * - 'none': No model calls (kernel-only processing)
+ * - 'record': Record model interactions to file
+ * - 'replay': Replay recorded model interactions
+ *
+ * Policy enforcement:
+ * - 'strict' and 'default' policies MUST use 'none'
+ * - 'dev' policy may use 'record' or 'replay'
+ */
+export type ModelMode = 'none' | 'record' | 'replay';
+
+/**
  * Policy profile name.
  */
 export type PolicyProfileName = 'strict' | 'default' | 'dev';
@@ -39,6 +53,18 @@ export interface HarnessRunInput {
    * Policy profile to use.
    */
   policy: PolicyProfileName;
+
+  /**
+   * Model mode (default: 'none').
+   * Enforced by policy: strict/default MUST use 'none'.
+   */
+  model_mode?: ModelMode;
+
+  /**
+   * Path to recording file for record/replay modes.
+   * Required when model_mode is 'record' or 'replay'.
+   */
+  model_recording_path?: string;
 
   /**
    * If true, preserve the sandbox directory after execution.
@@ -288,6 +314,79 @@ export interface HarnessRunResult {
    * Caller is responsible for cleanup.
    */
   sandbox_path?: string;
+
+  /**
+   * Model mode used for this run.
+   */
+  model_mode: ModelMode;
+
+  /**
+   * Path to model I/O log (only if model_mode was 'record').
+   * Format: JSONL with one entry per model interaction.
+   */
+  model_io_path?: string;
+}
+
+// =============================================================================
+// Model I/O Types
+// =============================================================================
+
+/**
+ * Entry in the model I/O log (JSONL format).
+ * Records all model interactions for audit and replay.
+ */
+export interface ModelIOEntry {
+  /**
+   * Sequence number within the run.
+   */
+  sequence: number;
+
+  /**
+   * Timestamp (ISO 8601 UTC).
+   */
+  timestamp: string;
+
+  /**
+   * SHA-256 hash of the request (prompt + context).
+   */
+  request_sha256: string;
+
+  /**
+   * Model identifier.
+   */
+  model_id: string;
+
+  /**
+   * Request parameters (canonicalized).
+   */
+  parameters: {
+    prompt_length: number;
+    context_intent_id: string;
+    context_mode: string;
+  };
+
+  /**
+   * Raw response content.
+   */
+  raw_response: string;
+
+  /**
+   * SHA-256 hash of the response.
+   */
+  response_sha256: string;
+
+  /**
+   * Tokens used.
+   */
+  tokens: {
+    input: number;
+    output: number;
+  };
+
+  /**
+   * Latency in milliseconds.
+   */
+  latency_ms: number;
 }
 
 // =============================================================================
