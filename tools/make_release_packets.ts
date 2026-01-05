@@ -132,7 +132,8 @@ async function createFreezeManifest(version: string, freezeDir: string): Promise
   await mkdir(freezeDir, { recursive: true });
 
   // 1. commit.txt
-  const commit = exec(`git rev-parse ${version}`);
+  // Use ^{commit} to dereference annotated tags to the actual commit
+  const commit = exec(`git rev-parse ${version}^{commit}`);
   await writeFile(join(freezeDir, 'commit.txt'), commit + '\n');
   console.log(`    commit.txt: ${commit}`);
 
@@ -288,15 +289,12 @@ async function createTransferBundle(
 async function createChecksumFile(dir: string, filename: string): Promise<void> {
   const checksumPath = join(dir, filename);
 
-  // First pass: collect all files except the checksum file itself
+  // Collect all files except the checksum file itself (standard practice)
   const files = await collectFilesRecursive(dir, '.');
   const fileList = files.filter((f) => f !== `./${filename}`).sort();
 
-  // Generate checksums
+  // Generate checksums for all files
   const lines: string[] = [];
-
-  // Include the checksum file itself with empty hash (will be replaced)
-  lines.push(`${'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'}  ./${filename}`);
 
   for (const file of fileList) {
     const filePath = join(dir, file.slice(2)); // Remove './' prefix
