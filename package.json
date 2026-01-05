@@ -20,7 +20,8 @@
     "clean": "rm -rf dist",
     "dogfood": "npx tsx tools/dogfood.ts",
     "review": "npx tsx tools/review_run.ts",
-    "golden": "npx tsx tools/run_golden_suite.ts"
+    "golden": "npx tsx tools/run_golden_suite.ts",
+    "release-packets": "npx tsx tools/make_release_packets.ts"
   },
   "keywords": [
     "context-engineering",
