@@ -7,6 +7,7 @@ This document provides exact steps to verify a release of the Context Engine Ker
 - **[BUNDLE_SPEC.md](./BUNDLE_SPEC.md)** - Authoritative bundle output contract
 - **[EVIDENCE_SPEC.md](./EVIDENCE_SPEC.md)** - Execution evidence contract (EvidenceCore, hashing)
 - **[LEDGER_SPEC.md](./LEDGER_SPEC.md)** - Append-only ledger contract (JSONL format)
+- **[POLICY_SPEC.md](./POLICY_SPEC.md)** - Policy profiles and enforcement (PL1-PL7 invariants)
 - **[VERIFICATION_POLICY.md](./VERIFICATION_POLICY.md)** - L0/L1 verification milestone definitions
 
 ## Prerequisites

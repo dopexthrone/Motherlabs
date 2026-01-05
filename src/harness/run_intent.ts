@@ -126,7 +126,7 @@ export async function runHarness(input: HarnessRunInput): Promise<HarnessRunResu
 
   // Validate and set model mode (default: 'none')
   const modelMode: ModelMode = input.model_mode ?? getDefaultModelMode();
-  validateModelMode(modelMode, policy);
+  validateModelMode(modelMode, policy, input.model_recording_path);
 
   // Note: Model adapters are not yet integrated into kernel processing.
   // Currently the kernel is rule-based and doesn't make model calls.

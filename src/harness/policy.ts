@@ -174,13 +174,27 @@ export function getDefaultModelMode(): ModelMode {
  *
  * @param mode - Model mode to validate
  * @param policy - Policy to check against
+ * @param recordingPath - Path to recording file (required for record/replay)
  * @throws Error if model mode is not allowed by policy
  */
-export function validateModelMode(mode: ModelMode, policy: PolicyProfile): void {
+export function validateModelMode(
+  mode: ModelMode,
+  policy: PolicyProfile,
+  recordingPath?: string
+): void {
+  // PL4: strict/default only allow 'none'
   if (!isModelModeAllowed(mode, policy)) {
     throw new Error(
-      `Model mode '${mode}' is not allowed by policy '${policy.name}'. ` +
-      `Only 'none' is allowed for strict/default policies.`
+      `POLICY_VIOLATION: PL4: Model mode '${mode}' not allowed by ${policy.name} policy`
     );
+  }
+
+  // PL5: dev with record/replay requires recording path
+  if (policy.name === 'dev' && (mode === 'record' || mode === 'replay')) {
+    if (!recordingPath) {
+      throw new Error(
+        `POLICY_VIOLATION: PL5: ${mode} mode requires recording path`
+      );
+    }
   }
 }
