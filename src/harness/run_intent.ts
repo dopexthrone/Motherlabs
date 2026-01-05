@@ -16,22 +16,26 @@
 
 import { randomBytes } from 'node:crypto';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
-import { join, dirname, resolve } from 'node:path';
+import { join, dirname, resolve, basename, relative } from 'node:path';
 
 // Kernel imports (authoritative)
 import { transform, KERNEL_VERSION, getBundleHash } from '../assembler/bundle.js';
 import { generateProposal, validateEvidence } from '../protocol/proposal.js';
 
+// Utils (determinism)
+import { canonicalize } from '../utils/canonical.js';
+
 // Harness imports (non-authoritative)
-import type {
-  HarnessRunInput,
-  HarnessRunResult,
-  ExecutionMode,
-  PolicyProfileName,
-  ModelMode,
-  KernelResultKind,
-  DecisionRecord,
-  SandboxExecution,
+import {
+  RUN_SCHEMA_VERSION,
+  type HarnessRunInput,
+  type HarnessRunResult,
+  type ExecutionMode,
+  type PolicyProfileName,
+  type ModelMode,
+  type KernelResultKind,
+  type DecisionRecord,
+  type SandboxExecution,
 } from './types.js';
 import { loadPolicy, validateModelMode, getDefaultModelMode } from './policy.js';
 import { createSandbox, cleanupSandbox, runInSandbox, buildSandboxExecution } from './sandbox.js';
@@ -50,6 +54,27 @@ function generateRunId(): string {
   const timestamp = Date.now().toString(36);
   const random = randomBytes(4).toString('hex');
   return `hr_${timestamp}_${random}`;
+}
+
+// =============================================================================
+// Path Sanitization (RS6: No Leak)
+// =============================================================================
+
+/**
+ * Sanitize intent path for public output.
+ * Removes absolute paths to prevent host-identifying data leaks.
+ * Per RUN_SPEC.md RS6.
+ *
+ * @param intentPath - Original intent path (may be absolute)
+ * @returns Sanitized path (relative or basename)
+ */
+function sanitizeIntentPath(intentPath: string): string {
+  // If it's an absolute path, use only the basename
+  if (intentPath.startsWith('/') || /^[A-Za-z]:[\\/]/.test(intentPath)) {
+    return basename(intentPath);
+  }
+  // Otherwise return as-is (relative path)
+  return intentPath;
 }
 
 // =============================================================================
@@ -159,12 +184,13 @@ export async function runHarness(input: HarnessRunInput): Promise<HarnessRunResu
 
     const completedAt = new Date().toISOString();
     return {
+      run_schema_version: RUN_SCHEMA_VERSION,
       run_id: runId,
       started_at: startedAt,
       completed_at: completedAt,
       kernel_version: KERNEL_VERSION,
       policy,
-      intent: { path: input.intent_path, sha256: intentSha256 },
+      intent: { path: sanitizeIntentPath(input.intent_path), sha256: intentSha256 },
       bundle: null,
       kernel_result_kind: kernelResultKind,
       refuse_reason: refuseReason,
@@ -184,12 +210,13 @@ export async function runHarness(input: HarnessRunInput): Promise<HarnessRunResu
   if (kernelResultKind === 'CLARIFY' || input.mode === 'plan-only') {
     const completedAt = new Date().toISOString();
     const result: HarnessRunResult = {
+      run_schema_version: RUN_SCHEMA_VERSION,
       run_id: runId,
       started_at: startedAt,
       completed_at: completedAt,
       kernel_version: KERNEL_VERSION,
       policy,
-      intent: { path: input.intent_path, sha256: intentSha256 },
+      intent: { path: sanitizeIntentPath(input.intent_path), sha256: intentSha256 },
       bundle: { bundle_id: bundle.id, sha256: `sha256:${bundleHash}` },
       kernel_result_kind: kernelResultKind,
       execution: null,
@@ -267,12 +294,13 @@ export async function runHarness(input: HarnessRunInput): Promise<HarnessRunResu
   const completedAt = new Date().toISOString();
 
   const result: HarnessRunResult = {
+    run_schema_version: RUN_SCHEMA_VERSION,
     run_id: runId,
     started_at: startedAt,
     completed_at: completedAt,
     kernel_version: KERNEL_VERSION,
     policy,
-    intent: { path: input.intent_path, sha256: intentSha256 },
+    intent: { path: sanitizeIntentPath(input.intent_path), sha256: intentSha256 },
     bundle: { bundle_id: bundle.id, sha256: `sha256:${bundleHash}` },
     kernel_result_kind: kernelResultKind,
     execution: sandboxExecution,
@@ -280,7 +308,7 @@ export async function runHarness(input: HarnessRunInput): Promise<HarnessRunResu
     model_mode: modelMode,
   };
 
-  // Add sandbox path if preserved
+  // Add sandbox path if preserved (internal/debug use only, not for public output)
   if (sandboxPreserved) {
     result.sandbox_path = sandbox.dir;
   }
@@ -358,13 +386,15 @@ function parseArgs(args: string[]): HarnessRunInput {
 
 /**
  * Write result to output directory.
+ * Uses canonical JSON for determinism (per RUN_SPEC.md RS7).
  */
 async function writeResult(result: HarnessRunResult): Promise<string> {
   const outDir = `artifacts/harness/out/${result.run_id}`;
   await mkdir(outDir, { recursive: true });
 
   const resultPath = join(outDir, 'result.json');
-  await writeFile(resultPath, JSON.stringify(result, null, 2), 'utf-8');
+  // Use canonical JSON for determinism + trailing newline
+  await writeFile(resultPath, canonicalize(result) + '\n', 'utf-8');
 
   return resultPath;
 }
@@ -385,8 +415,8 @@ async function main(): Promise<void> {
     // Append to ledger
     await appendHarnessResult(result);
 
-    // Output to stdout
-    console.log(JSON.stringify(result, null, 2));
+    // Output to stdout (canonical JSON per RUN_SPEC.md RS7)
+    console.log(canonicalize(result));
 
     // Exit with appropriate code
     process.exit(result.decision.accepted ? 0 : 1);

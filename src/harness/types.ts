@@ -224,9 +224,21 @@ export interface DecisionRecord {
 }
 
 /**
+ * Current run schema version.
+ * Bump this when RunResult schema changes.
+ */
+export const RUN_SCHEMA_VERSION = '1.0.0';
+
+/**
  * Complete result of a harness run.
  */
 export interface HarnessRunResult {
+  /**
+   * Schema version for this RunResult format.
+   * Required per RUN_SPEC.md RS1.
+   */
+  run_schema_version: string;
+
   /**
    * Unique run identifier.
    * Format: "hr_{timestamp}_{suffix}"

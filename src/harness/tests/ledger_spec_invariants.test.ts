@@ -273,6 +273,7 @@ function createMockHarnessResult(
   };
 
   return {
+    run_schema_version: '1.0.0',
     run_id: 'hr_20260105T100000Z_xyz789',
     started_at: '2026-01-05T10:00:00.000Z',
     completed_at: '2026-01-05T10:00:05.000Z',
