@@ -31,13 +31,17 @@ Single source of truth for release verification status.
 | Commit | `a55e3f9f9c4cbd32b8bd48ea1cbf342ab451b762` |
 | Tag date | 2026-01-04 |
 | Reference run | `v0.2.1/README.txt` |
+| Reference Tag | `v0.2.1-reference-20260105` |
 | Independent verifiers | 0 |
+| Internal verifiers | 1 |
 | Verified | NO (pending external verification) |
 
 **Transfer bundle ready:** `artifacts/transfer/v0.2.1/`
 
 **External verification reports:**
-- None yet
+| Date | Verifier | Release | Result | Kind | OS | Node | npm | Path |
+|------|----------|---------|--------|------|-----|------|-----|------|
+| 20260105 | internal_me | v0.2.1 | PASS | internal | Ubuntu 24.04.3 LTS | v24.11.1 | 11.6.2 | v0.2.1/verified/20260105_internal_me/ |
 
 ---
 
