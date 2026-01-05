@@ -1,0 +1,17 @@
+{
+  "goal": "Build a web service",
+  "constraints": [
+    "Must be stateless",
+    "Must be stateful",
+    "Must use REST API",
+    "Must use GraphQL only",
+    "Must have zero dependencies",
+    "Must use React framework"
+  ],
+  "context": {
+    "category": "edge_case",
+    "expected_result": "CLARIFY",
+    "reason": "Multiple contradictory constraints",
+    "acceptance_test": "must-clarify-or-handle"
+  }
+}

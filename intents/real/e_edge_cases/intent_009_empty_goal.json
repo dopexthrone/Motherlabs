@@ -1,0 +1,12 @@
+{
+  "goal": "",
+  "constraints": [
+    "This should be rejected"
+  ],
+  "context": {
+    "category": "edge_case",
+    "expected_result": "REFUSE",
+    "reason": "Empty goal is invalid",
+    "acceptance_test": "must-refuse"
+  }
+}

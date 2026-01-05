@@ -1,0 +1,7 @@
+{
+  "goal": "Create a simple hello world program",
+  "constraints": [
+    "Must print exactly 'Hello, World!' to stdout",
+    "Must use JavaScript"
+  ]
+}

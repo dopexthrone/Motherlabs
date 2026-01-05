@@ -1,0 +1,18 @@
+{
+  "goal": "Design a REST API specification for the context engine transform endpoint",
+  "constraints": [
+    "Must accept POST requests with JSON body",
+    "Request body must contain 'goal' (required string) and 'constraints' (optional array)",
+    "Response must return bundle object with 'id', 'sha256', and 'outputs' fields",
+    "Must return HTTP 400 for invalid input with error details",
+    "Must return HTTP 422 for intents that require clarification",
+    "Must include request/response examples",
+    "Must define rate limiting headers",
+    "Output must be OpenAPI 3.0 specification in YAML format"
+  ],
+  "context": {
+    "category": "blueprint",
+    "output_type": "spec",
+    "acceptance_test": "golden-only"
+  }
+}

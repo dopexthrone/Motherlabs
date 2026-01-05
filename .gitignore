@@ -24,3 +24,11 @@ coverage/
 # Temp files
 *.tmp
 *.temp
+# Ignore dogfood run artifacts (ephemeral)
+artifacts/dogfood/
+
+# Generated release artifacts (regenerate via: npm run release-packets -- <version>)
+# These are NOT tracked; only freeze manifests and verifier reports are tracked.
+artifacts/releases/
+artifacts/transfer/
+artifacts/verification_packets/

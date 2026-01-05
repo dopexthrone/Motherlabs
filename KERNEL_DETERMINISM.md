@@ -1,8 +1,8 @@
 # Kernel Determinism Contract
 
-**Version**: 0.1.0
+**Version**: 0.1.1
 **Status**: ENFORCED
-**Last Updated**: 2026-01-04
+**Last Updated**: 2026-01-05
 
 ---
 
@@ -22,8 +22,8 @@ This is enforced by eliminating or pinning every source of nondeterminism and by
 ## 1. Pinned Execution Environment
 
 ### 1.1 Node Version
-- `.nvmrc`: `20.11.1`
-- `package.json` engines: `{ "node": "20.11.1" }`
+- `.nvmrc`: `24.11.1`
+- `package.json` engines: `{ "node": "24.11.1" }`
 - CI uses `npm ci` with locked dependencies
 
 ### 1.2 Locale and Timezone

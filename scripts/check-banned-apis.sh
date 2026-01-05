@@ -24,9 +24,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 SRC_DIR="$PROJECT_ROOT/src"
 
-# Exclude test files and protocol/executor (evidence domain, not bundle hash domain)
+# Exclude test files, protocol/executor, and harness/ (evidence domain, not bundle hash domain)
 # The executor is untrusted and produces timestamps for audit - this is allowed per KERNEL_DETERMINISM.md
-EXCLUDE_PATTERN="tests/\|protocol/executor"
+# The harness is non-authoritative orchestration layer - it may use Date.now(), new Date(), etc.
+# because harness runtime data never affects bundle hashes (by design)
+EXCLUDE_PATTERN="tests/\|protocol/executor\|harness/"
 
 echo "=== Banned API Check ==="
 echo "Checking: $SRC_DIR"

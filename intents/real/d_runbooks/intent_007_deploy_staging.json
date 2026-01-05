@@ -1,0 +1,18 @@
+{
+  "goal": "Create a deployment runbook for releasing kernel to staging environment",
+  "constraints": [
+    "Must include pre-deployment checklist (tests pass, version bumped, changelog updated)",
+    "Must include step-by-step deployment procedure",
+    "Must include rollback procedure with exact commands",
+    "Must include smoke test verification steps",
+    "Must include notification procedure (who to inform, when)",
+    "Must include timing estimates for each step",
+    "Must be formatted as Markdown with checkboxes",
+    "Output must be a single runbook.md file"
+  ],
+  "context": {
+    "category": "runbook",
+    "output_type": "markdown",
+    "acceptance_test": "golden-only"
+  }
+}

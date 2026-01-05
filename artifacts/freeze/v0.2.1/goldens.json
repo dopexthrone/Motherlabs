@@ -1,0 +1,82 @@
+[
+  {
+    "intent_id": "intent_001_api_spec",
+    "bundle_sha256": "sha256:04d8c18fbb24effb354169cfa3ac2ecceb58ce6166f782dc30f67e4d1854232f",
+    "result_kind": "CLARIFY",
+    "accepted": false,
+    "last_updated": "2026-01-05T07:28:16.535Z",
+    "kernel_version": "0.1.0"
+  },
+  {
+    "intent_id": "intent_002_data_model",
+    "bundle_sha256": "sha256:b8cc2cb7c82960fa0751ebad55a3c5537c344095c937aa14ab2a482558964a37",
+    "result_kind": "CLARIFY",
+    "accepted": false,
+    "last_updated": "2026-01-05T07:28:16.535Z",
+    "kernel_version": "0.1.0"
+  },
+  {
+    "intent_id": "intent_003_add_validation",
+    "bundle_sha256": "sha256:3083388bf9cb9c25d67dc11432206fd4569cf8137210d38baa79ebb62a46e67a",
+    "result_kind": "BUNDLE",
+    "accepted": true,
+    "last_updated": "2026-01-05T07:28:16.535Z",
+    "kernel_version": "0.1.0"
+  },
+  {
+    "intent_id": "intent_004_error_handling",
+    "bundle_sha256": "sha256:41a82c6f7169cf0776674a7dffcb371b132e85074c436ef9d5556b1b3046d764",
+    "result_kind": "BUNDLE",
+    "accepted": true,
+    "last_updated": "2026-01-05T07:28:16.535Z",
+    "kernel_version": "0.1.0"
+  },
+  {
+    "intent_id": "intent_005_cli_tool",
+    "bundle_sha256": "sha256:75b497552bd303530b7a1a9c6a4bb09e596aadc10faacb61b5eed2a8f0d3de26",
+    "result_kind": "BUNDLE",
+    "accepted": true,
+    "last_updated": "2026-01-05T07:28:16.535Z",
+    "kernel_version": "0.1.0"
+  },
+  {
+    "intent_id": "intent_006_test_fixtures",
+    "bundle_sha256": "sha256:c32c9fe331bb1b7c27a5c6edefbff6a5ba4062211d4637fadec4eaa37aee98a2",
+    "result_kind": "BUNDLE",
+    "accepted": true,
+    "last_updated": "2026-01-05T07:28:16.535Z",
+    "kernel_version": "0.1.0"
+  },
+  {
+    "intent_id": "intent_007_deploy_staging",
+    "bundle_sha256": "sha256:a55471dd9936e3b637673881069f5a8ef271adddbe1d355538ee4b622c73e466",
+    "result_kind": "BUNDLE",
+    "accepted": true,
+    "last_updated": "2026-01-05T07:28:16.535Z",
+    "kernel_version": "0.1.0"
+  },
+  {
+    "intent_id": "intent_008_verify_determinism",
+    "bundle_sha256": "sha256:1bd2712bc2a3ec0ffac07e00447c9e8b13fac72c35bbf7eb1ebed34e1be21ae6",
+    "result_kind": "CLARIFY",
+    "accepted": false,
+    "last_updated": "2026-01-05T07:28:16.535Z",
+    "kernel_version": "0.1.0"
+  },
+  {
+    "intent_id": "intent_009_empty_goal",
+    "bundle_sha256": null,
+    "result_kind": "REFUSE",
+    "accepted": false,
+    "last_updated": "2026-01-05T07:28:16.535Z",
+    "kernel_version": "0.1.0"
+  },
+  {
+    "intent_id": "intent_010_contradictory",
+    "bundle_sha256": "sha256:6afdd273897f0204d84c0f6aac09a50d0d95211b4730fade11e909632602a179",
+    "result_kind": "CLARIFY",
+    "accepted": false,
+    "last_updated": "2026-01-05T07:28:16.535Z",
+    "kernel_version": "0.1.0"
+  }
+]

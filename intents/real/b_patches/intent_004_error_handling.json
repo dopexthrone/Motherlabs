@@ -1,0 +1,17 @@
+{
+  "goal": "Refactor error handling to use a centralized error class hierarchy",
+  "constraints": [
+    "Must create KernelError base class extending Error",
+    "Must create ValidationError, TransformError, and ExecutionError subclasses",
+    "Must include error codes for each error type",
+    "Must preserve stack traces in all error scenarios",
+    "Must ensure errors are serializable to JSON",
+    "Must not break existing error consumers",
+    "Output must be a unified diff patch"
+  ],
+  "context": {
+    "category": "patch",
+    "output_type": "diff",
+    "acceptance_test": "executable"
+  }
+}
