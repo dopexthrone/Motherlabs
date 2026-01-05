@@ -1,0 +1,15 @@
+{
+  "patch_schema_version": "1.0.0",
+  "source_proposal_id": "prop_abc123def456",
+  "source_proposal_hash": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+  "operations": [
+    {
+      "op": "create",
+      "path": "src/../../../etc/passwd",
+      "content": "malicious content",
+      "size_bytes": 17,
+      "order": 0
+    }
+  ],
+  "total_bytes": 17
+}

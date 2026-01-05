@@ -7,6 +7,7 @@ This document provides exact steps to verify a release of the Context Engine Ker
 - **[BUNDLE_SPEC.md](./BUNDLE_SPEC.md)** - Authoritative bundle output contract
 - **[EVIDENCE_SPEC.md](./EVIDENCE_SPEC.md)** - Execution evidence contract (EvidenceCore, hashing)
 - **[LEDGER_SPEC.md](./LEDGER_SPEC.md)** - Append-only ledger contract (JSONL format)
+- **[PATCH_SPEC.md](./PATCH_SPEC.md)** - Patch/proposal contract (PS1-PS10 invariants, pre-exec validation)
 - **[POLICY_SPEC.md](./POLICY_SPEC.md)** - Policy profiles and enforcement (PL1-PL7 invariants)
 - **[RUN_SPEC.md](./RUN_SPEC.md)** - Run result contract (RS1-RS8 invariants, canonical output)
 - **[VERIFICATION_POLICY.md](./VERIFICATION_POLICY.md)** - L0/L1 verification milestone definitions
@@ -181,6 +182,7 @@ Report the specific failing test and error message.
 | v0.2.0  | 184   | 3       | Harness + sandbox |
 | v0.2.1  | 193   | 10      | Security + golden suite |
 | v0.3.6  | 506   | 10      | RUN_SPEC.md + canonical CLI output |
+| v0.3.7  | 552   | 10      | PATCH_SPEC.md + patch verifier |
 
 ## Contact
 

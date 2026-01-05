@@ -26,7 +26,8 @@
     "tag-verified": "node dist/tools/tag_verified_release.js",
     "tag-reference": "node dist/tools/tag_reference_release.js",
     "bundle-verify": "node dist/tools/bundle_verify.js",
-    "bundle-summarize": "node dist/tools/bundle_summarize.js"
+    "bundle-summarize": "node dist/tools/bundle_summarize.js",
+    "patch-verify": "node dist/tools/patch_verify.js"
   },
   "keywords": [
     "context-engineering",

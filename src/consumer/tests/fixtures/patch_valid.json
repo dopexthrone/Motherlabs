@@ -1,0 +1,24 @@
+{
+  "patch_schema_version": "1.0.0",
+  "source_proposal_id": "prop_abc123def456",
+  "source_proposal_hash": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+  "operations": [
+    {
+      "op": "create",
+      "path": "src/utils/helper.ts",
+      "content": "export function helper(): void {\n  console.log('hello');\n}\n",
+      "expected_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "size_bytes": 59,
+      "order": 0
+    },
+    {
+      "op": "create",
+      "path": "tests/helper.test.ts",
+      "content": "import { helper } from '../src/utils/helper';\n\ntest('helper works', () => {\n  helper();\n});\n",
+      "expected_hash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "size_bytes": 92,
+      "order": 1
+    }
+  ],
+  "total_bytes": 151
+}

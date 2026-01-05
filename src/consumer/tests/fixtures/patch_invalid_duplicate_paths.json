@@ -1,0 +1,22 @@
+{
+  "patch_schema_version": "1.0.0",
+  "source_proposal_id": "prop_abc123def456",
+  "source_proposal_hash": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+  "operations": [
+    {
+      "op": "create",
+      "path": "src/utils/helper.ts",
+      "content": "// version 1",
+      "size_bytes": 12,
+      "order": 0
+    },
+    {
+      "op": "modify",
+      "path": "src/utils/helper.ts",
+      "content": "// version 2",
+      "size_bytes": 12,
+      "order": 1
+    }
+  ],
+  "total_bytes": 24
+}
