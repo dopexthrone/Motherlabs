@@ -10,7 +10,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "node --test dist/tests/*.test.js dist/harness/tests/*.test.js",
+    "test": "node --test dist/tests/*.test.js dist/harness/tests/*.test.js dist/tools/tests/*.test.js",
     "test:security": "node --test dist/harness/tests/security.test.js",
     "test:harness": "node --test dist/harness/tests/*.test.js",
     "test:determinism": "node --test dist/tests/determinism.test.js",
@@ -21,7 +21,8 @@
     "dogfood": "npx tsx tools/dogfood.ts",
     "review": "npx tsx tools/review_run.ts",
     "golden": "npx tsx tools/run_golden_suite.ts",
-    "release-packets": "npx tsx tools/make_release_packets.ts"
+    "release-packets": "npx tsx tools/make_release_packets.ts",
+    "ingest-verifier": "node dist/tools/ingest_verifier_report.js"
   },
   "keywords": [
     "context-engineering",

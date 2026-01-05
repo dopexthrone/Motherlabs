@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "release_version": "v0.2.1",
+  "verifier": {
+    "handle": "test_verifier",
+    "date_utc": "2026-01-05"
+  },
+  "environment": {
+    "os": "Ubuntu 22.04.3 LTS",
+    "architecture": "x86_64",
+    "kernel": "Linux 6.5.0-14-generic",
+    "node_version": "v24.11.1",
+    "npm_version": "10.2.0"
+  },
+  "source_verification": {
+    "archive_hash_match": true,
+    "archive_hash_actual": "14e6709029d73fd236b8a01415a70dfe795f4319b32007db2af760a667d624d2",
+    "git_tag_match": true,
+    "git_commit_actual": "a55e3f9f9c4cbd32b8bd48ea1cbf342ab451b762"
+  },
+  "build_verification": {
+    "npm_ci_success": true,
+    "npm_build_success": true,
+    "banned_api_check_pass": true,
+    "banned_api_violations": 0
+  },
+  "test_results": {
+    "total": 193,
+    "passed": 193,
+    "failed": 0,
+    "skipped": 0
+  },
+  "golden_results": {
+    "passed": 10,
+    "failed": 0,
+    "changed": 0,
+    "new": 0
+  },
+  "summary": {
+    "result": "PASS",
+    "issues": [],
+    "notes": "All verification steps completed successfully.",
+    "attestation": {
+      "ran_all_steps": true,
+      "clean_environment": true,
+      "correct_node_version": true,
+      "accurate_results": true
+    }
+  }
+}
