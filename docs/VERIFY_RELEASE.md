@@ -2,6 +2,11 @@
 
 This document provides exact steps to verify a release of the Context Engine Kernel.
 
+## Related Specifications
+
+- **[BUNDLE_SPEC.md](./BUNDLE_SPEC.md)** - Authoritative bundle output contract
+- **[VERIFICATION_POLICY.md](./VERIFICATION_POLICY.md)** - L0/L1 verification milestone definitions
+
 ## Prerequisites
 
 - Node.js 24.11.1 (exact version required for determinism)
