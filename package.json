@@ -4,7 +4,7 @@
   "description": "Deterministic context engineering kernel for AI systems",
   "type": "module",
   "engines": {
-    "node": "20.11.1"
+    "node": "24.11.1"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
