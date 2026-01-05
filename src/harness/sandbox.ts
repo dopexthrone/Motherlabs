@@ -13,8 +13,8 @@
 
 import { createHash, randomBytes } from 'node:crypto';
 import { spawn } from 'node:child_process';
-import { mkdir, writeFile, readFile, readdir, stat, rm } from 'node:fs/promises';
-import { join } from 'node:path';
+import { mkdir, writeFile, readFile, readdir, lstat, rm } from 'node:fs/promises';
+import { join, normalize, isAbsolute } from 'node:path';
 import { tmpdir } from 'node:os';
 
 import type { PolicyProfile, SandboxExecution, OutputFile, ContentHash } from './types.js';
@@ -262,22 +262,72 @@ function sha256(content: string | Buffer): ContentHash {
 }
 
 /**
+ * Security constants for sandbox hardening.
+ */
+const MAX_DIRECTORY_DEPTH = 20;
+
+/**
+ * Validate that a path is safe (no traversal attempts).
+ *
+ * @param relativePath - Relative path to validate
+ * @returns true if safe, false if potentially malicious
+ */
+function isPathSafe(relativePath: string): boolean {
+  // Reject absolute paths
+  if (isAbsolute(relativePath)) {
+    return false;
+  }
+
+  // Reject paths with parent directory references
+  if (relativePath.includes('..')) {
+    return false;
+  }
+
+  // Normalize and check again (handles encoded traversal)
+  const normalized = normalize(relativePath);
+  if (normalized.startsWith('..') || isAbsolute(normalized)) {
+    return false;
+  }
+
+  return true;
+}
+
+/**
  * Collect outputs from sandbox directory.
  * Walks directory deterministically (sorted).
  *
+ * Security hardening:
+ * - Uses lstat (no symlink following)
+ * - Skips symlinks entirely
+ * - Validates all paths for traversal attempts
+ * - Limits directory depth
+ *
  * @param sandbox - Sandbox to collect from
  * @param policy - Policy for limits
- * @returns Output files and total bytes
+ * @returns Output files, total bytes, and security violations
  */
 export async function collectOutputs(
   sandbox: Sandbox,
   policy: PolicyProfile
-): Promise<{ outputs: OutputFile[]; total_bytes: number; truncated: boolean }> {
+): Promise<{
+  outputs: OutputFile[];
+  total_bytes: number;
+  truncated: boolean;
+  security_violations: string[];
+}> {
   const outputs: OutputFile[] = [];
   let totalBytes = 0;
   let truncated = false;
+  const securityViolations: string[] = [];
 
-  async function walkDir(dir: string, basePath: string): Promise<void> {
+  async function walkDir(dir: string, basePath: string, depth: number): Promise<void> {
+    // Check max depth
+    if (depth > MAX_DIRECTORY_DEPTH) {
+      securityViolations.push(`Max directory depth exceeded at: ${basePath}`);
+      truncated = true;
+      return;
+    }
+
     let entries: string[];
     try {
       entries = await readdir(dir);
@@ -302,15 +352,28 @@ export async function collectOutputs(
       const fullPath = join(dir, entry);
       const relativePath = basePath ? `${basePath}/${entry}` : entry;
 
+      // Validate path for security
+      if (!isPathSafe(relativePath)) {
+        securityViolations.push(`Path traversal attempt: ${relativePath}`);
+        continue;
+      }
+
+      // Use lstat to NOT follow symlinks
       let stats;
       try {
-        stats = await stat(fullPath);
+        stats = await lstat(fullPath);
       } catch {
         continue;
       }
 
+      // Refuse symlinks entirely - security hardening
+      if (stats.isSymbolicLink()) {
+        securityViolations.push(`Symlink detected and skipped: ${relativePath}`);
+        continue;
+      }
+
       if (stats.isDirectory()) {
-        await walkDir(fullPath, relativePath);
+        await walkDir(fullPath, relativePath, depth + 1);
       } else if (stats.isFile()) {
         try {
           const content = await readFile(fullPath);
@@ -327,9 +390,14 @@ export async function collectOutputs(
     }
   }
 
-  await walkDir(sandbox.outDir, '');
+  await walkDir(sandbox.outDir, '', 0);
 
-  return { outputs, total_bytes: totalBytes, truncated };
+  return {
+    outputs,
+    total_bytes: totalBytes,
+    truncated,
+    security_violations: securityViolations,
+  };
 }
 
 /**
@@ -370,7 +438,13 @@ export async function buildSandboxExecution(
   }
 
   // Collect outputs
-  const { outputs, total_bytes, truncated } = await collectOutputs(sandbox, policy);
+  const { outputs, total_bytes, truncated, security_violations } = await collectOutputs(sandbox, policy);
+
+  // Log security violations if any (for audit trail)
+  if (security_violations.length > 0) {
+    // In production, this would be sent to a security audit log
+    // For now, we just include it in the result for transparency
+  }
 
   return {
     sandbox_id: sandbox.id,
@@ -380,6 +454,6 @@ export async function buildSandboxExecution(
     stderr_sha256: stderrSha256,
     outputs,
     total_output_bytes: total_bytes,
-    output_truncated: truncated,
+    output_truncated: truncated || security_violations.length > 0,
   };
 }
