@@ -153,3 +153,31 @@ export type {
 // Executor harness
 export { executeProposal } from './protocol/executor.js';
 export type { ExecutorConfig } from './protocol/executor.js';
+
+// Model adapters
+export type {
+  ModelAdapter,
+  ModelCapabilities,
+  TransformContext,
+  TransformMode,
+  TransformResult,
+  AdapterErrorCode,
+  RecordedInteraction,
+  RecordingSession,
+  MockResponse,
+  MockDefaultBehavior,
+  MockModelAdapterOptions,
+  RecordingModelAdapterOptions,
+  ReplayModelAdapterOptions,
+} from './adapters/index.js';
+
+export {
+  AdapterError,
+  MockModelAdapter,
+  RecordingModelAdapter,
+  ReplayModelAdapter,
+  createEchoAdapter,
+  createFixedAdapter,
+  createAdapterFromRecording,
+  loadReplayAdapter,
+} from './adapters/index.js';
