@@ -10,7 +10,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "node --test dist/tests/*.test.js",
+    "test": "node --test dist/tests/*.test.js dist/harness/tests/*.test.js",
+    "test:harness": "node --test dist/harness/tests/*.test.js",
     "test:determinism": "node --test dist/tests/determinism.test.js",
     "test:golden": "node dist/tests/golden-hash.test.js",
     "lint:banned": "bash scripts/check-banned-apis.sh",

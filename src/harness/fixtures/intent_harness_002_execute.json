@@ -1,0 +1,8 @@
+{
+  "goal": "Generate a simple configuration file",
+  "constraints": [
+    "Must create a config.json file",
+    "Must include version field set to '1.0.0'",
+    "Must be valid JSON"
+  ]
+}
