@@ -1,0 +1,289 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/motherlabs/context-engine-kernel/docs/verifier_report.schema.json",
+  "title": "Verifier Report",
+  "description": "Structured verification report for context-engine-kernel releases",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "release_version",
+    "verifier",
+    "environment",
+    "source_verification",
+    "build_verification",
+    "test_results",
+    "golden_results",
+    "summary"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Version of this report schema"
+    },
+    "release_version": {
+      "type": "string",
+      "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Release version being verified (e.g., v0.2.1)"
+    },
+    "verifier": {
+      "type": "object",
+      "required": ["handle", "date_utc"],
+      "properties": {
+        "handle": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Verifier name or pseudonym"
+        },
+        "date_utc": {
+          "type": "string",
+          "format": "date",
+          "description": "Verification date in YYYY-MM-DD format"
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "required": ["os", "architecture", "node_version"],
+      "properties": {
+        "os": {
+          "type": "string",
+          "description": "Operating system name and version"
+        },
+        "architecture": {
+          "type": "string",
+          "enum": ["x86_64", "arm64", "aarch64"],
+          "description": "CPU architecture"
+        },
+        "kernel": {
+          "type": "string",
+          "description": "OS kernel version (optional)"
+        },
+        "node_version": {
+          "type": "string",
+          "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$",
+          "description": "Exact Node.js version"
+        },
+        "npm_version": {
+          "type": "string",
+          "description": "npm version"
+        }
+      }
+    },
+    "source_verification": {
+      "type": "object",
+      "required": ["archive_hash_match", "git_tag_match"],
+      "properties": {
+        "archive_hash_match": {
+          "type": "boolean",
+          "description": "Whether source.tar.gz SHA256 matches expected"
+        },
+        "archive_hash_actual": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "Actual SHA256 of source.tar.gz"
+        },
+        "git_tag_match": {
+          "type": "boolean",
+          "description": "Whether git tag commit matches expected"
+        },
+        "git_commit_actual": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$",
+          "description": "Actual commit hash at tag"
+        }
+      }
+    },
+    "build_verification": {
+      "type": "object",
+      "required": ["npm_ci_success", "npm_build_success", "banned_api_check_pass"],
+      "properties": {
+        "npm_ci_success": {
+          "type": "boolean",
+          "description": "Whether npm ci completed without errors"
+        },
+        "npm_build_success": {
+          "type": "boolean",
+          "description": "Whether npm run build completed without errors"
+        },
+        "banned_api_check_pass": {
+          "type": "boolean",
+          "description": "Whether banned API check passed"
+        },
+        "banned_api_violations": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of banned API violations (0 if passed)"
+        }
+      }
+    },
+    "test_results": {
+      "type": "object",
+      "required": ["total", "passed", "failed"],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of tests"
+        },
+        "passed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of passing tests"
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of failing tests"
+        },
+        "skipped": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of skipped tests"
+        },
+        "output_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA256 of test output for reproducibility check"
+        }
+      }
+    },
+    "golden_results": {
+      "type": "object",
+      "required": ["passed", "failed", "changed", "new"],
+      "properties": {
+        "passed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of goldens that matched"
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of goldens that failed"
+        },
+        "changed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of goldens that changed"
+        },
+        "new": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of new goldens (not in recorded set)"
+        },
+        "hash_matches": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["expected", "actual", "match"],
+            "properties": {
+              "expected": {
+                "type": ["string", "null"],
+                "description": "Expected hash (null for REFUSE)"
+              },
+              "actual": {
+                "type": ["string", "null"],
+                "description": "Actual hash computed"
+              },
+              "match": {
+                "type": "boolean",
+                "description": "Whether hashes match"
+              }
+            }
+          },
+          "description": "Per-intent hash verification"
+        }
+      }
+    },
+    "determinism_check": {
+      "type": "object",
+      "properties": {
+        "consecutive_runs_identical": {
+          "type": "boolean",
+          "description": "Whether consecutive runs produced identical results"
+        },
+        "sample_intent": {
+          "type": "string",
+          "description": "Intent ID used for determinism check"
+        },
+        "run1_hash": {
+          "type": "string",
+          "description": "Hash from first run"
+        },
+        "run2_hash": {
+          "type": "string",
+          "description": "Hash from second run"
+        }
+      }
+    },
+    "freeze_manifest": {
+      "type": "object",
+      "properties": {
+        "files_ok": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of files with matching hashes"
+        },
+        "files_failed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of files with mismatched hashes"
+        },
+        "all_match": {
+          "type": "boolean",
+          "description": "Whether all freeze manifest hashes matched"
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["result", "attestation"],
+      "properties": {
+        "result": {
+          "type": "string",
+          "enum": ["PASS", "FAIL", "PARTIAL"],
+          "description": "Overall verification result"
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of issues found"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional observations"
+        },
+        "attestation": {
+          "type": "object",
+          "required": [
+            "ran_all_steps",
+            "clean_environment",
+            "correct_node_version",
+            "accurate_results"
+          ],
+          "properties": {
+            "ran_all_steps": {
+              "type": "boolean",
+              "description": "Verifier ran all verification steps"
+            },
+            "clean_environment": {
+              "type": "boolean",
+              "description": "Used fresh clone and npm ci"
+            },
+            "correct_node_version": {
+              "type": "boolean",
+              "description": "Used exact Node version (24.11.1)"
+            },
+            "accurate_results": {
+              "type": "boolean",
+              "description": "All reported results are accurate"
+            }
+          }
+        }
+      }
+    }
+  }
+}
