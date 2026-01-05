@@ -22,6 +22,8 @@ import {
   type VerifierKind,
 } from '../tag_verified_release.js';
 
+import { canonicalize } from '../../utils/canonical.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const FIXTURES_BASE = join(__dirname, '../../../src/tools/tests/fixtures');
@@ -490,6 +492,40 @@ describe('Verified Release Tagging', () => {
           process.env['MOTHER_REPO_ROOT'] = originalEnv;
         }
       }
+    });
+
+    it('dry-run JSON output is byte-identical across runs', () => {
+      // Create a DryRunOutput object
+      const output: DryRunOutput = {
+        release: 'v0.2.1',
+        target_commit: 'a55e3f9f9c4cbd32b8bd48ea1cbf342ab451b762',
+        threshold: 1,
+        verified_count: 2,
+        independent_count: 2,
+        internal_count: 0,
+        tag: 'v0.2.1-verified-20260105',
+        index_update: 'APPLY',
+        tag_action: 'CREATE',
+      };
+
+      // Serialize twice using canonicalize
+      const json1 = canonicalize(output);
+      const json2 = canonicalize(output);
+
+      // Assert byte-identical
+      assert.strictEqual(json1, json2, 'Canonicalized output must be byte-identical');
+
+      // Assert valid JSON
+      const parsed1 = JSON.parse(json1);
+      const parsed2 = JSON.parse(json2);
+
+      // Assert parses to same object
+      assert.deepStrictEqual(parsed1, parsed2, 'Parsed objects must be equal');
+
+      // Assert keys are sorted (canonical property)
+      const keys = Object.keys(parsed1);
+      const sortedKeys = [...keys].sort();
+      assert.deepStrictEqual(keys, sortedKeys, 'Keys must be sorted in canonical output');
     });
   });
 });

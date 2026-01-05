@@ -25,6 +25,8 @@ import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 
+import { canonicalize } from '../utils/canonical.js';
+
 // =============================================================================
 // Constants
 // =============================================================================
@@ -421,7 +423,7 @@ async function tagVerifiedRelease(options: TagVerifiedOptions): Promise<void> {
       index_update: 'APPLY',
       tag_action: 'CREATE',
     };
-    console.log(JSON.stringify(output, null, 2));
+    console.log(canonicalize(output));
     return;
   }
 
