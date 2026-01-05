@@ -16,7 +16,9 @@
     "test:golden": "node dist/tests/golden-hash.test.js",
     "lint:banned": "bash scripts/check-banned-apis.sh",
     "verify": "npm run build && npm run lint:banned && npm run test",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "dogfood": "npx tsx tools/dogfood.ts",
+    "review": "npx tsx tools/review_run.ts"
   },
   "keywords": [
     "context-engineering",

@@ -39,6 +39,13 @@ export interface HarnessRunInput {
    * Policy profile to use.
    */
   policy: PolicyProfileName;
+
+  /**
+   * If true, preserve the sandbox directory after execution.
+   * The sandbox path will be returned in the result.
+   * Caller is responsible for cleanup.
+   */
+  preserve_sandbox?: boolean;
 }
 
 // =============================================================================
@@ -275,6 +282,12 @@ export interface HarnessRunResult {
    * Decision record.
    */
   decision: DecisionRecord;
+
+  /**
+   * Sandbox path (only if preserve_sandbox was true and execution happened).
+   * Caller is responsible for cleanup.
+   */
+  sandbox_path?: string;
 }
 
 // =============================================================================

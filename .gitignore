@@ -24,3 +24,5 @@ coverage/
 # Temp files
 *.tmp
 *.temp
+# Ignore dogfood run artifacts (ephemeral)
+artifacts/dogfood/

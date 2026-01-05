@@ -203,6 +203,7 @@ export async function runHarness(input: HarnessRunInput): Promise<HarnessRunResu
   const sandbox = await createSandbox();
   let sandboxExecution: SandboxExecution;
   let decision: DecisionRecord;
+  let sandboxPreserved = false;
 
   try {
     // Apply proposal (write files to sandbox)
@@ -241,13 +242,19 @@ export async function runHarness(input: HarnessRunInput): Promise<HarnessRunResu
       ],
       validated_by_kernel: true,
     };
+
+    // Mark sandbox as preserved if requested (cleanup will be skipped)
+    sandboxPreserved = input.preserve_sandbox === true;
   } finally {
-    await cleanupSandbox(sandbox);
+    // Only cleanup if not preserving
+    if (!sandboxPreserved) {
+      await cleanupSandbox(sandbox);
+    }
   }
 
   const completedAt = new Date().toISOString();
 
-  return {
+  const result: HarnessRunResult = {
     run_id: runId,
     started_at: startedAt,
     completed_at: completedAt,
@@ -259,6 +266,13 @@ export async function runHarness(input: HarnessRunInput): Promise<HarnessRunResu
     execution: sandboxExecution,
     decision,
   };
+
+  // Add sandbox path if preserved
+  if (sandboxPreserved) {
+    result.sandbox_path = sandbox.dir;
+  }
+
+  return result;
 }
 
 // =============================================================================
