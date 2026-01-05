@@ -28,11 +28,12 @@ import type {
   HarnessRunResult,
   ExecutionMode,
   PolicyProfileName,
+  ModelMode,
   KernelResultKind,
   DecisionRecord,
   SandboxExecution,
 } from './types.js';
-import { loadPolicy } from './policy.js';
+import { loadPolicy, validateModelMode, getDefaultModelMode } from './policy.js';
 import { createSandbox, cleanupSandbox, runInSandbox, buildSandboxExecution } from './sandbox.js';
 import { buildKernelEvidence, hashFile } from './evidence.js';
 import { appendHarnessResult } from './ledger.js';
@@ -123,6 +124,15 @@ export async function runHarness(input: HarnessRunInput): Promise<HarnessRunResu
   const startedAt = new Date().toISOString();
   const policy = loadPolicy(input.policy);
 
+  // Validate and set model mode (default: 'none')
+  const modelMode: ModelMode = input.model_mode ?? getDefaultModelMode();
+  validateModelMode(modelMode, policy);
+
+  // Note: Model adapters are not yet integrated into kernel processing.
+  // Currently the kernel is rule-based and doesn't make model calls.
+  // When model integration is added, record/replay will be handled here.
+  // For now, model_mode is validated but has no effect on processing.
+
   // Load intent
   const { intent, sha256: intentSha256 } = await loadIntent(input.intent_path);
 
@@ -164,6 +174,7 @@ export async function runHarness(input: HarnessRunInput): Promise<HarnessRunResu
         reasons: [`Kernel refused: ${refuseReason}`],
         validated_by_kernel: true,
       },
+      model_mode: modelMode,
     };
   }
 
@@ -189,6 +200,7 @@ export async function runHarness(input: HarnessRunInput): Promise<HarnessRunResu
           : ['Plan-only mode: no execution'],
         validated_by_kernel: true,
       },
+      model_mode: modelMode,
     };
     if (clarifyQuestions) {
       result.clarify_questions = clarifyQuestions;
@@ -265,6 +277,7 @@ export async function runHarness(input: HarnessRunInput): Promise<HarnessRunResu
     kernel_result_kind: kernelResultKind,
     execution: sandboxExecution,
     decision,
+    model_mode: modelMode,
   };
 
   // Add sandbox path if preserved
@@ -284,13 +297,20 @@ export async function runHarness(input: HarnessRunInput): Promise<HarnessRunResu
  */
 function parseArgs(args: string[]): HarnessRunInput {
   if (args.length < 1) {
-    console.error('Usage: run_intent <intent_path> --mode plan-only|execute-sandbox --policy default|strict|dev');
+    console.error('Usage: run_intent <intent_path> [options]');
+    console.error('Options:');
+    console.error('  --mode plan-only|execute-sandbox');
+    console.error('  --policy default|strict|dev');
+    console.error('  --model-mode none|record|replay');
+    console.error('  --model-recording <path>');
     process.exit(1);
   }
 
   const intentPath = args[0]!;
   let mode: ExecutionMode = 'plan-only';
   let policy: PolicyProfileName = 'default';
+  let modelMode: ModelMode | undefined;
+  let modelRecordingPath: string | undefined;
 
   for (let i = 1; i < args.length; i++) {
     if (args[i] === '--mode' && args[i + 1]) {
@@ -311,10 +331,29 @@ function parseArgs(args: string[]): HarnessRunInput {
         process.exit(1);
       }
       i++;
+    } else if (args[i] === '--model-mode' && args[i + 1]) {
+      const modelModeArg = args[i + 1];
+      if (modelModeArg === 'none' || modelModeArg === 'record' || modelModeArg === 'replay') {
+        modelMode = modelModeArg;
+      } else {
+        console.error(`Invalid model-mode: ${modelModeArg}`);
+        process.exit(1);
+      }
+      i++;
+    } else if (args[i] === '--model-recording' && args[i + 1]) {
+      modelRecordingPath = args[i + 1];
+      i++;
     }
   }
 
-  return { intent_path: intentPath, mode, policy };
+  const input: HarnessRunInput = { intent_path: intentPath, mode, policy };
+  if (modelMode) {
+    input.model_mode = modelMode;
+  }
+  if (modelRecordingPath) {
+    input.model_recording_path = modelRecordingPath;
+  }
+  return input;
 }
 
 /**

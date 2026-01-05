@@ -6,7 +6,7 @@
  * Policies are JSON-serializable and included in execution evidence.
  */
 
-import type { PolicyProfile, PolicyProfileName } from './types.js';
+import type { PolicyProfile, PolicyProfileName, ModelMode } from './types.js';
 
 // =============================================================================
 // Policy Definitions
@@ -133,4 +133,54 @@ export function isWritePathAllowed(path: string, policy: PolicyProfile): boolean
  */
 export function listPolicies(): PolicyProfileName[] {
   return Object.keys(POLICIES) as PolicyProfileName[];
+}
+
+// =============================================================================
+// Model Mode Policy Enforcement
+// =============================================================================
+
+/**
+ * Validate that a model mode is allowed by the policy.
+ *
+ * Policy rules:
+ * - 'strict' policy: ONLY 'none' allowed
+ * - 'default' policy: ONLY 'none' allowed
+ * - 'dev' policy: 'none', 'record', 'replay' allowed
+ *
+ * @param mode - Model mode to check
+ * @param policy - Policy to check against
+ * @returns true if allowed
+ */
+export function isModelModeAllowed(mode: ModelMode, policy: PolicyProfile): boolean {
+  // Strict and default policies only allow 'none'
+  if (policy.name === 'strict' || policy.name === 'default') {
+    return mode === 'none';
+  }
+
+  // Dev policy allows all modes
+  return true;
+}
+
+/**
+ * Get the default model mode for a policy.
+ * Always returns 'none' - live model calls require explicit opt-in.
+ */
+export function getDefaultModelMode(): ModelMode {
+  return 'none';
+}
+
+/**
+ * Validate model mode against policy and throw if not allowed.
+ *
+ * @param mode - Model mode to validate
+ * @param policy - Policy to check against
+ * @throws Error if model mode is not allowed by policy
+ */
+export function validateModelMode(mode: ModelMode, policy: PolicyProfile): void {
+  if (!isModelModeAllowed(mode, policy)) {
+    throw new Error(
+      `Model mode '${mode}' is not allowed by policy '${policy.name}'. ` +
+      `Only 'none' is allowed for strict/default policies.`
+    );
+  }
 }
