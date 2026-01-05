@@ -7,6 +7,7 @@
   "required": [
     "schema_version",
     "release_version",
+    "verifier_kind",
     "verifier",
     "environment",
     "source_verification",
@@ -25,6 +26,11 @@
       "type": "string",
       "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$",
       "description": "Release version being verified (e.g., v0.2.1)"
+    },
+    "verifier_kind": {
+      "type": "string",
+      "enum": ["internal", "independent"],
+      "description": "Type of verifier: 'internal' for single-operator self-verification, 'independent' for third-party verification"
     },
     "verifier": {
       "type": "object",

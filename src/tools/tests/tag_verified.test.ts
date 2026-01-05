@@ -19,6 +19,7 @@ import {
   updateIndexWithVerifiedTag,
   createStubGitHelper,
   type DryRunOutput,
+  type VerifierKind,
 } from '../tag_verified_release.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -93,8 +94,12 @@ describe('Verified Release Tagging', () => {
   });
 
   describe('parseMarkdownForVerification', () => {
-    it('parses valid verified report', () => {
+    it('parses valid verified report with verifier_kind', () => {
       const content = `# Verifier Report: v0.2.1
+
+## Verifier Information
+
+- **Verifier Kind**: independent
 
 ## Environment
 
@@ -109,9 +114,23 @@ describe('Verified Release Tagging', () => {
       const result = parseMarkdownForVerification(content);
 
       assert.equal(result.verified, true);
+      assert.equal(result.verifier_kind, 'independent');
       assert.equal(result.os, 'Ubuntu 22.04.3 LTS');
       assert.equal(result.node_version, 'v24.11.1');
       assert.equal(result.npm_version, '10.2.0');
+    });
+
+    it('parses internal verifier_kind', () => {
+      const content = `- **Verifier Kind**: internal
+### Overall Result: PASS`;
+      const result = parseMarkdownForVerification(content);
+      assert.equal(result.verifier_kind, 'internal');
+    });
+
+    it('returns null for missing verifier_kind', () => {
+      const content = `### Overall Result: PASS`;
+      const result = parseMarkdownForVerification(content);
+      assert.equal(result.verifier_kind, null);
     });
 
     it('detects failed result', () => {
@@ -124,6 +143,7 @@ describe('Verified Release Tagging', () => {
       const content = `### Overall Result: PASS`;
       const result = parseMarkdownForVerification(content);
       assert.equal(result.verified, true);
+      assert.equal(result.verifier_kind, null);
       assert.equal(result.os, '');
       assert.equal(result.node_version, '');
       assert.equal(result.npm_version, '');
@@ -146,7 +166,7 @@ describe('Verified Release Tagging', () => {
   });
 
   describe('loadVerifiedReports', () => {
-    it('loads valid reports from fixture', async () => {
+    it('loads valid reports from fixture with verifier_kind', async () => {
       // Set up env to use fixture directory
       const originalEnv = process.env['MOTHER_REPO_ROOT'];
       process.env['MOTHER_REPO_ROOT'] = join(FIXTURES_BASE, 'tag_verified');
@@ -158,8 +178,10 @@ describe('Verified Release Tagging', () => {
         // Should be sorted by folder name
         assert.equal(reports[0]!.verifier_id, 'verifier_a');
         assert.equal(reports[0]!.date, '20260105');
+        assert.equal(reports[0]!.verifier_kind, 'independent');
         assert.equal(reports[1]!.verifier_id, 'verifier_b');
         assert.equal(reports[1]!.date, '20260106');
+        assert.equal(reports[1]!.verifier_kind, 'independent');
       } finally {
         if (originalEnv === undefined) {
           delete process.env['MOTHER_REPO_ROOT'];
@@ -193,6 +215,23 @@ describe('Verified Release Tagging', () => {
         const reports = await loadVerifiedReports('v0.2.1');
         // Report has placeholders in required fields, should be excluded
         assert.equal(reports.length, 0);
+      } finally {
+        if (originalEnv === undefined) {
+          delete process.env['MOTHER_REPO_ROOT'];
+        } else {
+          process.env['MOTHER_REPO_ROOT'] = originalEnv;
+        }
+      }
+    });
+
+    it('loads internal reports when present', async () => {
+      const originalEnv = process.env['MOTHER_REPO_ROOT'];
+      process.env['MOTHER_REPO_ROOT'] = join(FIXTURES_BASE, 'tag_internal_only');
+
+      try {
+        const reports = await loadVerifiedReports('v0.2.1');
+        assert.equal(reports.length, 1);
+        assert.equal(reports[0]!.verifier_kind, 'internal');
       } finally {
         if (originalEnv === undefined) {
           delete process.env['MOTHER_REPO_ROOT'];
@@ -275,7 +314,7 @@ describe('Verified Release Tagging', () => {
   });
 
   describe('Threshold not met', () => {
-    it('returns exit code 2 with exact error string', async () => {
+    it('returns exit code 2 with exact error string for no reports', async () => {
       const originalEnv = process.env['MOTHER_REPO_ROOT'];
       process.env['MOTHER_REPO_ROOT'] = join(FIXTURES_BASE, 'tag_verified_empty');
 
@@ -283,11 +322,36 @@ describe('Verified Release Tagging', () => {
         const reports = await loadVerifiedReports('v0.2.1');
         assert.equal(reports.length, 0);
 
-        // Verify the exact error format
+        // Verify the exact error format (now says "independent")
         const threshold = 1;
-        const count = reports.length;
-        const expectedError = `THRESHOLD_NOT_MET: need ${threshold} verified report(s); have ${count}`;
-        assert.equal(expectedError, 'THRESHOLD_NOT_MET: need 1 verified report(s); have 0');
+        const independentCount = reports.filter(r => r.verifier_kind === 'independent').length;
+        const expectedError = `THRESHOLD_NOT_MET: need ${threshold} independent verified report(s); have ${independentCount}`;
+        assert.equal(expectedError, 'THRESHOLD_NOT_MET: need 1 independent verified report(s); have 0');
+      } finally {
+        if (originalEnv === undefined) {
+          delete process.env['MOTHER_REPO_ROOT'];
+        } else {
+          process.env['MOTHER_REPO_ROOT'] = originalEnv;
+        }
+      }
+    });
+
+    it('internal-only reports do NOT count toward verified threshold', async () => {
+      const originalEnv = process.env['MOTHER_REPO_ROOT'];
+      process.env['MOTHER_REPO_ROOT'] = join(FIXTURES_BASE, 'tag_internal_only');
+
+      try {
+        const reports = await loadVerifiedReports('v0.2.1');
+        assert.equal(reports.length, 1); // Has 1 internal report
+
+        // Count only independent
+        const independentCount = reports.filter(r => r.verifier_kind === 'independent').length;
+        assert.equal(independentCount, 0);
+
+        // Verify the error format
+        const threshold = 1;
+        const expectedError = `THRESHOLD_NOT_MET: need ${threshold} independent verified report(s); have ${independentCount}`;
+        assert.equal(expectedError, 'THRESHOLD_NOT_MET: need 1 independent verified report(s); have 0');
       } finally {
         if (originalEnv === undefined) {
           delete process.env['MOTHER_REPO_ROOT'];
@@ -299,13 +363,17 @@ describe('Verified Release Tagging', () => {
   });
 
   describe('Threshold met dry-run', () => {
-    it('outputs JSON with expected tag name and target SHA', async () => {
+    it('outputs JSON with expected tag name and verifier_kind counts', async () => {
       const originalEnv = process.env['MOTHER_REPO_ROOT'];
       process.env['MOTHER_REPO_ROOT'] = join(FIXTURES_BASE, 'tag_verified');
 
       try {
         const reports = await loadVerifiedReports('v0.2.1');
         assert.ok(reports.length >= 1, 'Should have at least 1 verified report');
+
+        // Count by kind
+        const independentCount = reports.filter(r => r.verifier_kind === 'independent').length;
+        const internalCount = reports.filter(r => r.verifier_kind === 'internal').length;
 
         // Simulate dry-run output structure
         const stubCommit = 'a55e3f9f9c4cbd32b8bd48ea1cbf342ab451b762';
@@ -314,6 +382,8 @@ describe('Verified Release Tagging', () => {
           target_commit: stubCommit,
           threshold: 1,
           verified_count: reports.length,
+          independent_count: independentCount,
+          internal_count: internalCount,
           tag: 'v0.2.1-verified-20260105',
           index_update: 'APPLY',
           tag_action: 'CREATE',
@@ -324,6 +394,8 @@ describe('Verified Release Tagging', () => {
         assert.equal(output.target_commit, stubCommit);
         assert.equal(output.tag, 'v0.2.1-verified-20260105');
         assert.ok(output.verified_count >= 1);
+        assert.ok(output.independent_count >= 1, 'Should have independent verifiers');
+        assert.equal(output.internal_count, 0, 'Fixture has no internal verifiers');
       } finally {
         if (originalEnv === undefined) {
           delete process.env['MOTHER_REPO_ROOT'];

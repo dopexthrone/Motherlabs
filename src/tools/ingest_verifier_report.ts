@@ -49,6 +49,8 @@ const FOLDER_NAME_PATTERN = /^(\d{8})_([a-zA-Z0-9_-]+)$/;
 // Types
 // =============================================================================
 
+type VerifierKind = 'internal' | 'independent';
+
 interface ParsedMetadata {
   release_tag: string;
   verified: boolean;
@@ -57,12 +59,14 @@ interface ParsedMetadata {
   node_version: string;
   npm_version: string;
   verifier_handle: string;
+  verifier_kind: VerifierKind;
   date: string;
 }
 
 interface VerifierReportJson {
   schema_version: string;
   release_version: string;
+  verifier_kind: VerifierKind;
   verifier: { handle: string; date_utc: string };
   environment: { os: string; node_version: string; npm_version?: string };
   summary: { result: 'PASS' | 'FAIL' | 'PARTIAL' };
@@ -74,6 +78,7 @@ interface IndexEntry {
   verifier_id: string;
   release_tag: string;
   result: string;
+  kind: VerifierKind;
   os: string;
   node: string;
   npm: string;
@@ -171,6 +176,11 @@ async function validateJsonSchema(
     );
   }
 
+  // Validate verifier_kind
+  if (!json.verifier_kind || !['internal', 'independent'].includes(json.verifier_kind)) {
+    throw new Error('MISSING_FIELD: verifier_kind');
+  }
+
   // Validate nested required fields
   if (!json.verifier?.handle) {
     throw new Error('verifier_report.json missing verifier.handle');
@@ -243,6 +253,14 @@ function parseMarkdownReport(content: string, expectedVersion: string): ParsedMe
     missing.push('verifier_handle (from "**Name/Handle**: ...")');
   }
 
+  // Parse Verifier Kind (e.g., "- **Verifier Kind**: internal")
+  const kindMatch = content.match(/\*\*Verifier Kind\*\*:\s*(internal|independent)(?:\n|$)/i);
+  const verifier_kind_raw = kindMatch?.[1]?.toLowerCase() ?? '';
+  if (!verifier_kind_raw || !['internal', 'independent'].includes(verifier_kind_raw)) {
+    throw new Error('MISSING_FIELD: verifier_kind');
+  }
+  const verifier_kind = verifier_kind_raw as VerifierKind;
+
   // Parse Date (e.g., "- **Date (UTC)**: 2026-01-05")
   const dateMatch = content.match(/\*\*Date \(UTC\)\*\*:\s*(\d{4}-\d{2}-\d{2})/);
   const date = dateMatch?.[1] ?? '';
@@ -264,6 +282,7 @@ function parseMarkdownReport(content: string, expectedVersion: string): ParsedMe
     node_version,
     npm_version,
     verifier_handle,
+    verifier_kind,
     date,
   };
 }
@@ -276,9 +295,9 @@ function parseExistingEntries(indexContent: string, version: string): IndexEntry
   const entries: IndexEntry[] = [];
 
   // Find the section for this version and look for table rows
-  // Format: | 20260105 | acme | v0.2.1 | PASS | Ubuntu 22.04 | v24.11.1 | 10.2.0 | v0.2.1/verified/20260105_acme/ |
+  // Format: | 20260105 | acme | v0.2.1 | PASS | internal | Ubuntu 22.04 | v24.11.1 | 10.2.0 | v0.2.1/verified/20260105_acme/ |
   const tableRowPattern =
-    /^\|\s*(\d{8})\s*\|\s*([^\|]+)\s*\|\s*(v[\d.]+)\s*\|\s*(PASS|FAIL|PARTIAL)\s*\|\s*([^\|]+)\s*\|\s*([^\|]+)\s*\|\s*([^\|]+)\s*\|\s*([^\|]+)\s*\|/gm;
+    /^\|\s*(\d{8})\s*\|\s*([^\|]+)\s*\|\s*(v[\d.]+)\s*\|\s*(PASS|FAIL|PARTIAL)\s*\|\s*(internal|independent)\s*\|\s*([^\|]+)\s*\|\s*([^\|]+)\s*\|\s*([^\|]+)\s*\|\s*([^\|]+)\s*\|/gm;
 
   let match;
   while ((match = tableRowPattern.exec(indexContent)) !== null) {
@@ -288,10 +307,11 @@ function parseExistingEntries(indexContent: string, version: string): IndexEntry
         verifier_id: match[2]!.trim(),
         release_tag: match[3]!.trim(),
         result: match[4]!.trim(),
-        os: match[5]!.trim(),
-        node: match[6]!.trim(),
-        npm: match[7]!.trim(),
-        path: match[8]!.trim(),
+        kind: match[5]!.trim() as VerifierKind,
+        os: match[6]!.trim(),
+        node: match[7]!.trim(),
+        npm: match[8]!.trim(),
+        path: match[9]!.trim(),
       });
     }
   }
@@ -308,7 +328,7 @@ function checkDuplicate(
 }
 
 function formatTableRow(entry: IndexEntry): string {
-  return `| ${entry.date} | ${entry.verifier_id} | ${entry.release_tag} | ${entry.result} | ${entry.os} | ${entry.node} | ${entry.npm} | ${entry.path} |`;
+  return `| ${entry.date} | ${entry.verifier_id} | ${entry.release_tag} | ${entry.result} | ${entry.kind} | ${entry.os} | ${entry.node} | ${entry.npm} | ${entry.path} |`;
 }
 
 async function updateIndex(
@@ -329,7 +349,7 @@ async function updateIndex(
   const section = sectionMatch[1]!;
 
   // Check if table already exists
-  const tableHeaderPattern = /\| Date \| Verifier \| Release \| Result \| OS \| Node \| npm \| Path \|/;
+  const tableHeaderPattern = /\| Date \| Verifier \| Release \| Result \| Kind \| OS \| Node \| npm \| Path \|/;
   const hasTable = tableHeaderPattern.test(section);
 
   let newSection: string;
@@ -359,8 +379,8 @@ async function updateIndex(
     const tableEndMatch = section.slice(tableStart).match(/\n(?!\|)/);
     const tableEnd = tableEndMatch ? tableStart + tableEndMatch.index! : section.length;
 
-    const tableHeader = `| Date | Verifier | Release | Result | OS | Node | npm | Path |
-|------|----------|---------|--------|-----|------|-----|------|`;
+    const tableHeader = `| Date | Verifier | Release | Result | Kind | OS | Node | npm | Path |
+|------|----------|---------|--------|------|-----|------|-----|------|`;
     const tableRows = existingEntries.map(formatTableRow).join('\n');
     const newTable = `${tableHeader}\n${tableRows}`;
 
@@ -376,8 +396,8 @@ async function updateIndex(
     const noneYetMatch = section.slice(insertPoint).match(/- None yet\n?/);
     const noneYetPos = noneYetMatch ? insertPoint + noneYetMatch.index! : -1;
 
-    const tableHeader = `| Date | Verifier | Release | Result | OS | Node | npm | Path |
-|------|----------|---------|--------|-----|------|-----|------|`;
+    const tableHeader = `| Date | Verifier | Release | Result | Kind | OS | Node | npm | Path |
+|------|----------|---------|--------|------|-----|------|-----|------|`;
     const tableRow = formatTableRow(entry);
     const newTable = `${tableHeader}\n${tableRow}`;
 
@@ -396,23 +416,26 @@ async function updateIndex(
     }
   }
 
-  // Update verifier count
+  // Update verifier count (only count independent verifiers)
   const countMatch = newSection.match(/Independent verifiers \| (\d+)/);
   if (countMatch) {
-    const currentCount = parseInt(countMatch[1]!, 10);
     const newEntries = parseExistingEntries(newSection, version);
-    // Count unique verifiers
-    const uniqueVerifiers = new Set(newEntries.map((e) => e.verifier_id));
+    // Count unique INDEPENDENT verifiers only
+    const uniqueIndependent = new Set(
+      newEntries.filter((e) => e.kind === 'independent').map((e) => e.verifier_id)
+    );
     newSection = newSection.replace(
       /Independent verifiers \| \d+/,
-      `Independent verifiers | ${uniqueVerifiers.size}`
+      `Independent verifiers | ${uniqueIndependent.size}`
     );
   }
 
-  // Update Verified status if any entry passed
+  // Update Verified status only if an INDEPENDENT verifier passed
   const allEntries = parseExistingEntries(newSection, version);
-  const hasPassingVerifier = allEntries.some((e) => e.result === 'PASS');
-  if (hasPassingVerifier) {
+  const hasPassingIndependent = allEntries.some(
+    (e) => e.result === 'PASS' && e.kind === 'independent'
+  );
+  if (hasPassingIndependent) {
     newSection = newSection.replace(
       /Verified \| NO \(pending external verification\)/,
       'Verified | YES'
@@ -476,6 +499,7 @@ async function ingestReport(version: string, submissionPath: string): Promise<vo
 
   console.log(`  Release: ${metadata.release_tag}`);
   console.log(`  Result: ${metadata.result}`);
+  console.log(`  Kind: ${metadata.verifier_kind}`);
   console.log(`  OS: ${metadata.os}`);
   console.log(`  Node: ${metadata.node_version}`);
   console.log(`  npm: ${metadata.npm_version}`);
@@ -516,6 +540,7 @@ async function ingestReport(version: string, submissionPath: string): Promise<vo
     verifier_id,
     release_tag: version,
     result: metadata.result,
+    kind: metadata.verifier_kind,
     os: metadata.os.slice(0, 30), // Truncate for table
     node: metadata.node_version,
     npm: metadata.npm_version,
@@ -603,4 +628,5 @@ export {
   type ParsedMetadata,
   type IndexEntry,
   type VerifierReportJson,
+  type VerifierKind,
 };

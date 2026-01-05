@@ -2,8 +2,8 @@
 
 ## Verifier Information
 
-- **Name/Handle**: verifier_a
-- **Verifier Kind**: independent
+- **Name/Handle**: internal_verifier
+- **Verifier Kind**: internal
 - **Date (UTC)**: 2026-01-05
 - **Report Version**: 1
 
@@ -29,5 +29,5 @@ None
 
 ## Attestation
 
-Signed: verifier_a
+Signed: internal_verifier
 Date: 2026-01-05

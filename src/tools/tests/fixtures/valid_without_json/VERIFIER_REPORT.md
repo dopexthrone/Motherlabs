@@ -3,6 +3,7 @@
 ## Verifier Information
 
 - **Name/Handle**: another_verifier
+- **Verifier Kind**: internal
 - **Date (UTC)**: 2026-01-06
 - **Report Version**: 1
 

@@ -1,22 +1,22 @@
 #!/usr/bin/env node
 /**
- * Verified Release Tagger
- * =======================
+ * Reference Release Tagger
+ * ========================
  *
- * Creates a "verified" annotated tag when threshold of independent verifiers is met.
+ * Creates a "reference" annotated tag when internal (single-operator) verification exists.
  *
  * Usage:
- *   npm run tag-verified -- <release> --threshold <n> --date <YYYYMMDD> [--dry-run]
+ *   npm run tag-reference -- <release> --date <YYYYMMDD> [--dry-run]
  *
  * Example:
- *   npm run tag-verified -- v0.2.1 --threshold 1 --date 20260105 --dry-run
+ *   npm run tag-reference -- v0.2.1 --date 20260105 --dry-run
  *
  * This tool:
  *   1. Validates release tag exists
- *   2. Counts eligible verified reports
- *   3. Checks threshold is met
+ *   2. Counts eligible internal (verifier_kind=internal) reports
+ *   3. Checks at least 1 internal report exists
  *   4. Creates annotated tag pointing to release commit
- *   5. Updates INDEX.md with verified tag record
+ *   5. Updates INDEX.md with reference tag record
  */
 
 import { readFile, writeFile, readdir, access } from 'node:fs/promises';
@@ -38,7 +38,7 @@ function getProjectRoot(): string {
   if (envRoot) {
     return resolve(envRoot);
   }
-  // When compiled, this file is at dist/tools/tag_verified_release.js
+  // When compiled, this file is at dist/tools/tag_reference_release.js
   return resolve(__dirname, '..', '..');
 }
 
@@ -76,9 +76,6 @@ interface VerifiedReport {
 interface DryRunOutput {
   release: string;
   target_commit: string;
-  threshold: number;
-  verified_count: number;
-  independent_count: number;
   internal_count: number;
   tag: string;
   index_update: 'APPLY' | 'SKIP';
@@ -184,12 +181,6 @@ function validateDate(date: string | undefined, dryRun: boolean): void {
   }
 }
 
-function validateThreshold(threshold: number): void {
-  if (!Number.isInteger(threshold) || threshold < 1) {
-    throw new Error(`INVALID_THRESHOLD: expected integer >= 1, got ${threshold}`);
-  }
-}
-
 // =============================================================================
 // Report Parsing
 // =============================================================================
@@ -225,7 +216,7 @@ function parseMarkdownForVerification(content: string): {
   return { verified, verifier_kind, os, node_version, npm_version };
 }
 
-async function loadVerifiedReports(release: string): Promise<VerifiedReport[]> {
+async function loadInternalReports(release: string): Promise<VerifiedReport[]> {
   const verifiedDir = join(getVerifierReportsBase(), release, 'verified');
 
   if (!existsSync(verifiedDir)) {
@@ -272,8 +263,8 @@ async function loadVerifiedReports(release: string): Promise<VerifiedReport[]> {
       continue;
     }
 
-    // Must have verifier_kind
-    if (!parsed.verifier_kind) {
+    // Must have verifier_kind = internal
+    if (parsed.verifier_kind !== 'internal') {
       continue;
     }
 
@@ -291,7 +282,7 @@ async function loadVerifiedReports(release: string): Promise<VerifiedReport[]> {
       folder_name: folder,
       date,
       verifier_id,
-      verifier_kind: parsed.verifier_kind,
+      verifier_kind: 'internal',
       os: parsed.os,
       node_version: parsed.node_version,
       npm_version: parsed.npm_version,
@@ -306,7 +297,7 @@ async function loadVerifiedReports(release: string): Promise<VerifiedReport[]> {
 // =============================================================================
 
 function checkIndexAlreadyRecorded(content: string, release: string): boolean {
-  // Look for "Verified Tag" in the release section
+  // Look for "Reference Tag" in the release section
   const sectionRegex = new RegExp(
     `###\\s*${release.replace(/\./g, '\\.')}[\\s\\S]*?(?=###\\s*v\\d|##\\s*Verification Process|$)`
   );
@@ -317,10 +308,10 @@ function checkIndexAlreadyRecorded(content: string, release: string): boolean {
   }
 
   const section = sectionMatch[0];
-  return /Verified Tag\s*\|/.test(section);
+  return /Reference Tag\s*\|/.test(section);
 }
 
-function updateIndexWithVerifiedTag(content: string, release: string, tagName: string): string {
+function updateIndexWithReferenceTag(content: string, release: string, tagName: string): string {
   // Find the release section
   const sectionRegex = new RegExp(
     `(###\\s*${release.replace(/\./g, '\\.')}[\\s\\S]*?)(?=###\\s*v\\d|##\\s*Verification Process|$)`
@@ -333,17 +324,28 @@ function updateIndexWithVerifiedTag(content: string, release: string, tagName: s
 
   const section = sectionMatch[1]!;
 
-  // Find the table and add Verified Tag row after Verified row
+  // Find the table and add Reference Tag row after Reference run or Verified row
+  // Try to insert after "Reference run" row first
+  const refRunPattern = /(\| Reference run \|[^\n]*\n)/;
+  const refRunMatch = section.match(refRunPattern);
+
+  if (refRunMatch) {
+    const insertPoint = section.indexOf(refRunMatch[0]) + refRunMatch[0].length;
+    const newRow = `| Reference Tag | \`${tagName}\` |\n`;
+    const newSection = section.slice(0, insertPoint) + newRow + section.slice(insertPoint);
+    return content.replace(sectionRegex, newSection);
+  }
+
+  // Fallback: insert after "Verified" row
   const verifiedRowPattern = /(\| Verified \|[^\n]*\n)/;
   const verifiedRowMatch = section.match(verifiedRowPattern);
 
   if (!verifiedRowMatch) {
-    throw new Error(`Cannot find "| Verified |" row in ${release} section`);
+    throw new Error(`Cannot find "| Reference run |" or "| Verified |" row in ${release} section`);
   }
 
   const insertPoint = section.indexOf(verifiedRowMatch[0]) + verifiedRowMatch[0].length;
-  const newRow = `| Verified Tag | \`${tagName}\` |\n`;
-
+  const newRow = `| Reference Tag | \`${tagName}\` |\n`;
   const newSection = section.slice(0, insertPoint) + newRow + section.slice(insertPoint);
 
   return content.replace(sectionRegex, newSection);
@@ -353,20 +355,17 @@ function updateIndexWithVerifiedTag(content: string, release: string, tagName: s
 // Main Logic
 // =============================================================================
 
-interface TagVerifiedOptions {
+interface TagReferenceOptions {
   release: string;
-  threshold: number;
   date?: string;
   dryRun: boolean;
-  allowInternal: boolean;
 }
 
-async function tagVerifiedRelease(options: TagVerifiedOptions): Promise<void> {
-  const { release, threshold, date, dryRun, allowInternal } = options;
+async function tagReferenceRelease(options: TagReferenceOptions): Promise<void> {
+  const { release, date, dryRun } = options;
 
   // Validate inputs
   validateRelease(release);
-  validateThreshold(threshold);
   validateDate(date, dryRun);
 
   const git = getGitHelper();
@@ -374,38 +373,29 @@ async function tagVerifiedRelease(options: TagVerifiedOptions): Promise<void> {
   // Get target commit
   const targetCommit = git.revParse(release);
 
-  // Load all verified reports
-  const allReports = await loadVerifiedReports(release);
+  // Load internal reports only
+  const internalReports = await loadInternalReports(release);
+  const internalCount = internalReports.length;
 
-  // Count by kind
-  const independentCount = allReports.filter(r => r.verifier_kind === 'independent').length;
-  const internalCount = allReports.filter(r => r.verifier_kind === 'internal').length;
-  const totalCount = allReports.length;
-
-  // For verified tags, we ONLY count independent reports
-  // --allow-internal is reserved for reference tags (tag_reference_release.ts)
-  // Verified tags MUST have independent verifiers
-  const eligibleCount = independentCount;
-
-  // Check threshold
-  if (eligibleCount < threshold) {
-    console.error(`THRESHOLD_NOT_MET: need ${threshold} independent verified report(s); have ${eligibleCount}`);
+  // Check threshold (minimum 1 internal report)
+  if (internalCount < 1) {
+    console.error(`THRESHOLD_NOT_MET: need 1 internal verified report(s); have 0`);
     process.exit(2);
   }
 
   // Compute tag name
   const tagDate = date ?? '00000000'; // Placeholder for dry-run
-  const tagName = `${release}-verified-${tagDate}`;
+  const tagName = `${release}-reference-${tagDate}`;
 
   // Check if tag already exists
   if (git.tagExists(tagName)) {
     throw new Error(`TAG_EXISTS: ${tagName} already exists`);
   }
 
-  // Check if INDEX.md already records verified tag
+  // Check if INDEX.md already records reference tag
   const indexContent = await readFile(getIndexPath(), 'utf-8');
   if (checkIndexAlreadyRecorded(indexContent, release)) {
-    throw new Error(`ALREADY_RECORDED: Verified Tag already set for ${release}`);
+    throw new Error(`ALREADY_RECORDED: Reference Tag already set for ${release}`);
   }
 
   // Dry run: output JSON and exit
@@ -413,9 +403,6 @@ async function tagVerifiedRelease(options: TagVerifiedOptions): Promise<void> {
     const output: DryRunOutput = {
       release,
       target_commit: targetCommit,
-      threshold,
-      verified_count: totalCount,
-      independent_count: independentCount,
       internal_count: internalCount,
       tag: tagName,
       index_update: 'APPLY',
@@ -427,22 +414,21 @@ async function tagVerifiedRelease(options: TagVerifiedOptions): Promise<void> {
 
   // Update INDEX.md
   console.log('Updating INDEX.md...');
-  const updatedIndex = updateIndexWithVerifiedTag(indexContent, release, tagName);
+  const updatedIndex = updateIndexWithReferenceTag(indexContent, release, tagName);
   await writeFile(getIndexPath(), updatedIndex);
-  console.log(`  ✓ Added Verified Tag: ${tagName}`);
+  console.log(`  ✓ Added Reference Tag: ${tagName}`);
 
   // Create annotated tag
   console.log('Creating annotated tag...');
-  const tagMessage = `Verified by ${independentCount} independent report(s); see artifacts/verifier_reports/INDEX.md`;
+  const tagMessage = `Reference verification by ${internalCount} internal report(s); see artifacts/verifier_reports/INDEX.md`;
   git.createAnnotatedTag(tagName, targetCommit, tagMessage);
   console.log(`  ✓ Created tag: ${tagName} -> ${targetCommit.slice(0, 8)}`);
 
   // Summary
   console.log(`\n${'─'.repeat(60)}`);
-  console.log(`✓ Verified milestone recorded`);
+  console.log(`✓ Reference milestone recorded`);
   console.log(`  Release: ${release}`);
   console.log(`  Tag: ${tagName}`);
-  console.log(`  Independent verifiers: ${independentCount}`);
   console.log(`  Internal verifiers: ${internalCount}`);
   console.log(`\nNext: git push origin --tags`);
   console.log(`${'─'.repeat(60)}\n`);
@@ -454,58 +440,48 @@ async function tagVerifiedRelease(options: TagVerifiedOptions): Promise<void> {
 
 function parseArgs(
   args: string[]
-): { release: string; threshold: number; date?: string; dryRun: boolean; allowInternal: boolean } | null {
+): { release: string; date?: string; dryRun: boolean } | null {
   if (args.length === 0 || args.includes('--help') || args.includes('-h')) {
     return null;
   }
 
   const release = args[0]!;
-  let threshold = 1;
   let date: string | undefined;
   let dryRun = false;
-  let allowInternal = false;
 
   for (let i = 1; i < args.length; i++) {
     const arg = args[i]!;
 
-    if (arg === '--threshold' && args[i + 1]) {
-      threshold = parseInt(args[i + 1]!, 10);
-      i++;
-    } else if (arg === '--date' && args[i + 1]) {
+    if (arg === '--date' && args[i + 1]) {
       date = args[i + 1]!;
       i++;
     } else if (arg === '--dry-run') {
       dryRun = true;
-    } else if (arg === '--allow-internal') {
-      allowInternal = true;
     }
   }
 
   // Handle exactOptionalPropertyTypes: only include date if defined
   if (date !== undefined) {
-    return { release, threshold, date, dryRun, allowInternal };
+    return { release, date, dryRun };
   }
-  return { release, threshold, dryRun, allowInternal };
+  return { release, dryRun };
 }
 
 function printHelp(): void {
-  console.log('Usage: npm run tag-verified -- <release> [options]');
+  console.log('Usage: npm run tag-reference -- <release> --date <YYYYMMDD> [--dry-run]');
   console.log('');
-  console.log('Creates a verified tag for releases with INDEPENDENT verifier reports.');
-  console.log('For internal/reference tags, use: npm run tag-reference');
+  console.log('Creates a reference tag for releases with INTERNAL verifier reports.');
+  console.log('This is for single-operator self-verification (L0 verification level).');
+  console.log('');
+  console.log('For verified tags (L1, requires independent verifiers), use: npm run tag-verified');
   console.log('');
   console.log('Arguments:');
   console.log('  release            Release version (e.g., v0.2.1)');
   console.log('');
   console.log('Options:');
-  console.log('  --threshold <n>    Minimum independent reports required (default: 1)');
   console.log('  --date <YYYYMMDD>  Date for tag name (required unless --dry-run)');
   console.log('  --dry-run          Preview actions without creating tag');
-  console.log('  --allow-internal   (Reserved) Allow internal reports in count');
   console.log('  --help             Show this help message');
-  console.log('');
-  console.log('Note: Only verifier_kind=independent reports count toward threshold.');
-  console.log('      Internal reports are ignored for verified tags.');
   console.log('');
   console.log('Environment variables (for testing):');
   console.log('  MOTHER_REPO_ROOT       Override project root path');
@@ -514,8 +490,8 @@ function printHelp(): void {
   console.log('  MOTHER_GIT_STUB_TAGS   Comma-separated existing tags');
   console.log('');
   console.log('Examples:');
-  console.log('  npm run tag-verified -- v0.2.1 --threshold 1 --date 20260105 --dry-run');
-  console.log('  npm run tag-verified -- v0.2.1 --threshold 1 --date 20260105');
+  console.log('  npm run tag-reference -- v0.2.1 --date 20260105 --dry-run');
+  console.log('  npm run tag-reference -- v0.2.1 --date 20260105');
 }
 
 async function main(): Promise<void> {
@@ -527,7 +503,7 @@ async function main(): Promise<void> {
     process.exit(args.includes('--help') || args.includes('-h') ? 0 : 1);
   }
 
-  await tagVerifiedRelease(parsed);
+  await tagReferenceRelease(parsed);
 }
 
 // Only run CLI when this file is the entry point
@@ -546,17 +522,16 @@ if (isMainModule) {
 export {
   validateRelease,
   validateDate,
-  validateThreshold,
   parseMarkdownForVerification,
-  loadVerifiedReports,
+  loadInternalReports,
   checkIndexAlreadyRecorded,
-  updateIndexWithVerifiedTag,
-  tagVerifiedRelease,
+  updateIndexWithReferenceTag,
+  tagReferenceRelease,
   createStubGitHelper,
   getProjectRoot,
   type VerifierKind,
   type VerifiedReport,
   type DryRunOutput,
-  type TagVerifiedOptions,
+  type TagReferenceOptions,
   type GitHelper,
 };

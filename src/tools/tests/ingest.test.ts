@@ -18,6 +18,7 @@ import {
   checkDuplicate,
   formatTableRow,
   type IndexEntry,
+  type VerifierKind,
 } from '../ingest_verifier_report.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -120,6 +121,7 @@ describe('Verifier Report Ingestion', () => {
         JSON.stringify({
           schema_version: '2.0',
           release_version: 'v0.2.1',
+          verifier_kind: 'internal',
           verifier: { handle: 'test', date_utc: '2026-01-05' },
           environment: { os: 'Linux', node_version: 'v24.11.1' },
           source_verification: { archive_hash_match: true, git_tag_match: true },
@@ -168,10 +170,21 @@ describe('Verifier Report Ingestion', () => {
       assert.equal(result.release_tag, 'v0.2.1');
       assert.equal(result.verified, true);
       assert.equal(result.result, 'PASS');
+      assert.equal(result.verifier_kind, 'independent');
       assert.equal(result.os, 'Ubuntu 22.04.3 LTS');
       assert.equal(result.node_version, 'v24.11.1');
       assert.equal(result.npm_version, '10.2.0');
       assert.equal(result.verifier_handle, 'test_verifier');
+    });
+
+    it('fails with stable error when verifier_kind is missing', async () => {
+      const mdPath = join(FIXTURES_DIR, 'missing_verifier_kind', 'VERIFIER_REPORT.md');
+      const content = await readFile(mdPath, 'utf-8');
+
+      assert.throws(
+        () => parseMarkdownReport(content, 'v0.2.1'),
+        /MISSING_FIELD: verifier_kind/
+      );
     });
 
     it('detects version mismatch', async () => {
@@ -184,8 +197,25 @@ describe('Verifier Report Ingestion', () => {
       );
     });
 
-    it('reports missing fields with stable error message', () => {
+    it('reports missing verifier_kind with stable error message', () => {
       const content = `# Verifier Report: v0.2.1
+
+## Summary
+
+### Overall Result: PASS
+`;
+
+      // verifier_kind is now checked first
+      assert.throws(
+        () => parseMarkdownReport(content, 'v0.2.1'),
+        /MISSING_FIELD: verifier_kind/
+      );
+    });
+
+    it('reports other missing fields after verifier_kind present', () => {
+      const content = `# Verifier Report: v0.2.1
+
+- **Verifier Kind**: internal
 
 ## Summary
 
@@ -206,6 +236,7 @@ describe('Verifier Report Ingestion', () => {
         verifier_id: 'acme',
         release_tag: 'v0.2.1',
         result: 'PASS',
+        kind: 'independent',
         os: 'Ubuntu 22.04',
         node: 'v24.11.1',
         npm: '10.2.0',
@@ -215,23 +246,25 @@ describe('Verifier Report Ingestion', () => {
       const row = formatTableRow(entry);
       assert.equal(
         row,
-        '| 20260105 | acme | v0.2.1 | PASS | Ubuntu 22.04 | v24.11.1 | 10.2.0 | v0.2.1/verified/20260105_acme/ |'
+        '| 20260105 | acme | v0.2.1 | PASS | independent | Ubuntu 22.04 | v24.11.1 | 10.2.0 | v0.2.1/verified/20260105_acme/ |'
       );
     });
 
     it('parses existing entries from index content', () => {
       const content = `### v0.2.1
 
-| Date | Verifier | Release | Result | OS | Node | npm | Path |
-|------|----------|---------|--------|-----|------|-----|------|
-| 20260105 | acme | v0.2.1 | PASS | Ubuntu 22.04 | v24.11.1 | 10.2.0 | v0.2.1/verified/20260105_acme/ |
-| 20260104 | beta | v0.2.1 | FAIL | Fedora 39 | v24.11.1 | 10.2.0 | v0.2.1/failed/20260104_beta/ |
+| Date | Verifier | Release | Result | Kind | OS | Node | npm | Path |
+|------|----------|---------|--------|------|-----|------|-----|------|
+| 20260105 | acme | v0.2.1 | PASS | independent | Ubuntu 22.04 | v24.11.1 | 10.2.0 | v0.2.1/verified/20260105_acme/ |
+| 20260104 | beta | v0.2.1 | FAIL | internal | Fedora 39 | v24.11.1 | 10.2.0 | v0.2.1/failed/20260104_beta/ |
 `;
 
       const entries = parseExistingEntries(content, 'v0.2.1');
       assert.equal(entries.length, 2);
       assert.equal(entries[0]!.verifier_id, 'acme');
+      assert.equal(entries[0]!.kind, 'independent');
       assert.equal(entries[1]!.verifier_id, 'beta');
+      assert.equal(entries[1]!.kind, 'internal');
     });
 
     it('detects duplicates correctly', () => {
@@ -241,6 +274,7 @@ describe('Verifier Report Ingestion', () => {
           verifier_id: 'acme',
           release_tag: 'v0.2.1',
           result: 'PASS',
+          kind: 'independent',
           os: 'Ubuntu',
           node: 'v24.11.1',
           npm: '10.2.0',
@@ -267,6 +301,7 @@ describe('Verifier Report Ingestion', () => {
       // Cross-validate
       assert.equal(jsonResult.release_version, mdResult.release_tag);
       assert.equal(jsonResult.summary.result, mdResult.result);
+      assert.equal(jsonResult.verifier_kind, mdResult.verifier_kind);
 
       // Verify deterministic output
       const entry: IndexEntry = {
@@ -274,6 +309,7 @@ describe('Verifier Report Ingestion', () => {
         verifier_id: 'test_verifier',
         release_tag: mdResult.release_tag,
         result: mdResult.result,
+        kind: mdResult.verifier_kind,
         os: mdResult.os.slice(0, 30),
         node: mdResult.node_version,
         npm: mdResult.npm_version,
@@ -295,6 +331,7 @@ describe('Verifier Report Ingestion', () => {
       assert.equal(result.release_tag, 'v0.2.1');
       assert.equal(result.verified, true);
       assert.equal(result.result, 'PASS');
+      assert.equal(result.verifier_kind, 'internal');
       assert.equal(result.os, 'Fedora 39');
       assert.equal(result.verifier_handle, 'another_verifier');
     });

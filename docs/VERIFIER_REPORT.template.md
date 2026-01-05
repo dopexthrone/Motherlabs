@@ -3,8 +3,13 @@
 ## Verifier Information
 
 - **Name/Handle**: [your name or pseudonym]
+- **Verifier Kind**: internal
 - **Date (UTC)**: [YYYY-MM-DD]
 - **Report Version**: 1
+
+> **Verifier Kind guidance:**
+> - Use `internal` for single-operator self-verification (default)
+> - Use `independent` ONLY if you are a truly third-party verifier with no relationship to the maintainer
 
 ## Environment
 

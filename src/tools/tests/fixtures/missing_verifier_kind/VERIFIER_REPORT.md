@@ -2,8 +2,7 @@
 
 ## Verifier Information
 
-- **Name/Handle**: verifier_a
-- **Verifier Kind**: independent
+- **Name/Handle**: test_verifier
 - **Date (UTC)**: 2026-01-05
 - **Report Version**: 1
 
@@ -23,11 +22,7 @@
 
 ### Overall Result: PASS
 
-### Issues Found
-
-None
-
 ## Attestation
 
-Signed: verifier_a
+Signed: test_verifier
 Date: 2026-01-05

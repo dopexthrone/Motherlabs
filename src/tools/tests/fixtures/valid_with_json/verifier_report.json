@@ -1,6 +1,7 @@
 {
   "schema_version": "1.0",
   "release_version": "v0.2.1",
+  "verifier_kind": "independent",
   "verifier": {
     "handle": "test_verifier",
     "date_utc": "2026-01-05"

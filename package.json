@@ -23,7 +23,8 @@
     "golden": "npx tsx tools/run_golden_suite.ts",
     "release-packets": "npx tsx tools/make_release_packets.ts",
     "ingest-verifier": "node dist/tools/ingest_verifier_report.js",
-    "tag-verified": "node dist/tools/tag_verified_release.js"
+    "tag-verified": "node dist/tools/tag_verified_release.js",
+    "tag-reference": "node dist/tools/tag_reference_release.js"
   },
   "keywords": [
     "context-engineering",

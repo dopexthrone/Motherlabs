@@ -3,6 +3,7 @@
 ## Verifier Information
 
 - **Name/Handle**: verifier_a
+- **Verifier Kind**: independent
 - **Date (UTC)**: 2026-01-05
 
 ## Environment

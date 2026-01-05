@@ -3,6 +3,7 @@
 ## Verifier Information
 
 - **Name/Handle**: test_verifier
+- **Verifier Kind**: independent
 - **Date (UTC)**: 2026-01-05
 - **Report Version**: 1
 

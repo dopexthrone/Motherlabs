@@ -3,6 +3,7 @@
 ## Verifier Information
 
 - **Name/Handle**: bad_json_verifier
+- **Verifier Kind**: internal
 - **Date (UTC)**: 2026-01-07
 - **Report Version**: 1
 
