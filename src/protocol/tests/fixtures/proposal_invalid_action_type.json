@@ -1,0 +1,21 @@
+{
+  "id": "prop_a1b2c3d4e5f67890",
+  "schema_version": "1.0.0",
+  "source_bundle_id": "bun_1234567890abcdef",
+  "source_bundle_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "actions": [
+    {
+      "id": "act_0000000000000001",
+      "type": "rename_file",
+      "target": "src/a.ts",
+      "content": "a",
+      "required": true,
+      "description": "Invalid action type",
+      "order": 0
+    }
+  ],
+  "acceptance_tests": [],
+  "summary": "Test proposal with invalid action type",
+  "requires_approval": false,
+  "confidence": 50
+}

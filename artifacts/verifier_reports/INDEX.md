@@ -4,6 +4,26 @@ Single source of truth for release verification status.
 
 ## Releases
 
+### v0.3.8
+
+| Item | Value |
+|------|-------|
+| Commit | `71561854a8d70777eafdc6c7dab1e16712a637c1` |
+| Tag date | 2026-01-05 |
+| Reference run | `v0.3.8/` |
+| Reference Tag | `v0.3.8-reference-20260105` |
+| Independent verifiers | 0 |
+| Internal verifiers | 0 |
+| Verified | NO (pending external verification) |
+
+**Transfer bundle ready:** `artifacts/transfer/v0.3.8/`
+
+**External verification reports:**
+| Date | Verifier | Release | Result | Kind | OS | Node | npm | Path |
+|------|----------|---------|--------|------|-----|------|-----|------|
+
+---
+
 ### v0.3.7
 
 | Item | Value |

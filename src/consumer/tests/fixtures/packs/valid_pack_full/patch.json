@@ -1,0 +1,16 @@
+{
+  "patch_schema_version": "1.0.0",
+  "source_proposal_id": "prop_1234567890abcdef",
+  "source_proposal_hash": "sha256:abcd1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab",
+  "operations": [
+    {
+      "op": "create",
+      "path": "src/hello.ts",
+      "content": "export function hello() { return 'Hello, World!'; }",
+      "expected_hash": "sha256:deadbeef1234567890abcdef1234567890abcdef1234567890abcdef12345678",
+      "size_bytes": 51,
+      "order": 0
+    }
+  ],
+  "total_bytes": 51
+}

@@ -7,9 +7,13 @@ This document provides exact steps to verify a release of the Context Engine Ker
 - **[BUNDLE_SPEC.md](./BUNDLE_SPEC.md)** - Authoritative bundle output contract
 - **[EVIDENCE_SPEC.md](./EVIDENCE_SPEC.md)** - Execution evidence contract (EvidenceCore, hashing)
 - **[LEDGER_SPEC.md](./LEDGER_SPEC.md)** - Append-only ledger contract (JSONL format)
+- **[PACK_SPEC.md](./PACK_SPEC.md)** - Run export pack contract (PK1-PK12 invariants, external handoff)
 - **[PATCH_SPEC.md](./PATCH_SPEC.md)** - Patch/proposal contract (PS1-PS10 invariants, pre-exec validation)
 - **[POLICY_SPEC.md](./POLICY_SPEC.md)** - Policy profiles and enforcement (PL1-PL7 invariants)
 - **[RUN_SPEC.md](./RUN_SPEC.md)** - Run result contract (RS1-RS8 invariants, canonical output)
+
+**Internal Contracts (non-artifact):**
+- **[PROPOSAL_INTERNAL_SPEC.md](./PROPOSAL_INTERNAL_SPEC.md)** - Internal Proposal type contract (PR1-PR12 invariants, no external artifact)
 - **[VERIFICATION_POLICY.md](./VERIFICATION_POLICY.md)** - L0/L1 verification milestone definitions
 
 ## Prerequisites
@@ -183,6 +187,8 @@ Report the specific failing test and error message.
 | v0.2.1  | 193   | 10      | Security + golden suite |
 | v0.3.6  | 506   | 10      | RUN_SPEC.md + canonical CLI output |
 | v0.3.7  | 552   | 10      | PATCH_SPEC.md + patch verifier |
+| v0.3.8  | 595   | 10      | Governance: re-scope proposal spec as internal (no external artifact) |
+| v0.3.9  | 645   | 10      | PACK_SPEC.md + pack verifier (PK1-PK12 invariants) |
 
 ## Contact
 

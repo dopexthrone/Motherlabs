@@ -1,0 +1,19 @@
+{
+  "proposal_id": "prop_1234567890abcdef",
+  "proposal_hash": "sha256:abcd1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab",
+  "action_results": [
+    {
+      "path": "src/hello.ts",
+      "action": "create",
+      "sha256": "sha256:deadbeef1234567890abcdef1234567890abcdef1234567890abcdef12345678",
+      "exit_code": 0
+    }
+  ],
+  "test_results": [],
+  "status": "complete",
+  "started_at": "2026-01-05T12:00:00.000Z",
+  "completed_at": "2026-01-05T12:00:01.000Z",
+  "total_duration_ms": 1000,
+  "executor_id": "executor_test",
+  "working_dir": "/tmp/sandbox"
+}

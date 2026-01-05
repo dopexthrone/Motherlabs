@@ -1,0 +1,6 @@
+{
+  "created_by": "test_harness",
+  "description": "Test pack with all optional files",
+  "version": "1.0.0",
+  "custom_field": "any arbitrary data is allowed here"
+}

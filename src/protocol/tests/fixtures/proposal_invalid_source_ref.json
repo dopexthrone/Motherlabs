@@ -1,0 +1,11 @@
+{
+  "id": "prop_a1b2c3d4e5f67890",
+  "schema_version": "1.0.0",
+  "source_bundle_id": "",
+  "source_bundle_hash": "not-a-hash",
+  "actions": [],
+  "acceptance_tests": [],
+  "summary": "Test proposal",
+  "requires_approval": false,
+  "confidence": 50
+}

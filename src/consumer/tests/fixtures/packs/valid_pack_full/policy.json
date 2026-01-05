@@ -1,0 +1,9 @@
+{
+  "name": "default",
+  "allow_network": false,
+  "timeout_ms": 60000,
+  "max_output_files": 500,
+  "max_total_output_bytes": 52428800,
+  "allowed_commands": ["node", "npm", "npx"],
+  "allowed_write_roots": ["out", "dist", "build", "tmp"]
+}

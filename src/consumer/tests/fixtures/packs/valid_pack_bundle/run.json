@@ -1,0 +1,32 @@
+{
+  "run_schema_version": "1.0.0",
+  "run_id": "run_20260105_120000_test",
+  "started_at": "2026-01-05T12:00:00.000Z",
+  "completed_at": "2026-01-05T12:00:01.000Z",
+  "kernel_version": "0.1.0",
+  "policy": {
+    "name": "default",
+    "allow_network": false,
+    "timeout_ms": 60000,
+    "max_output_files": 500,
+    "max_total_output_bytes": 52428800,
+    "allowed_commands": ["node", "npm", "npx"],
+    "allowed_write_roots": ["out", "dist", "build", "tmp"]
+  },
+  "intent": {
+    "path": "intents/test_intent.json",
+    "sha256": "sha256:abc123def456789012345678901234567890123456789012345678901234abcd"
+  },
+  "bundle": {
+    "bundle_id": "bundle_test123456789a",
+    "sha256": "sha256:70bc0e6f72af6c79e2142c81026d7b1797d78ff24086ae7b02ec557af5e53a80"
+  },
+  "kernel_result_kind": "BUNDLE",
+  "execution": null,
+  "decision": {
+    "accepted": true,
+    "reasons": ["Bundle produced successfully"],
+    "validated_by_kernel": true
+  },
+  "model_mode": "none"
+}

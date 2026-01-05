@@ -1,0 +1,49 @@
+{
+  "id": "prop_a1b2c3d4e5f67890",
+  "schema_version": "1.0.0",
+  "source_bundle_id": "bun_1234567890abcdef",
+  "source_bundle_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "actions": [
+    {
+      "id": "act_0000000000000001",
+      "type": "create_file",
+      "target": "src/example.ts",
+      "content": "export const x = 1;\n",
+      "expected_hash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "required": true,
+      "description": "Create example file",
+      "order": 0
+    },
+    {
+      "id": "act_0000000000000002",
+      "type": "modify_file",
+      "target": "src/other.ts",
+      "content": "export const y = 2;\n",
+      "expected_hash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "required": true,
+      "description": "Modify other file",
+      "order": 1
+    }
+  ],
+  "acceptance_tests": [
+    {
+      "id": "test_hash_act_0000000000000001",
+      "name": "Verify hash of src/example.ts",
+      "type": "hash_match",
+      "target": "src/example.ts",
+      "expected": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "required": true
+    },
+    {
+      "id": "test_hash_act_0000000000000002",
+      "name": "Verify hash of src/other.ts",
+      "type": "hash_match",
+      "target": "src/other.ts",
+      "expected": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "required": true
+    }
+  ],
+  "summary": "Create example file and modify other file",
+  "requires_approval": false,
+  "confidence": 85
+}
