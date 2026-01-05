@@ -29,7 +29,7 @@ nvm use 24.11.1
 ```bash
 git clone https://github.com/motherlabs/context-engine-kernel.git
 cd context-engine-kernel
-git checkout v0.2.0  # Replace with target version
+git checkout v0.2.1  # Current governed release
 ```
 
 ### 2. Clean Install Dependencies
@@ -65,7 +65,7 @@ PASSED: No violations found
 npm test
 ```
 
-Expected output (v0.2.0+):
+Expected output (v0.2.1):
 ```
 ℹ tests 193
 ℹ pass 193
