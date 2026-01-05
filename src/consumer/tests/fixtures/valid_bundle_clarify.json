@@ -1,0 +1,121 @@
+{
+  "id": "bundle_clarify12345a",
+  "schema_version": "0.1.0",
+  "kernel_version": "0.1.0",
+  "source_intent_hash": "abc123def456789012345678901234567890123456789012345678901234abcd",
+  "status": "incomplete",
+  "root_node": {
+    "id": "node_clari123456789a",
+    "parent_id": null,
+    "status": "blocked",
+    "goal": "Build a web application",
+    "constraints": ["Must be fast"],
+    "entropy": {
+      "unresolved_refs": 2,
+      "schema_gaps": 1,
+      "contradiction_count": 0,
+      "branching_factor": 3,
+      "entropy_score": 65
+    },
+    "density": {
+      "concrete_constraints": 1,
+      "specified_outputs": 0,
+      "constraint_depth": 1,
+      "density_score": 20
+    },
+    "children": [],
+    "unresolved_questions": [
+      {
+        "id": "q_framework00001a",
+        "text": "Which framework should be used?",
+        "expected_answer_type": "choice",
+        "why_needed": "Framework choice affects all architecture decisions",
+        "information_gain": 80,
+        "priority": 90,
+        "options": ["Next.js", "React", "Vue"]
+      },
+      {
+        "id": "q_database000001a",
+        "text": "Which database should be used?",
+        "expected_answer_type": "choice",
+        "why_needed": "Database choice affects data model",
+        "information_gain": 70,
+        "priority": 80,
+        "options": ["MongoDB", "PostgreSQL", "SQLite"]
+      }
+    ]
+  },
+  "terminal_nodes": [
+    {
+      "id": "node_clari123456789a",
+      "parent_id": null,
+      "status": "blocked",
+      "goal": "Build a web application",
+      "constraints": ["Must be fast"],
+      "entropy": {
+        "unresolved_refs": 2,
+        "schema_gaps": 1,
+        "contradiction_count": 0,
+        "branching_factor": 3,
+        "entropy_score": 65
+      },
+      "density": {
+        "concrete_constraints": 1,
+        "specified_outputs": 0,
+        "constraint_depth": 1,
+        "density_score": 20
+      },
+      "children": [],
+      "unresolved_questions": [
+        {
+          "id": "q_framework00001a",
+          "text": "Which framework should be used?",
+          "expected_answer_type": "choice",
+          "why_needed": "Framework choice affects all architecture decisions",
+          "information_gain": 80,
+          "priority": 90,
+          "options": ["Next.js", "React", "Vue"]
+        },
+        {
+          "id": "q_database000001a",
+          "text": "Which database should be used?",
+          "expected_answer_type": "choice",
+          "why_needed": "Database choice affects data model",
+          "information_gain": 70,
+          "priority": 80,
+          "options": ["MongoDB", "PostgreSQL", "SQLite"]
+        }
+      ]
+    }
+  ],
+  "outputs": [],
+  "unresolved_questions": [
+    {
+      "id": "q_framework00001a",
+      "text": "Which framework should be used?",
+      "expected_answer_type": "choice",
+      "why_needed": "Framework choice affects all architecture decisions",
+      "information_gain": 80,
+      "priority": 90,
+      "options": ["Next.js", "React", "Vue"]
+    },
+    {
+      "id": "q_database000001a",
+      "text": "Which database should be used?",
+      "expected_answer_type": "choice",
+      "why_needed": "Database choice affects data model",
+      "information_gain": 70,
+      "priority": 80,
+      "options": ["MongoDB", "PostgreSQL", "SQLite"]
+    }
+  ],
+  "stats": {
+    "total_nodes": 1,
+    "terminal_nodes": 1,
+    "max_depth": 0,
+    "total_outputs": 0,
+    "unresolved_count": 2,
+    "avg_terminal_entropy": 65,
+    "avg_terminal_density": 20
+  }
+}

@@ -10,7 +10,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "node --test dist/tests/*.test.js dist/harness/tests/*.test.js dist/tools/tests/*.test.js",
+    "test": "node --test dist/tests/*.test.js dist/harness/tests/*.test.js dist/tools/tests/*.test.js dist/consumer/tests/*.test.js",
     "test:security": "node --test dist/harness/tests/security.test.js",
     "test:harness": "node --test dist/harness/tests/*.test.js",
     "test:determinism": "node --test dist/tests/determinism.test.js",
@@ -24,7 +24,9 @@
     "release-packets": "npx tsx tools/make_release_packets.ts",
     "ingest-verifier": "node dist/tools/ingest_verifier_report.js",
     "tag-verified": "node dist/tools/tag_verified_release.js",
-    "tag-reference": "node dist/tools/tag_reference_release.js"
+    "tag-reference": "node dist/tools/tag_reference_release.js",
+    "bundle-verify": "node dist/tools/bundle_verify.js",
+    "bundle-summarize": "node dist/tools/bundle_summarize.js"
   },
   "keywords": [
     "context-engineering",

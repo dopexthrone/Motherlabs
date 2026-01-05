@@ -1,0 +1,83 @@
+{
+  "id": "bundle_unsorted1234a",
+  "schema_version": "0.1.0",
+  "kernel_version": "0.1.0",
+  "source_intent_hash": "abc123def456789012345678901234567890123456789012345678901234abcd",
+  "status": "complete",
+  "root_node": {
+    "id": "node_unsort12345678a",
+    "parent_id": null,
+    "status": "terminal",
+    "goal": "Create multiple files",
+    "constraints": [],
+    "entropy": {
+      "unresolved_refs": 0,
+      "schema_gaps": 0,
+      "contradiction_count": 0,
+      "branching_factor": 1,
+      "entropy_score": 10
+    },
+    "density": {
+      "concrete_constraints": 0,
+      "specified_outputs": 2,
+      "constraint_depth": 1,
+      "density_score": 50
+    },
+    "children": [],
+    "unresolved_questions": []
+  },
+  "terminal_nodes": [
+    {
+      "id": "node_unsort12345678a",
+      "parent_id": null,
+      "status": "terminal",
+      "goal": "Create multiple files",
+      "constraints": [],
+      "entropy": {
+        "unresolved_refs": 0,
+        "schema_gaps": 0,
+        "contradiction_count": 0,
+        "branching_factor": 1,
+        "entropy_score": 10
+      },
+      "density": {
+        "concrete_constraints": 0,
+        "specified_outputs": 2,
+        "constraint_depth": 1,
+        "density_score": 50
+      },
+      "children": [],
+      "unresolved_questions": []
+    }
+  ],
+  "outputs": [
+    {
+      "id": "out_zebra123456789a",
+      "type": "file",
+      "path": "zebra.ts",
+      "content": "// zebra",
+      "content_hash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "source_constraints": [],
+      "confidence": 80
+    },
+    {
+      "id": "out_apple123456789a",
+      "type": "file",
+      "path": "apple.ts",
+      "content": "// apple",
+      "content_hash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      "source_constraints": [],
+      "confidence": 80
+    }
+  ],
+  "unresolved_questions": [],
+  "stats": {
+    "total_nodes": 1,
+    "terminal_nodes": 1,
+    "max_depth": 0,
+    "total_outputs": 2,
+    "unresolved_count": 0,
+    "avg_terminal_entropy": 10,
+    "avg_terminal_density": 50
+  }
+}
