@@ -1,0 +1,14 @@
+{
+  "model_io_schema_version": "1.0.0",
+  "adapter_id": "mock_a1b2c3d4",
+  "model_id": "mock",
+  "mode": "record",
+  "interactions": [
+    {
+      "i": 0,
+      "prompt_hash": "sha256:6d995dba1af0373913b98421f7b825327673d9870e4227386600e9d929f2c90c",
+      "response_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "response_content": "Hello, World!"
+    }
+  ]
+}

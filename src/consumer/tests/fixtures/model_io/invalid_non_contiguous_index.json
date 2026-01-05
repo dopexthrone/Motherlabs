@@ -1,0 +1,20 @@
+{
+  "model_io_schema_version": "1.0.0",
+  "adapter_id": "mock_a1b2c3d4",
+  "model_id": "mock",
+  "mode": "record",
+  "interactions": [
+    {
+      "i": 0,
+      "prompt_hash": "sha256:6d995dba1af0373913b98421f7b825327673d9870e4227386600e9d929f2c90c",
+      "response_hash": "sha256:dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f",
+      "response_content": "Hello, World!"
+    },
+    {
+      "i": 5,
+      "prompt_hash": "sha256:318f903a83b4d30d1bea59e2a5803a149c7ac810ed42607ee291456012e1d972",
+      "response_hash": "sha256:62a0827299d29b41ca45a79b16caeb828481bc1ebec8a4100f0dfdf331389eb5",
+      "response_content": "Response to second prompt"
+    }
+  ]
+}

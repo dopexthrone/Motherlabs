@@ -48,3 +48,22 @@ export { PATCH_SCHEMA_VERSION } from './patch_types.js';
 
 // Patch Verification
 export { verifyPatch } from './patch_verify.js';
+
+// Model IO Types
+export type {
+  ModelIOSession,
+  ModelIOInteraction,
+  ModelIOCore,
+  ModelIOInteractionCore,
+  ModelIOViolation,
+  ModelIOVerifyResult,
+  ModelIOVerifySuccess,
+  ModelIOVerifyFailure,
+  ModelIOVerifyOptions,
+  ModelIOMode,
+  ModelIOStats,
+} from './model_io_types.js';
+export { MODEL_IO_SCHEMA_VERSION, MODEL_IO_LIMITS, VALID_MODES } from './model_io_types.js';
+
+// Model IO Verification
+export { verifyModelIO, computeModelIOCore, computeModelIOHash } from './model_io_verify.js';

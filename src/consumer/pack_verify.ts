@@ -25,6 +25,7 @@ import { join, basename, resolve, normalize } from 'node:path';
 import { canonicalize, canonicalHash } from '../utils/canonical.js';
 import { verifyBundle } from './bundle_verify.js';
 import { verifyPatch } from './patch_verify.js';
+import { verifyModelIO } from './model_io_verify.js';
 import type {
   PackVerifyResult,
   PackVerifySuccess,
@@ -614,6 +615,30 @@ export function verifyPack(packPath: string, options: PackVerifyOptions = {}): P
 
     // Validate policy.json consistency
     validatePolicyConsistency(resolvedPath, runData, violations);
+
+    // Validate model_io.json
+    const modelIoPath = join(resolvedPath, 'model_io.json');
+    if (existsSync(modelIoPath) && isRegularFile(modelIoPath)) {
+      const modelIoResult = readJsonFile(modelIoPath);
+      if (!modelIoResult.ok) {
+        violations.push({
+          rule_id: RULES.PK8,
+          path: 'model_io.json',
+          message: `failed to parse: ${modelIoResult.error}`,
+        });
+      } else {
+        const modelIoVerify = verifyModelIO(modelIoResult.data);
+        if (!modelIoVerify.ok) {
+          for (const v of modelIoVerify.violations) {
+            violations.push({
+              rule_id: RULES.PK8,
+              path: 'model_io.json',
+              message: `${v.rule_id}: ${v.message}`,
+            });
+          }
+        }
+      }
+    }
 
     // PK9: Validate ledger.jsonl
     validateLedger(resolvedPath, violations);

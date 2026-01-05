@@ -369,6 +369,36 @@ describe('Pack Verification', () => {
       const result = verifyPack(join(FIXTURES_DIR, 'valid_pack_full'));
       assert.ok(result.ok, `Expected valid_pack_full to pass: ${JSON.stringify(result)}`);
     });
+
+    it('valid_pack_with_model_io passes', () => {
+      const result = verifyPack(join(FIXTURES_DIR, 'valid_pack_with_model_io'));
+      assert.ok(result.ok, `Expected valid_pack_with_model_io to pass: ${JSON.stringify(result)}`);
+      if (result.ok) {
+        assert.ok(result.files_verified.includes('model_io.json'), 'Expected model_io.json to be verified');
+      }
+    });
+  });
+
+  describe('Model IO Integration', () => {
+    it('invalid model_io.json in pack fails', () => {
+      const tempPath = createTempPack('invalid_model_io');
+      try {
+        // Copy valid pack files
+        copyFileSync(join(FIXTURES_DIR, 'valid_pack_bundle', 'run.json'), join(tempPath, 'run.json'));
+        copyFileSync(join(FIXTURES_DIR, 'valid_pack_bundle', 'bundle.json'), join(tempPath, 'bundle.json'));
+        // Add invalid model_io.json
+        writeFileSync(join(tempPath, 'model_io.json'), JSON.stringify({ invalid: 'model_io' }));
+
+        const result = verifyPack(tempPath);
+        assert.ok(!result.ok);
+        assert.ok(
+          result.violations?.some((v: PackViolation) => v.rule_id === 'PK8' && v.path === 'model_io.json'),
+          'Expected PK8 violation for invalid model_io.json'
+        );
+      } finally {
+        cleanupTempPack(tempPath);
+      }
+    });
   });
 
   describe('IO Errors', () => {

@@ -1,0 +1,7 @@
+{
+  "model_io_schema_version": "1.0.0",
+  "adapter_id": "mock_a1b2c3d4",
+  "model_id": "mock",
+  "mode": "invalid_mode",
+  "interactions": []
+}

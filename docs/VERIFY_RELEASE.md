@@ -8,6 +8,7 @@ This document provides exact steps to verify a release of the Context Engine Ker
 - **[EVIDENCE_SPEC.md](./EVIDENCE_SPEC.md)** - Execution evidence contract (EvidenceCore, hashing)
 - **[LEDGER_SPEC.md](./LEDGER_SPEC.md)** - Append-only ledger contract (JSONL format)
 - **[PACK_SPEC.md](./PACK_SPEC.md)** - Run export pack contract (PK1-PK12 invariants, external handoff)
+- **[MODEL_IO_SPEC.md](./MODEL_IO_SPEC.md)** - Model IO recording session contract (MI1-MI12 invariants)
 - **[PATCH_SPEC.md](./PATCH_SPEC.md)** - Patch/proposal contract (PS1-PS10 invariants, pre-exec validation)
 - **[POLICY_SPEC.md](./POLICY_SPEC.md)** - Policy profiles and enforcement (PL1-PL7 invariants)
 - **[RUN_SPEC.md](./RUN_SPEC.md)** - Run result contract (RS1-RS8 invariants, canonical output)
@@ -189,6 +190,7 @@ Report the specific failing test and error message.
 | v0.3.7  | 552   | 10      | PATCH_SPEC.md + patch verifier |
 | v0.3.8  | 595   | 10      | Governance: re-scope proposal spec as internal (no external artifact) |
 | v0.3.9  | 645   | 10      | PACK_SPEC.md + pack verifier (PK1-PK12 invariants) |
+| v0.3.10 | TBD   | 10      | MODEL_IO_SPEC.md + model IO verifier (MI1-MI12 invariants) |
 
 ## Contact
 

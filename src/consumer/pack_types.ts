@@ -23,9 +23,9 @@ export const PACK_MANIFEST = {
   /** Required files */
   REQUIRED: ['run.json', 'bundle.json'] as const,
   /** Optional files */
-  OPTIONAL: ['patch.json', 'evidence.json', 'ledger.jsonl', 'policy.json', 'meta.json'] as const,
+  OPTIONAL: ['patch.json', 'evidence.json', 'ledger.jsonl', 'policy.json', 'model_io.json', 'meta.json'] as const,
   /** All allowed files */
-  ALL: ['run.json', 'bundle.json', 'patch.json', 'evidence.json', 'ledger.jsonl', 'policy.json', 'meta.json'] as const,
+  ALL: ['run.json', 'bundle.json', 'patch.json', 'evidence.json', 'ledger.jsonl', 'policy.json', 'model_io.json', 'meta.json'] as const,
 } as const;
 
 /**

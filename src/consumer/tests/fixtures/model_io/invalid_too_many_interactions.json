@@ -1,0 +1,8 @@
+{
+  "model_io_schema_version": "1.0.0",
+  "adapter_id": "mock_a1b2c3d4",
+  "model_id": "mock",
+  "mode": "record",
+  "interactions": [],
+  "_test_note": "This fixture is used to test MI4/MI11 violations by programmatically setting 10001 interactions in the test"
+}

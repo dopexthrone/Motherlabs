@@ -28,7 +28,8 @@
     "bundle-verify": "node dist/tools/bundle_verify.js",
     "bundle-summarize": "node dist/tools/bundle_summarize.js",
     "patch-verify": "node dist/tools/patch_verify.js",
-    "pack-verify": "node dist/tools/pack_verify.js"
+    "pack-verify": "node dist/tools/pack_verify.js",
+    "model-io-verify": "node dist/tools/model_io_verify.js"
   },
   "keywords": [
     "context-engineering",
