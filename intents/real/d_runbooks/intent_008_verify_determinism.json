@@ -1,0 +1,18 @@
+{
+  "goal": "Create a verification runbook for confirming kernel determinism after release",
+  "constraints": [
+    "Must verify golden hash stability across 3 test intents",
+    "Must compare hashes between local build and CI artifacts",
+    "Must verify cross-platform consistency (Linux vs macOS)",
+    "Must include commands for each verification step",
+    "Must define pass/fail criteria clearly",
+    "Must include troubleshooting steps for common failures",
+    "Must be executable as a checklist",
+    "Output must be a single verify_determinism.md file"
+  ],
+  "context": {
+    "category": "runbook",
+    "output_type": "markdown",
+    "acceptance_test": "golden-only"
+  }
+}

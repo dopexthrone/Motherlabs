@@ -1,0 +1,19 @@
+{
+  "goal": "Generate a CLI tool structure for processing intents from the command line",
+  "constraints": [
+    "Must use Node.js with ESM modules",
+    "Must accept intent file path as positional argument",
+    "Must support --output flag for specifying output directory",
+    "Must support --format flag (json, yaml, markdown)",
+    "Must support --verbose flag for detailed logging",
+    "Must return exit code 0 on success, 1 on failure",
+    "Must include help text with --help flag",
+    "Must create bin entry point and package.json updates",
+    "Output must be a complete directory scaffold"
+  ],
+  "context": {
+    "category": "scaffold",
+    "output_type": "directory",
+    "acceptance_test": "executable"
+  }
+}

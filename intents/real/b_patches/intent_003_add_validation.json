@@ -1,0 +1,19 @@
+{
+  "goal": "Add input validation to the intent parser before transformation",
+  "constraints": [
+    "Must validate goal is non-empty after trimming whitespace",
+    "Must validate goal length is under 10000 characters",
+    "Must validate constraints array has no more than 100 items",
+    "Must validate each constraint is non-empty after trimming",
+    "Must reject goals that are only placeholder text (TBD, TODO, etc)",
+    "Must return structured validation errors with field paths",
+    "Must not modify existing transform behavior for valid inputs",
+    "Output must be a unified diff patch"
+  ],
+  "context": {
+    "category": "patch",
+    "output_type": "diff",
+    "target_file": "src/assembler/bundle.ts",
+    "acceptance_test": "executable"
+  }
+}

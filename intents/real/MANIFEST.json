@@ -1,0 +1,76 @@
+{
+  "version": "1.0.0",
+  "description": "Real Motherlabs intents for golden suite testing",
+  "intents": [
+    {
+      "id": "intent_001_api_spec",
+      "path": "a_blueprints/intent_001_api_spec.json",
+      "category": "blueprint",
+      "acceptance_test": "golden-only",
+      "description": "REST API specification for transform endpoint"
+    },
+    {
+      "id": "intent_002_data_model",
+      "path": "a_blueprints/intent_002_data_model.json",
+      "category": "blueprint",
+      "acceptance_test": "golden-only",
+      "description": "TypeScript data model for validation pipeline"
+    },
+    {
+      "id": "intent_003_add_validation",
+      "path": "b_patches/intent_003_add_validation.json",
+      "category": "patch",
+      "acceptance_test": "executable",
+      "description": "Add input validation to intent parser"
+    },
+    {
+      "id": "intent_004_error_handling",
+      "path": "b_patches/intent_004_error_handling.json",
+      "category": "patch",
+      "acceptance_test": "executable",
+      "description": "Refactor to centralized error class hierarchy"
+    },
+    {
+      "id": "intent_005_cli_tool",
+      "path": "c_scaffolds/intent_005_cli_tool.json",
+      "category": "scaffold",
+      "acceptance_test": "executable",
+      "description": "CLI tool structure for processing intents"
+    },
+    {
+      "id": "intent_006_test_fixtures",
+      "path": "c_scaffolds/intent_006_test_fixtures.json",
+      "category": "scaffold",
+      "acceptance_test": "executable",
+      "description": "Test fixture generator for intent test cases"
+    },
+    {
+      "id": "intent_007_deploy_staging",
+      "path": "d_runbooks/intent_007_deploy_staging.json",
+      "category": "runbook",
+      "acceptance_test": "golden-only",
+      "description": "Deployment runbook for staging environment"
+    },
+    {
+      "id": "intent_008_verify_determinism",
+      "path": "d_runbooks/intent_008_verify_determinism.json",
+      "category": "runbook",
+      "acceptance_test": "golden-only",
+      "description": "Verification runbook for kernel determinism"
+    },
+    {
+      "id": "intent_009_empty_goal",
+      "path": "e_edge_cases/intent_009_empty_goal.json",
+      "category": "edge_case",
+      "acceptance_test": "must-refuse",
+      "description": "Empty goal - must be refused"
+    },
+    {
+      "id": "intent_010_contradictory",
+      "path": "e_edge_cases/intent_010_contradictory.json",
+      "category": "edge_case",
+      "acceptance_test": "must-clarify-or-handle",
+      "description": "Contradictory constraints - must clarify or handle"
+    }
+  ]
+}

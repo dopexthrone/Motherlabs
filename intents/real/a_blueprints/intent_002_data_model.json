@@ -1,0 +1,17 @@
+{
+  "goal": "Define a TypeScript data model for the intent validation pipeline",
+  "constraints": [
+    "Must define Intent interface with goal, constraints, and context",
+    "Must define ValidationResult with errors, warnings, and valid flag",
+    "Must define ValidationRule type for custom validators",
+    "Must include JSDoc comments for all public types",
+    "Must export all types for external consumption",
+    "Must use strict TypeScript (no any, no unknown without guards)",
+    "Output must be a single .ts file with type definitions only"
+  ],
+  "context": {
+    "category": "blueprint",
+    "output_type": "types",
+    "acceptance_test": "golden-only"
+  }
+}

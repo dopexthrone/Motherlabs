@@ -1,0 +1,18 @@
+{
+  "goal": "Generate a test fixture generator for creating intent test cases",
+  "constraints": [
+    "Must generate valid intent JSON files",
+    "Must support categories: valid, invalid, edge-case, adversarial",
+    "Must include deterministic seed-based generation",
+    "Must generate matching expected output files",
+    "Must create fixtures in fixtures/ directory",
+    "Must include manifest.json listing all fixtures",
+    "Must support TypeScript for implementation",
+    "Output must include generator script and sample fixtures"
+  ],
+  "context": {
+    "category": "scaffold",
+    "output_type": "directory",
+    "acceptance_test": "executable"
+  }
+}
