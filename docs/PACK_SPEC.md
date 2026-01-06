@@ -408,6 +408,7 @@ A verifier supporting spec version N MUST accept packs created under spec versio
 - [LEDGER_SPEC.md](./LEDGER_SPEC.md) - Audit trail contract
 - [POLICY_SPEC.md](./POLICY_SPEC.md) - Policy profiles contract
 - [MODEL_IO_SPEC.md](./MODEL_IO_SPEC.md) - Model recording session contract
+- [GIT_APPLY_SPEC.md](./GIT_APPLY_SPEC.md) - Git apply result contract
 
 ### 10.2 Implementation References
 

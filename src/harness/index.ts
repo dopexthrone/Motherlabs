@@ -43,3 +43,15 @@ export type { ExportPackArgs, ExportPackResult, PackExportMode } from './pack_ex
 // Pack apply
 export { applyPatch, applyPatchToDir } from './pack_apply.js';
 export type { ApplyPackArgs } from './pack_apply.js';
+
+// Git apply
+export { applyPackToGitRepo, GIT_APPLY_SCHEMA_VERSION } from './git_apply.js';
+export type {
+  GitApplyArgs,
+  GitApplyOptions,
+  GitApplyResult,
+  GitApplyOutcome,
+  GitChangedFile,
+  GitApplySummary,
+  GitApplyViolation,
+} from './git_apply.js';
