@@ -86,3 +86,24 @@ export { APPLY_SCHEMA_VERSION } from './apply_types.js';
 
 // Apply Verification
 export { verifyApplyResult } from './apply_verify.js';
+
+// Repository State Types
+export type {
+  RepoState,
+  RepoStateCore,
+  RepoStateContracts,
+  RepoStateEphemeral,
+  RepoStateViolation,
+  RepoStateVerificationResult,
+  RepoStateVerifyOptions,
+  RepoStateGenerateOptions,
+} from './repo_state_types.js';
+export { REPO_STATE_SCHEMA_VERSION, NODE_VERSION_BASELINE } from './repo_state_types.js';
+
+// Repository State Verification
+export {
+  verifyRepoState,
+  computeRepoStateCore,
+  computeRepoStateHash,
+  serializeRepoState,
+} from './repo_state_verify.js';

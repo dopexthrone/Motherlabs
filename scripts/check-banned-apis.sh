@@ -24,12 +24,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 SRC_DIR="$PROJECT_ROOT/src"
 
-# Exclude test files, protocol/executor, harness/, and adapters/ (evidence domain, not bundle hash domain)
+# Exclude test files, protocol/executor, harness/, adapters/, and tools/ (evidence domain, not bundle hash domain)
 # The executor is untrusted and produces timestamps for audit - this is allowed per KERNEL_DETERMINISM.md
 # The harness is non-authoritative orchestration layer - it may use Date.now(), new Date(), etc.
 # because harness runtime data never affects bundle hashes (by design)
 # Adapters are also part of the harness layer - they record timestamps for audit trails
-EXCLUDE_PATTERN="tests/\|protocol/executor\|harness/\|adapters/"
+# Tools (CLI) are also part of the orchestration layer - ephemeral timestamps for display only
+EXCLUDE_PATTERN="tests/\|protocol/executor\|harness/\|adapters/\|tools/"
 
 echo "=== Banned API Check ==="
 echo "Checking: $SRC_DIR"
