@@ -35,8 +35,8 @@ Match: YES
 
 ```
 Tag: v0.3.13
-Commit: 464f61eaa8f279ab7005164c3158df87f48f6f1b
-Expected: 464f61eaa8f279ab7005164c3158df87f48f6f1b
+Commit: 5275d29c249d361d86e5528d2b99c896c9ed7df5
+Expected: 5275d29c249d361d86e5528d2b99c896c9ed7df5
 Match: YES
 ```
 

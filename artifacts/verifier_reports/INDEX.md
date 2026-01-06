@@ -8,7 +8,7 @@ Single source of truth for release verification status.
 
 | Item | Value |
 |------|-------|
-| Commit | `464f61eaa8f279ab7005164c3158df87f48f6f1b` |
+| Commit | `5275d29c249d361d86e5528d2b99c896c9ed7df5` |
 | Tag date | 2026-01-06 |
 | Reference run | `v0.3.13/` |
 | Reference Tag | `v0.3.13-reference-20260106` |
