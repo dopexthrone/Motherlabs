@@ -107,3 +107,39 @@ export {
   computeRepoStateHash,
   serializeRepoState,
 } from './repo_state_verify.js';
+
+// Workspace Snapshot Types
+export type {
+  WorkspaceSnapshot,
+  WorkspaceSnapshotCore,
+  WorkspaceSnapshotEphemeral,
+  WorkspaceRefs,
+  WorkspaceEnv,
+  WorkspaceSafety,
+  IntentRef,
+  PackRef,
+  ModelIORef,
+  PolicyRef,
+  RepoStateRef,
+  EnvHashedEntry,
+  WorkspaceViolation,
+  WorkspaceVerificationResult,
+  WorkspaceVerifyOptions,
+  ToolId,
+} from './workspace_types.js';
+export {
+  WORKSPACE_SCHEMA_VERSION,
+  VALID_TOOL_IDS,
+  DEFAULT_ENV_ALLOWLIST,
+  FORBIDDEN_ENV_NAMES,
+  FORBIDDEN_ENV_PREFIXES,
+  REQUIRED_REFS_BY_TOOL,
+} from './workspace_types.js';
+
+// Workspace Snapshot Verification
+export {
+  verifyWorkspaceSnapshot,
+  computeWorkspaceCore,
+  computeWorkspaceHash,
+  serializeWorkspaceSnapshot,
+} from './workspace_verify.js';

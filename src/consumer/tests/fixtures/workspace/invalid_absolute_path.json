@@ -1,0 +1,26 @@
+{
+  "args": {
+    "policy": "strict"
+  },
+  "env": {
+    "allowlist": ["NODE_ENV"],
+    "hashed": []
+  },
+  "refs": {
+    "intent": {
+      "rel_path": "/home/user/intents/test.json",
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "policy": {
+      "policy_hash": "sha256:abc123def456789012345678901234567890123456789012345678901234abcd",
+      "profile": "strict"
+    }
+  },
+  "safety": {
+    "denies_absolute": true,
+    "denies_traversal": true,
+    "work_root_rel": "."
+  },
+  "tool_id": "pack-export",
+  "workspace_schema_version": "1.0.0"
+}

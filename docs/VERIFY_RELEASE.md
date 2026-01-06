@@ -13,6 +13,7 @@ This document provides exact steps to verify a release of the Context Engine Ker
 - **[APPLY_SPEC.md](./APPLY_SPEC.md)** - Apply result contract (AS1-AS12 invariants, patch application)
 - **[GIT_APPLY_SPEC.md](./GIT_APPLY_SPEC.md)** - Git apply result contract (GA1-GA12 invariants, git repo apply)
 - **[REPO_STATE_SPEC.md](./REPO_STATE_SPEC.md)** - Repository state contract (RS1-RS12 invariants, environment fingerprint)
+- **[WORKSPACE_SPEC.md](./WORKSPACE_SPEC.md)** - Workspace snapshot contract (WS1-WS14 invariants, reproducibility)
 - **[POLICY_SPEC.md](./POLICY_SPEC.md)** - Policy profiles and enforcement (PL1-PL7 invariants)
 - **[RUN_SPEC.md](./RUN_SPEC.md)** - Run result contract (RS1-RS8 invariants, canonical output)
 
@@ -198,6 +199,7 @@ Report the specific failing test and error message.
 | v0.3.12 | 788   | 10      | APPLY_SPEC.md + pack apply pipeline (pack-apply CLI, AS1-AS12 invariants) |
 | v0.3.13 | 833   | 10      | GIT_APPLY_SPEC.md + git apply pipeline (git-apply CLI, GA1-GA12 invariants) |
 | v0.3.14 | 895   | 10      | REPO_STATE_SPEC.md + repo-state CLI (RS1-RS12 invariants) |
+| v0.3.15 | 989   | 10      | WORKSPACE_SPEC.md + workspace-snapshot CLI (WS1-WS14 invariants) |
 
 ## Contact
 

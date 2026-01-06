@@ -1,0 +1,49 @@
+{
+  "args": {
+    "dry_run": true,
+    "mode": "exec",
+    "policy": "dev"
+  },
+  "env": {
+    "allowlist": ["CI", "LANG", "LC_ALL", "NODE_ENV", "TZ"],
+    "hashed": [
+      { "name": "CI", "sha256": "sha256:4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5" },
+      { "name": "NODE_ENV", "sha256": "sha256:a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3" }
+    ]
+  },
+  "ephemeral": {
+    "generated_at": "2026-01-06T12:00:00.000Z",
+    "human_notes": "Test snapshot",
+    "tool_version": "0.3.15"
+  },
+  "refs": {
+    "intent": {
+      "rel_path": "intents/complex.json",
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "model_io": {
+      "rel_path": "recordings/session.json",
+      "sha256": "sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+    },
+    "pack": {
+      "pack_hash": "sha256:fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321",
+      "rel_path": "packs/run_001"
+    },
+    "policy": {
+      "policy_hash": "sha256:abc123def456789012345678901234567890123456789012345678901234abcd",
+      "profile": "dev"
+    },
+    "repo_state": {
+      "rel_path": "state/repo.json",
+      "sha256": "sha256:0000111122223333444455556666777788889999aaaabbbbccccddddeeeeffff"
+    }
+  },
+  "safety": {
+    "denies_absolute": true,
+    "denies_traversal": true,
+    "work_root_rel": "."
+  },
+  "tool_id": "pack-export",
+  "warnings": ["WARN_001", "WARN_002"],
+  "workspace_schema_version": "1.0.0"
+}

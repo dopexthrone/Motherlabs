@@ -33,7 +33,8 @@
     "pack-apply": "node dist/tools/pack_apply.js",
     "git-apply": "node dist/tools/git_apply.js",
     "model-io-verify": "node dist/tools/model_io_verify.js",
-    "repo-state": "node dist/tools/repo_state.js"
+    "repo-state": "node dist/tools/repo_state.js",
+    "workspace-snapshot": "node dist/tools/workspace_snapshot.js"
   },
   "keywords": [
     "context-engineering",
