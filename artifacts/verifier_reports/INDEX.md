@@ -4,6 +4,27 @@ Single source of truth for release verification status.
 
 ## Releases
 
+### v0.3.13
+
+| Item | Value |
+|------|-------|
+| Commit | `464f61eaa8f279ab7005164c3158df87f48f6f1b` |
+| Tag date | 2026-01-06 |
+| Reference run | `v0.3.13/` |
+| Reference Tag | `v0.3.13-reference-20260106` |
+| Independent verifiers | 0 |
+| Internal verifiers | 1 |
+| Verified | NO (pending external verification) |
+
+**Transfer bundle ready:** `artifacts/transfer/v0.3.13/`
+
+**External verification reports:**
+| Date | Verifier | Release | Result | Kind | OS | Node | npm | Path |
+|------|----------|---------|--------|------|-----|------|-----|------|
+| 20260106 | internal_me | v0.3.13 | PASS | internal | Ubuntu 24.04.3 LTS | v24.11.1 | 11.6.2 | v0.3.13/verified/20260106_internal_me/ |
+
+---
+
 ### v0.3.12
 
 | Item | Value |

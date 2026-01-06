@@ -31,6 +31,7 @@
     "pack-verify": "node dist/tools/pack_verify.js",
     "pack-export": "node dist/tools/pack_export.js",
     "pack-apply": "node dist/tools/pack_apply.js",
+    "git-apply": "node dist/tools/git_apply.js",
     "model-io-verify": "node dist/tools/model_io_verify.js"
   },
   "keywords": [
