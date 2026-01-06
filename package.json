@@ -29,6 +29,7 @@
     "bundle-summarize": "node dist/tools/bundle_summarize.js",
     "patch-verify": "node dist/tools/patch_verify.js",
     "pack-verify": "node dist/tools/pack_verify.js",
+    "pack-export": "node dist/tools/pack_export.js",
     "model-io-verify": "node dist/tools/model_io_verify.js"
   },
   "keywords": [

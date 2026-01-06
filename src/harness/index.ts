@@ -35,3 +35,7 @@ export { createLedgerEntry, serializeLedgerEntry, appendToLedger, appendHarnessR
 
 // Main runner
 export { runHarness } from './run_intent.js';
+
+// Pack export
+export { exportPack } from './pack_export.js';
+export type { ExportPackArgs, ExportPackResult, PackExportMode } from './pack_export.js';
