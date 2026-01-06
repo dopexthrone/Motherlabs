@@ -39,3 +39,7 @@ export { runHarness } from './run_intent.js';
 // Pack export
 export { exportPack } from './pack_export.js';
 export type { ExportPackArgs, ExportPackResult, PackExportMode } from './pack_export.js';
+
+// Pack apply
+export { applyPatch, applyPatchToDir } from './pack_apply.js';
+export type { ApplyPackArgs } from './pack_apply.js';

@@ -1,0 +1,27 @@
+{
+  "apply_schema_version": "1.0.0",
+  "outcome": "SUCCESS",
+  "dry_run": false,
+  "target_root": "workspace",
+  "patch_source": {
+    "proposal_id": "prop_1234567890abcdef",
+    "proposal_hash": "sha256:abcd1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab"
+  },
+  "operation_results": [
+    {
+      "op": "create",
+      "path": "src/hello.ts",
+      "status": "success",
+      "before_hash": null,
+      "after_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes_written": 51
+    }
+  ],
+  "summary": {
+    "total_operations": 1,
+    "succeeded": 1,
+    "skipped": 0,
+    "failed": 0,
+    "total_bytes_written": 51
+  }
+}

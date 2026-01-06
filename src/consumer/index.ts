@@ -67,3 +67,22 @@ export { MODEL_IO_SCHEMA_VERSION, MODEL_IO_LIMITS, VALID_MODES } from './model_i
 
 // Model IO Verification
 export { verifyModelIO, computeModelIOCore, computeModelIOHash } from './model_io_verify.js';
+
+// Apply Types
+export type {
+  ApplyResult,
+  ApplyOutcome,
+  ApplyOperationResult,
+  ApplyOperationStatus,
+  ApplyOpType,
+  ApplySummary,
+  ApplyViolation,
+  ApplyPatchSource,
+  ApplyVerifyResult,
+  ApplyVerifyOptions,
+  ApplyOptions,
+} from './apply_types.js';
+export { APPLY_SCHEMA_VERSION } from './apply_types.js';
+
+// Apply Verification
+export { verifyApplyResult } from './apply_verify.js';
