@@ -11,7 +11,7 @@ Single source of truth for release verification status.
 | Commit | `95a57f2621dad1149de045e6a17fd65193bd8b61` |
 | Tag date | 2026-01-06 |
 | Reference run | `v0.3.16/` |
-| Reference Tag | (pending) |
+| Reference Tag | `v0.3.16-reference-20260106` |
 | Independent verifiers | 0 |
 | Internal verifiers | 1 |
 | Verified | NO (pending external verification) |
@@ -32,7 +32,6 @@ Single source of truth for release verification status.
 | Commit | `487968f` |
 | Tag date | 2026-01-06 |
 | Reference run | `v0.3.15/` |
-| Reference Tag | (pending) |
 | Independent verifiers | 0 |
 | Internal verifiers | 0 |
 | Verified | NO (pending external verification) |
@@ -49,10 +48,9 @@ Single source of truth for release verification status.
 
 | Item | Value |
 |------|-------|
-| Commit | (see git log) |
+| Commit | |
 | Tag date | 2026-01-06 |
 | Reference run | `v0.3.14/` |
-| Reference Tag | (pending) |
 | Independent verifiers | 0 |
 | Internal verifiers | 0 |
 | Verified | NO (pending external verification) |
