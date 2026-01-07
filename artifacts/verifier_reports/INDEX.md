@@ -4,6 +4,67 @@ Single source of truth for release verification status.
 
 ## Releases
 
+### v0.3.16
+
+| Item | Value |
+|------|-------|
+| Commit | `95a57f2621dad1149de045e6a17fd65193bd8b61` |
+| Tag date | 2026-01-06 |
+| Reference run | `v0.3.16/` |
+| Reference Tag | (pending) |
+| Independent verifiers | 0 |
+| Internal verifiers | 1 |
+| Verified | NO (pending external verification) |
+
+**Transfer bundle ready:** `artifacts/transfer/v0.3.16/`
+
+**External verification reports:**
+| Date | Verifier | Release | Result | Kind | OS | Node | npm | Path |
+|------|----------|---------|--------|------|-----|------|-----|------|
+| 20260106 | internal_claude | v0.3.16 | PASS | internal | Ubuntu (Linux 6.14.0-37-generic) | v24.11.1 | 11.6.2 | v0.3.16/verified/20260106_internal_claude/ |
+
+---
+
+### v0.3.15
+
+| Item | Value |
+|------|-------|
+| Commit | `487968f` |
+| Tag date | 2026-01-06 |
+| Reference run | `v0.3.15/` |
+| Reference Tag | (pending) |
+| Independent verifiers | 0 |
+| Internal verifiers | 0 |
+| Verified | NO (pending external verification) |
+
+**Transfer bundle ready:** `artifacts/transfer/v0.3.15/`
+
+**External verification reports:**
+| Date | Verifier | Release | Result | Kind | OS | Node | npm | Path |
+|------|----------|---------|--------|------|-----|------|-----|------|
+
+---
+
+### v0.3.14
+
+| Item | Value |
+|------|-------|
+| Commit | (see git log) |
+| Tag date | 2026-01-06 |
+| Reference run | `v0.3.14/` |
+| Reference Tag | (pending) |
+| Independent verifiers | 0 |
+| Internal verifiers | 0 |
+| Verified | NO (pending external verification) |
+
+**Transfer bundle ready:** `artifacts/transfer/v0.3.14/`
+
+**External verification reports:**
+| Date | Verifier | Release | Result | Kind | OS | Node | npm | Path |
+|------|----------|---------|--------|------|-----|------|-----|------|
+
+---
+
 ### v0.3.13
 
 | Item | Value |
