@@ -1,0 +1,1827 @@
+
+> context-engine-kernel@0.1.0 test
+> node --test dist/tests/*.test.js dist/harness/tests/*.test.js dist/tools/tests/*.test.js dist/consumer/tests/*.test.js dist/protocol/tests/*.test.js
+
+▶ Apply Result Verification
+  ▶ AS1: Schema Version Present
+    ✔ valid schema version passes (0.977312ms)
+    ✔ missing schema version fails (0.286878ms)
+    ✔ empty schema version fails (0.162114ms)
+  ✔ AS1: Schema Version Present (2.008015ms)
+  ▶ AS2: Deterministic Ordering
+    ✔ properly sorted operations pass (0.155231ms)
+    ✔ unsorted operations fail (3.308854ms)
+    ✔ properly sorted violations pass (0.214663ms)
+    ✔ unsorted violations fail (0.131817ms)
+  ✔ AS2: Deterministic Ordering (4.014999ms)
+  ▶ AS7: Hashes Present (sha256: format)
+    ✔ valid sha256 hashes pass (0.201899ms)
+    ✔ null hashes pass (0.102492ms)
+    ✔ invalid hash format fails (1.18932ms)
+    ✔ md5 hash fails (0.147116ms)
+    ✔ truncated hash fails (0.084227ms)
+  ✔ AS7: Hashes Present (sha256: format) (1.915151ms)
+  ▶ AS9: Stable Error Codes
+    ✔ FAILED outcome with error message passes (0.137588ms)
+    ✔ FAILED outcome without error message fails (0.065143ms)
+    ✔ REFUSED outcome without error message fails (0.050846ms)
+    ✔ operation error without error message fails (0.065263ms)
+  ✔ AS9: Stable Error Codes (0.435146ms)
+  ▶ AS12: No Absolute Path Leakage
+    ✔ relative paths pass (0.075622ms)
+    ✔ absolute target_root fails (2.502022ms)
+    ✔ absolute operation path fails (0.129904ms)
+  ✔ AS12: No Absolute Path Leakage (2.803527ms)
+  ▶ Summary Consistency
+    ✔ matching summary passes (0.049914ms)
+    ✔ mismatched total_operations fails (0.040596ms)
+    ✔ mismatched succeeded count fails (0.111719ms)
+    ✔ mismatched bytes_written fails (0.10631ms)
+  ✔ Summary Consistency (0.380995ms)
+  ▶ Fixture: Valid Apply Result
+    ✔ valid fixture passes all checks (1.095794ms)
+  ✔ Fixture: Valid Apply Result (1.169423ms)
+  ▶ Schema Errors
+    ✔ null input fails (0.126437ms)
+    ✔ array input fails (0.047599ms)
+    ✔ missing required fields fails (0.071875ms)
+    ✔ invalid outcome fails (0.057337ms)
+    ✔ invalid dry_run type fails (0.060503ms)
+    ✔ invalid operation status fails (0.067567ms)
+    ✔ invalid operation type fails (0.052358ms)
+  ✔ Schema Errors (0.620643ms)
+  ▶ Determinism
+    ✔ verification is deterministic (0.189345ms)
+    ✔ violations are sorted deterministically (0.299812ms)
+  ✔ Determinism (0.542838ms)
+✔ Apply Result Verification (15.328563ms)
+▶ Bundle Summary
+  ▶ Outcome Detection
+    ✔ detects BUNDLE outcome for complete status (3.858244ms)
+    ✔ detects CLARIFY outcome for incomplete status (0.65037ms)
+    ✔ detects REFUSE outcome for error status (0.451206ms)
+  ✔ Outcome Detection (5.48232ms)
+  ▶ Field Extraction
+    ✔ extracts schema_version correctly (0.886563ms)
+    ✔ computes bundle_hash (0.669685ms)
+    ✔ counts artifacts correctly (0.382608ms)
+    ✔ counts unresolved questions correctly (0.426941ms)
+    ✔ counts terminal nodes correctly (0.356599ms)
+  ✔ Field Extraction (2.993724ms)
+  ▶ Sorting
+    ✔ artifact_paths are sorted lexicographically (1.723101ms)
+    ✔ question_ids are sorted by priority desc, id asc (0.92758ms)
+    ✔ terminal_node_ids are sorted lexicographically (0.59181ms)
+  ✔ Sorting (3.4343ms)
+  ▶ Determinism
+    ✔ produces identical summary for same bundle (0.764172ms)
+    ✔ summary is byte-identical across multiple runs (0.941916ms)
+    ✔ canonical JSON has sorted keys (0.468959ms)
+  ✔ Determinism (2.391615ms)
+  ▶ Edge Cases
+    ✔ handles bundle with no outputs (0.841859ms)
+    ✔ handles bundle with no unresolved questions (1.052894ms)
+    ✔ handles bundle with no terminal nodes (0.353272ms)
+  ✔ Edge Cases (2.401223ms)
+✔ Bundle Summary (17.121726ms)
+▶ Bundle Verification
+  ▶ Valid Bundles
+    ✔ accepts valid BUNDLE outcome (4.508344ms)
+    ✔ accepts valid CLARIFY outcome (0.567825ms)
+    ✔ accepts valid REFUSE outcome (0.691417ms)
+  ✔ Valid Bundles (6.256562ms)
+  ▶ Invalid Bundles
+    ✔ rejects bundle with unsorted output paths (BS3) (0.830006ms)
+    ✔ rejects bundle with path traversal (BS7) (0.629821ms)
+    ✔ rejects non-object bundle (0.131898ms)
+    ✔ rejects null bundle (0.095399ms)
+    ✔ rejects bundle with missing schema_version (BS1) (0.125675ms)
+    ✔ rejects bundle with empty schema_version (BS1) (0.10096ms)
+  ✔ Invalid Bundles (2.170129ms)
+  ▶ Violation Ordering
+    ✔ violations are sorted by rule_id then path (0.617888ms)
+  ✔ Violation Ordering (0.676949ms)
+  ▶ Determinism
+    ✔ produces identical result for same input (2.077576ms)
+    ✔ violations are byte-identical across runs (0.693451ms)
+  ✔ Determinism (2.904756ms)
+✔ Bundle Verification (12.388409ms)
+▶ Model IO Verification
+  ▶ MI1: Schema Version Present
+    ✔ valid schema version passes (1.39233ms)
+    ✔ missing schema version fails (0.216757ms)
+    ✔ empty schema version fails (0.172884ms)
+    ✔ non-semver schema version fails (0.20809ms)
+  ✔ MI1: Schema Version Present (2.518472ms)
+  ▶ MI2: Adapter and Model ID Non-Empty
+    ✔ valid IDs pass (0.211838ms)
+    ✔ empty adapter_id fails (0.171792ms)
+    ✔ empty model_id fails (0.1708ms)
+  ✔ MI2: Adapter and Model ID Non-Empty (1.400235ms)
+  ▶ MI3: Mode Valid
+    ✔ record mode passes (0.332784ms)
+    ✔ replay mode passes (0.178565ms)
+    ✔ invalid mode fails (0.204884ms)
+  ✔ MI3: Mode Valid (1.063224ms)
+  ▶ MI4: Interactions Array Present
+    ✔ valid interactions array passes (0.151033ms)
+    ✔ empty interactions array passes (0.104165ms)
+    ✔ missing interactions array fails (0.070252ms)
+    ✔ too many interactions fails (65.743748ms)
+  ✔ MI4: Interactions Array Present (66.273932ms)
+  ▶ MI5: Indices Monotonic and Contiguous
+    ✔ contiguous indices pass (0.304902ms)
+    ✔ non-contiguous indices fail (0.172844ms)
+    ✔ wrong starting index fails (0.130404ms)
+  ✔ MI5: Indices Monotonic and Contiguous (0.76239ms)
+  ▶ MI6: Prompt Hash Format
+    ✔ valid prompt hash passes (0.157966ms)
+    ✔ invalid prompt hash format fails (0.121267ms)
+    ✔ prompt hash without prefix fails (0.100498ms)
+  ✔ MI6: Prompt Hash Format (0.479038ms)
+  ▶ MI7: Response Hash Integrity
+    ✔ valid response hash passes (0.13339ms)
+    ✔ mismatched response hash fails (0.127128ms)
+    ✔ skips hash verification when disabled (0.141205ms)
+  ✔ MI7: Response Hash Integrity (0.502001ms)
+  ▶ MI8: No Duplicate Prompt Hashes at Same Index
+    ✔ unique pairs pass (0.147958ms)
+    ✔ same prompt at different indices passes (0.116478ms)
+  ✔ MI8: No Duplicate Prompt Hashes at Same Index (0.336181ms)
+  ▶ MI9: Deterministic Sorting
+    ✔ sorted interactions pass (0.150231ms)
+    ✔ unsorted interactions fail (0.150793ms)
+  ✔ MI9: Deterministic Sorting (0.808486ms)
+  ▶ MI10: Stable Violations
+    ✔ violations are deterministically sorted (0.253345ms)
+  ✔ MI10: Stable Violations (0.414016ms)
+  ▶ MI11: Size Limits
+    ✔ within limits passes (0.124173ms)
+    ✔ skips size limits when disabled (0.809898ms)
+  ✔ MI11: Size Limits (1.024842ms)
+  ▶ Fixture: Valid Model IO
+    ✔ valid_model_io.json passes all checks (0.285355ms)
+  ✔ Fixture: Valid Model IO (0.352551ms)
+  ▶ Fixture: Invalid Bad Hash
+    ✔ invalid_bad_hash.json fails MI7 (0.175098ms)
+  ✔ Fixture: Invalid Bad Hash (0.238477ms)
+  ▶ Fixture: Invalid Non-Contiguous Index
+    ✔ invalid_non_contiguous_index.json fails MI5 (0.178224ms)
+  ✔ Fixture: Invalid Non-Contiguous Index (0.225482ms)
+  ▶ Fixture: Invalid Mode
+    ✔ invalid_mode.json fails MI3 (0.13841ms)
+  ✔ Fixture: Invalid Mode (0.194235ms)
+  ▶ ModelIOCore Computation
+    ✔ computeModelIOCore excludes ephemeral fields (0.147576ms)
+    ✔ computeModelIOCore sorts interactions by i (0.10102ms)
+  ✔ ModelIOCore Computation (0.32533ms)
+  ▶ ModelIOHash Computation
+    ✔ hash is deterministic for same session (0.1437ms)
+    ✔ hash differs for different sessions (0.128401ms)
+    ✔ hash ignores ephemeral fields (1.240466ms)
+  ✔ ModelIOHash Computation (1.60548ms)
+  ▶ Schema Errors
+    ✔ null input fails (0.187451ms)
+    ✔ array input fails (0.086803ms)
+    ✔ empty object fails (0.073878ms)
+  ✔ Schema Errors (0.426019ms)
+  ▶ Success Result Structure
+    ✔ includes interactions_count on success (0.114745ms)
+    ✔ includes model_io_hash on success (0.085069ms)
+  ✔ Success Result Structure (0.267151ms)
+✔ Model IO Verification (80.175649ms)
+▶ Pack Verification
+  ▶ PK1: Required Files Exist
+    ✔ valid pack with run.json and bundle.json passes (2.326712ms)
+    ✔ missing run.json fails (0.462678ms)
+    ✔ missing bundle.json for BUNDLE outcome fails (0.332945ms)
+    ✔ REFUSE outcome without bundle.json passes (0.264045ms)
+  ✔ PK1: Required Files Exist (4.361749ms)
+  ▶ PK2: No Unknown Files
+    ✔ pack with only manifest files passes (0.559409ms)
+    ✔ pack with unknown file fails (1.153262ms)
+  ✔ PK2: No Unknown Files (1.883281ms)
+  ▶ PK3: Run Spec Valid
+    ✔ valid run.json passes (0.728025ms)
+    ✔ run.json with missing fields fails (1.160556ms)
+  ✔ PK3: Run Spec Valid (2.086413ms)
+  ▶ PK4: Bundle Spec Valid
+    ✔ valid bundle.json passes (0.678161ms)
+    ✔ invalid bundle.json fails deep validation (1.345684ms)
+    ✔ skips bundle validation when deepValidation=false (0.45291ms)
+  ✔ PK4: Bundle Spec Valid (2.668354ms)
+  ▶ PK5: Hash Match (run -> bundle)
+    ✔ matching hash passes (0.35165ms)
+    ✔ mismatched hash fails (0.360296ms)
+    ✔ skips hash verification when verifyReferences=false (0.598112ms)
+  ✔ PK5: Hash Match (run -> bundle) (1.395917ms)
+  ▶ PK6: No Symlinks
+    ✔ regular files pass (0.352661ms)
+    ✔ symlink file fails (3.368807ms)
+  ✔ PK6: No Symlinks (3.821315ms)
+  ▶ PK7: No Path Traversal
+    ✔ normal path passes (0.461164ms)
+  ✔ PK7: No Path Traversal (0.538389ms)
+  ▶ PK8: Optional Files Valid
+    ✔ pack with all optional files passes (0.956463ms)
+    ✔ invalid patch.json in pack fails (0.798537ms)
+  ✔ PK8: Optional Files Valid (1.862843ms)
+  ▶ PK9: Ledger Format Valid
+    ✔ valid ledger.jsonl passes (0.508423ms)
+    ✔ invalid JSONL format fails (2.342212ms)
+  ✔ PK9: Ledger Format Valid (2.967514ms)
+  ▶ PK10: Stable Violations
+    ✔ violations are deterministically sorted (1.256285ms)
+  ✔ PK10: Stable Violations (1.365701ms)
+  ▶ PK11: Meta Ignored
+    ✔ meta.json is parsed but not validated (1.330976ms)
+    ✔ invalid JSON in meta.json fails (1.268879ms)
+  ✔ PK11: Meta Ignored (2.707537ms)
+  ▶ PK12: Regular Files Only
+    ✔ regular files pass (0.342573ms)
+  ✔ PK12: Regular Files Only (0.412544ms)
+  ▶ Valid Pack Fixtures
+    ✔ valid_pack_bundle passes (0.359594ms)
+    ✔ valid_pack_clarify passes (0.290224ms)
+    ✔ valid_pack_refuse passes (0.142988ms)
+    ✔ valid_pack_full passes (0.416922ms)
+    ✔ valid_pack_with_model_io passes (0.830147ms)
+  ✔ Valid Pack Fixtures (2.177683ms)
+  ▶ Model IO Integration
+    ✔ invalid model_io.json in pack fails (1.166096ms)
+  ✔ Model IO Integration (1.224386ms)
+  ▶ IO Errors
+    ✔ non-existent directory fails (0.135534ms)
+    ✔ file instead of directory fails (0.42695ms)
+  ✔ IO Errors (0.646102ms)
+  ▶ Success Result Structure
+    ✔ includes files_verified on success (0.349405ms)
+    ✔ includes reference_checks on success (0.305503ms)
+  ✔ Success Result Structure (0.727464ms)
+✔ Pack Verification (31.802815ms)
+▶ Patch Verification
+  ▶ PS1: Schema Version Present
+    ✔ valid schema version passes (0.611967ms)
+    ✔ missing schema version fails (0.110958ms)
+    ✔ empty schema version fails (0.10172ms)
+  ✔ PS1: Schema Version Present (1.223494ms)
+  ▶ PS2: Op Enum Valid
+    ✔ create op passes (0.141164ms)
+    ✔ modify op passes (0.088145ms)
+    ✔ delete op passes (0.117971ms)
+    ✔ invalid op fails (0.172002ms)
+  ✔ PS2: Op Enum Valid (0.670948ms)
+  ▶ PS3: Path Relative Only
+    ✔ relative path passes (0.127379ms)
+    ✔ absolute path fails (4.822122ms)
+    ✔ Windows drive path fails (0.492784ms)
+  ✔ PS3: Path Relative Only (5.649453ms)
+  ▶ PS4: No Path Traversal
+    ✔ normal path passes (0.171241ms)
+    ✔ traversal path fails (2.056756ms)
+    ✔ backslash path fails (0.120706ms)
+    ✔ dot-slash path fails (0.065443ms)
+    ✔ double-slash path fails (0.046528ms)
+    ✔ trailing slash path fails (0.041457ms)
+  ✔ PS4: No Path Traversal (2.667031ms)
+  ▶ PS5: No Duplicate Targets
+    ✔ unique paths pass (0.064911ms)
+    ✔ duplicate paths fail (1.182477ms)
+  ✔ PS5: No Duplicate Targets (1.355862ms)
+  ▶ PS6: Text Only UTF-8
+    ✔ valid UTF-8 passes (0.103003ms)
+    ✔ null bytes fail (0.564819ms)
+    ✔ delete with content fails (0.109835ms)
+    ✔ create without content fails (0.072807ms)
+  ✔ PS6: Text Only UTF-8 (0.945924ms)
+  ▶ PS7: Max Bytes Enforced
+    ✔ within limit passes (0.068128ms)
+    ✔ exceeds limit fails (0.08544ms)
+    ✔ mismatched total_bytes fails (0.066094ms)
+  ✔ PS7: Max Bytes Enforced (0.29335ms)
+  ▶ PS8: Sorting Canonical
+    ✔ properly sorted passes (0.076784ms)
+    ✔ unsorted by order fails (0.065113ms)
+    ✔ unsorted by path (same order) fails (0.062618ms)
+  ✔ PS8: Sorting Canonical (0.260549ms)
+  ▶ PS9: No Symlink Intent
+    ✔ symlink op fails (0.0589ms)
+  ✔ PS9: No Symlink Intent (0.093034ms)
+  ▶ PS10: Stable Violations
+    ✔ violations are sorted by rule_id then path (0.251331ms)
+  ✔ PS10: Stable Violations (0.292488ms)
+  ▶ Fixture: Valid Patch
+    ✔ valid fixture passes all checks (5.159084ms)
+  ✔ Fixture: Valid Patch (5.273779ms)
+  ▶ Schema Errors
+    ✔ null input fails (0.162806ms)
+    ✔ array input fails (0.063589ms)
+    ✔ missing required fields fails (0.062297ms)
+  ✔ Schema Errors (0.368041ms)
+✔ Patch Verification (20.416484ms)
+▶ Repository State Verification
+  ▶ RS1: Schema Version Present
+    ✔ valid schema version passes (1.393223ms)
+    ✔ missing schema version fails (0.239149ms)
+    ✔ wrong schema version fails (0.143519ms)
+  ✔ RS1: Schema Version Present (2.300224ms)
+  ▶ RS2: Node Version Baseline
+    ✔ matching node version passes (0.260839ms)
+    ✔ mismatched node version flags RS2 (0.704852ms)
+    ✔ skip node version check option works (0.221906ms)
+  ✔ RS2: Node Version Baseline (1.34396ms)
+  ▶ RS3: Repository Commit Format
+    ✔ valid 40-hex commit passes (0.217097ms)
+    ✔ short commit fails (0.144711ms)
+    ✔ HEAD string fails (0.162635ms)
+    ✔ uppercase hex fails (0.190557ms)
+  ✔ RS3: Repository Commit Format (0.909265ms)
+  ▶ RS4: Dirty Paths Validity
+    ✔ empty dirty_paths passes (0.213731ms)
+    ✔ valid sorted paths pass (0.276248ms)
+    ✔ path traversal fails (0.131987ms)
+    ✔ duplicate paths fail (0.110838ms)
+  ✔ RS4: Dirty Paths Validity (0.846236ms)
+  ▶ RS5: Package Lock Hash Format
+    ✔ valid sha256 hash passes (0.17629ms)
+    ✔ missing prefix fails (0.135023ms)
+    ✔ wrong algorithm fails (0.18106ms)
+    ✔ uppercase hex fails (0.115607ms)
+  ✔ RS5: Package Lock Hash Format (0.730029ms)
+  ▶ RS6: No Absolute Paths
+    ✔ relative paths pass (0.160572ms)
+    ✔ Unix absolute path fails (0.106309ms)
+    ✔ Windows absolute path fails (0.089658ms)
+  ✔ RS6: No Absolute Paths (0.43762ms)
+  ▶ RS7: Sorted Arrays
+    ✔ sorted dirty_paths passes (0.183544ms)
+    ✔ unsorted dirty_paths fails (0.143178ms)
+  ✔ RS7: Sorted Arrays (0.398808ms)
+  ▶ RS9: Contracts Map Validity
+    ✔ valid contracts passes (0.17594ms)
+    ✔ missing contract key fails (0.110628ms)
+    ✔ empty contract value fails (0.089197ms)
+  ✔ RS9: Contracts Map Validity (0.457848ms)
+  ▶ RS10: Core Hash Excludes Ephemeral
+    ✔ computeRepoStateCore excludes ephemeral (1.281693ms)
+    ✔ hash is same regardless of ephemeral (0.163046ms)
+  ✔ RS10: Core Hash Excludes Ephemeral (1.524248ms)
+  ▶ RS11: Canonical Round-Trip
+    ✔ valid state round-trips (0.161152ms)
+    ✔ verifyRoundTrip returns true for valid state (0.066465ms)
+  ✔ RS11: Canonical Round-Trip (0.320491ms)
+  ▶ Fixture: Valid Repo State
+    ✔ valid_repo_state.json passes (16.288273ms)
+    ✔ valid_repo_state_dirty.json passes (1.303765ms)
+  ✔ Fixture: Valid Repo State (18.244952ms)
+  ▶ Fixture: Invalid Absolute Path
+    ✔ invalid_absolute_path.json fails RS6 (0.670337ms)
+  ✔ Fixture: Invalid Absolute Path (0.997621ms)
+  ▶ Fixture: Invalid Unsorted Paths
+    ✔ invalid_unsorted_paths.json fails RS7 (0.675477ms)
+  ✔ Fixture: Invalid Unsorted Paths (0.759094ms)
+  ▶ Fixture: Invalid Bad Hash
+    ✔ invalid_bad_hash.json fails RS5 (1.273287ms)
+  ✔ Fixture: Invalid Bad Hash (1.378384ms)
+  ▶ Fixture: Invalid Bad Commit
+    ✔ invalid_bad_commit.json fails RS3 (0.670788ms)
+  ✔ Fixture: Invalid Bad Commit (0.763302ms)
+  ▶ Fixture: Invalid Missing Schema
+    ✔ invalid_missing_schema.json fails RS1 (1.419682ms)
+  ✔ Fixture: Invalid Missing Schema (1.511294ms)
+  ▶ Fixture: Invalid Empty Contract
+    ✔ invalid_empty_contract.json fails RS9 (0.491041ms)
+  ✔ Fixture: Invalid Empty Contract (0.567094ms)
+  ▶ Fixture: Invalid Path Traversal
+    ✔ invalid_path_traversal.json fails RS4 (0.803857ms)
+  ✔ Fixture: Invalid Path Traversal (0.87494ms)
+  ▶ RS8: Violation Ordering
+    ✔ violations are sorted by rule_id, path (6.250931ms)
+  ✔ RS8: Violation Ordering (6.326623ms)
+  ▶ Schema Errors
+    ✔ null input fails (0.184095ms)
+    ✔ array input fails (0.080601ms)
+    ✔ missing required fields fails (0.081683ms)
+  ✔ Schema Errors (0.439764ms)
+  ▶ Hash Computation
+    ✔ hash is deterministic (0.260819ms)
+    ✔ hash uses sha256 prefix (0.093065ms)
+    ✔ different state produces different hash (0.123411ms)
+  ✔ Hash Computation (0.547647ms)
+✔ Repository State Verification (43.632877ms)
+▶ Runner Verification
+  ▶ RN1: Schema Version Present
+    ✔ valid schema version passes (1.876399ms)
+    ✔ missing schema version fails (0.270527ms)
+    ✔ wrong schema version fails (0.160381ms)
+    ✔ empty schema version fails (0.14946ms)
+  ✔ RN1: Schema Version Present (3.012259ms)
+  ▶ RN2: Runner Identity Valid
+    ✔ valid runner_id passes (0.326653ms)
+    ✔ invalid runner_id format fails (0.725761ms)
+    ✔ empty runner_id fails (0.457448ms)
+    ✔ empty runner_version fails (0.414798ms)
+  ✔ RN2: Runner Identity Valid (2.373871ms)
+  ▶ RN3: Platform Complete
+    ✔ valid platform passes (0.407745ms)
+    ✔ all valid OS values pass (0.40525ms)
+    ✔ all valid arch values pass (0.496992ms)
+    ✔ invalid OS fails (0.192451ms)
+    ✔ invalid arch fails (0.983274ms)
+    ✔ node_version without v prefix fails (0.166352ms)
+  ✔ RN3: Platform Complete (2.871865ms)
+  ▶ RN4: Sandbox Configuration Valid
+    ✔ valid sandbox configurations pass (0.747973ms)
+    ✔ isolation_level none with non-none backend fails (0.155021ms)
+    ✔ invalid backend fails (0.139632ms)
+    ✔ non-boolean network_blocked fails (0.111178ms)
+  ✔ RN4: Sandbox Configuration Valid (1.256506ms)
+  ▶ RN5: Limits Within Bounds
+    ✔ valid limits pass (0.183664ms)
+    ✔ timeout_ms too low fails (0.109966ms)
+    ✔ timeout_ms too high fails (0.11718ms)
+    ✔ max_output_files too low fails (0.119073ms)
+    ✔ max_total_output_bytes too low fails (0.113162ms)
+    ✔ negative max_memory_bytes fails (0.126217ms)
+    ✔ zero max_cpu_seconds fails (0.130805ms)
+    ✔ valid optional limits pass (1.110262ms)
+  ✔ RN5: Limits Within Bounds (2.17066ms)
+  ▶ RN6: Commands Canonical
+    ✔ valid commands pass (0.208641ms)
+    ✔ unsorted allowlist fails (0.13354ms)
+    ✔ unsorted blocklist fails (0.119584ms)
+    ✔ overlapping allowlist and blocklist fails (0.163136ms)
+    ✔ empty shell fails (0.291367ms)
+  ✔ RN6: Commands Canonical (1.033999ms)
+  ▶ RN7: Write Roots Valid
+    ✔ valid write_roots pass (0.157405ms)
+    ✔ unsorted write_roots fails (0.119274ms)
+    ✔ absolute path in write_roots fails (0.085551ms)
+    ✔ path traversal in write_roots fails (0.072326ms)
+    ✔ empty write_roots passes (0.396904ms)
+  ✔ RN7: Write Roots Valid (0.941335ms)
+  ▶ RN8: Context Safe
+    ✔ valid context passes (0.21848ms)
+    ✔ non-dot working_dir fails (0.123682ms)
+    ✔ unsorted env_allowlist fails (0.349124ms)
+    ✔ forbidden env prefix fails (0.420278ms)
+    ✔ SSH_ prefix fails (0.178315ms)
+    ✔ AWS_ prefix fails (0.139882ms)
+  ✔ RN8: Context Safe (1.593438ms)
+  ▶ RN9: Timing Consistent
+    ✔ valid timing passes (0.308208ms)
+    ✔ completed_at before started_at fails (6.312878ms)
+    ✔ duration_ms mismatch fails (0.2876ms)
+    ✔ invalid ISO 8601 timestamp fails (0.195096ms)
+    ✔ valid phases pass (0.247675ms)
+    ✔ unsorted phases fail (1.238452ms)
+    ✔ skipTimingValidation option works (0.201858ms)
+  ✔ RN9: Timing Consistent (9.071179ms)
+  ▶ RN10: Exit Status Valid
+    ✔ valid exit status passes (0.211106ms)
+    ✔ exit code > 255 fails (0.148499ms)
+    ✔ exit code < 0 fails (0.256291ms)
+    ✔ lowercase signal fails (0.145873ms)
+    ✔ uppercase signal passes (0.136176ms)
+    ✔ non-boolean oom_killed fails (0.119393ms)
+  ✔ RN10: Exit Status Valid (1.178821ms)
+  ▶ RN11: Core Hash Excludes Ephemeral
+    ✔ ephemeral fields excluded from core (0.102913ms)
+    ✔ same runner with different ephemeral has same hash (0.113012ms)
+  ✔ RN11: Core Hash Excludes Ephemeral (0.294132ms)
+  ▶ RN12: Canonical Round-Trip
+    ✔ valid runner survives round-trip (0.237295ms)
+  ✔ RN12: Canonical Round-Trip (0.284914ms)
+  ▶ Fixture Tests
+    ✔ valid_basic.json passes (0.355316ms)
+    ✔ valid_with_phases.json passes (0.200987ms)
+    ✔ valid_with_ephemeral.json passes (0.233468ms)
+    ✔ valid_no_isolation.json passes (0.148829ms)
+    ✔ invalid_rn1_schema_version.json fails with RN1 (0.103694ms)
+    ✔ invalid_rn2_runner_id.json fails with RN2 (0.119574ms)
+    ✔ invalid_rn3_platform.json fails with RN3 (0.205094ms)
+    ✔ invalid_rn4_sandbox.json fails with RN4 (0.130295ms)
+    ✔ invalid_rn5_limits.json fails with RN5 (0.150612ms)
+    ✔ invalid_rn6_commands.json fails with RN6 (0.156884ms)
+    ✔ invalid_rn7_write_roots.json fails with RN7 (0.155752ms)
+    ✔ invalid_rn8_context.json fails with RN8 (0.146665ms)
+    ✔ invalid_rn9_timing.json fails with RN9 (0.09613ms)
+    ✔ invalid_rn10_exit.json fails with RN10 (4.475732ms)
+  ✔ Fixture Tests (6.969248ms)
+  ▶ Schema Validation
+    ✔ non-object input fails (0.152376ms)
+    ✔ null input fails (0.123842ms)
+    ✔ array input fails (0.07468ms)
+  ✔ Schema Validation (0.452679ms)
+  ▶ Serialization
+    ✔ serializeRunner produces canonical JSON (0.632696ms)
+  ✔ Serialization (0.681538ms)
+  ▶ Hash Consistency
+    ✔ identical runners produce identical hashes (0.194595ms)
+    ✔ different runners produce different hashes (0.131206ms)
+    ✔ hash format is sha256:hex64 (0.155011ms)
+  ✔ Hash Consistency (0.560381ms)
+  ▶ Warnings
+    ✔ sorted warnings pass (0.237105ms)
+    ✔ unsorted warnings fail (0.091451ms)
+  ✔ Warnings (0.388418ms)
+✔ Runner Verification (36.060968ms)
+▶ Workspace Snapshot Verification
+  ▶ WS1: Schema Version Present
+    ✔ valid schema version passes (1.975865ms)
+    ✔ missing schema version fails (0.253525ms)
+    ✔ wrong schema version fails (0.184907ms)
+  ✔ WS1: Schema Version Present (2.96539ms)
+  ▶ WS2: Tool ID Valid
+    ✔ valid tool IDs pass (0.632916ms)
+    ✔ invalid tool ID fails (1.451713ms)
+    ✔ missing tool ID fails (0.350457ms)
+  ✔ WS2: Tool ID Valid (2.59186ms)
+  ▶ WS3: Args Canonical
+    ✔ sorted args pass (0.541145ms)
+    ✔ unsorted args fail (0.191268ms)
+    ✔ null value in args fails (6.028054ms)
+    ✔ unsorted array in args fails (0.364373ms)
+    ✔ sorted array in args passes (0.204343ms)
+  ✔ WS3: Args Canonical (7.670383ms)
+  ▶ WS4: All Refs Relative
+    ✔ relative paths pass (0.357901ms)
+    ✔ absolute path fails (0.415159ms)
+    ✔ path traversal fails (0.235091ms)
+    ✔ backslash path fails (0.214342ms)
+    ✔ Windows drive path fails (0.186871ms)
+  ✔ WS4: All Refs Relative (1.592496ms)
+  ▶ WS5: Hash Format
+    ✔ valid sha256 hashes pass (0.945583ms)
+    ✔ invalid hash format fails (0.157275ms)
+    ✔ missing sha256 prefix fails (0.103545ms)
+    ✔ uppercase hex fails (0.083617ms)
+  ✔ WS5: Hash Format (1.394775ms)
+  ▶ WS6: Env Allowlist Valid
+    ✔ sorted allowlist passes (0.158477ms)
+    ✔ unsorted allowlist fails (0.140243ms)
+    ✔ forbidden env var fails (0.11751ms)
+    ✔ duplicate allowlist entries fail (0.080972ms)
+    ✔ SSH_ prefix rejected (0.071524ms)
+    ✔ NPM_ prefix rejected (0.069029ms)
+    ✔ GIT_ prefix rejected (0.078648ms)
+    ✔ AWS_ prefix rejected (0.126888ms)
+    ✔ OPENAI_ prefix rejected (0.08524ms)
+    ✔ PATH exact match rejected (0.09594ms)
+    ✔ HOME exact match rejected (0.856606ms)
+    ✔ USER exact match rejected (0.164258ms)
+  ✔ WS6: Env Allowlist Valid (2.262993ms)
+  ▶ WS7: Env Hashed Subset
+    ✔ hashed entries in allowlist pass (0.218019ms)
+    ✔ hashed entry not in allowlist fails (0.191178ms)
+    ✔ unsorted hashed entries fail (0.105548ms)
+  ✔ WS7: Env Hashed Subset (0.609883ms)
+  ▶ WS8: No Plaintext Values
+    ✔ hashed entry with value field fails (0.267422ms)
+  ✔ WS8: No Plaintext Values (0.322074ms)
+  ▶ WS9: Core Hash Excludes Ephemeral
+    ✔ computeWorkspaceCore excludes ephemeral (0.108794ms)
+    ✔ hash is same regardless of ephemeral (0.137728ms)
+  ✔ WS9: Core Hash Excludes Ephemeral (0.313869ms)
+  ▶ WS10: Canonical Round-Trip
+    ✔ valid snapshot round-trips (0.165861ms)
+    ✔ serialization produces canonical JSON (0.093675ms)
+  ✔ WS10: Canonical Round-Trip (0.336351ms)
+  ▶ WS11: Violations Stable
+    ✔ violations are sorted by rule_id, path (0.173996ms)
+    ✔ verification is deterministic (1.539157ms)
+  ✔ WS11: Violations Stable (1.782142ms)
+  ▶ WS12: Required Refs by Tool
+    ✔ pack-export requires intent (0.192731ms)
+    ✔ pack-apply requires pack (0.117039ms)
+    ✔ git-apply requires pack (0.458339ms)
+    ✔ repo-state requires no refs (0.136897ms)
+    ✔ workspace-snapshot requires no refs (0.095639ms)
+  ✔ WS12: Required Refs by Tool (1.109621ms)
+  ▶ WS13: Model IO Ref Conditional
+    ✔ model_mode record without model_io fails (0.131276ms)
+    ✔ model_mode replay without model_io fails (0.091542ms)
+    ✔ model_mode record with model_io passes (0.123171ms)
+    ✔ model_mode none without model_io passes (0.091361ms)
+  ✔ WS13: Model IO Ref Conditional (0.512551ms)
+  ▶ WS14: Leak Prevention
+    ✔ Unix absolute path in any field fails (0.16047ms)
+    ✔ Windows absolute path in any field fails (0.154349ms)
+  ✔ WS14: Leak Prevention (0.377618ms)
+  ▶ Fixture: Valid Workspace
+    ✔ valid_workspace.json passes (0.178154ms)
+    ✔ valid_workspace_full.json passes (0.210585ms)
+    ✔ valid_pack_apply.json passes (0.228439ms)
+    ✔ valid_git_apply.json passes (0.117801ms)
+  ✔ Fixture: Valid Workspace (0.827322ms)
+  ▶ Fixture: Invalid Snapshots
+    ✔ invalid_wrong_tool.json fails WS2 (0.119274ms)
+    ✔ invalid_missing_schema.json fails WS1 (0.086572ms)
+  ✔ Fixture: Invalid Snapshots (0.252884ms)
+  ▶ Schema Errors
+    ✔ null input fails (0.0537ms)
+    ✔ array input fails (0.025878ms)
+    ✔ empty object fails (0.051397ms)
+    ✔ string input fails (0.041668ms)
+  ✔ Schema Errors (0.22436ms)
+  ▶ Hash Computation
+    ✔ hash is deterministic (0.061085ms)
+    ✔ hash uses sha256 prefix (0.0267ms)
+    ✔ different snapshots produce different hashes (0.111258ms)
+  ✔ Hash Computation (0.248686ms)
+✔ Workspace Snapshot Verification (27.018884ms)
+▶ Evidence Spec Invariants
+  ▶ EV1: Proposal Hash Integrity
+    ✔ valid evidence has valid proposal_hash (0.754555ms)
+    ✔ rejects missing proposal_hash (0.339376ms)
+    ✔ rejects invalid hash format (1.794865ms)
+    ✔ accepts sha256-prefixed hash (0.203231ms)
+    ✔ accepts bare hex hash (0.090279ms)
+  ✔ EV1: Proposal Hash Integrity (3.7546ms)
+  ▶ EV2: Action Results Consistency
+    ✔ valid action results pass (0.786114ms)
+    ✔ rejects missing action_id (0.163676ms)
+    ✔ rejects invalid status (0.123622ms)
+    ✔ rejects negative duration_ms (0.113032ms)
+    ✔ accepts all valid status types (0.148378ms)
+  ✔ EV2: Action Results Consistency (1.665322ms)
+  ▶ EV3: Test Results Validity
+    ✔ valid test results pass (0.15994ms)
+    ✔ rejects missing test_id (0.119064ms)
+    ✔ rejects non-boolean passed (0.097723ms)
+    ✔ rejects non-string actual (0.131407ms)
+  ✔ EV3: Test Results Validity (0.669806ms)
+  ▶ EV4: Status Consistency
+    ✔ complete status with successful actions passes (0.142998ms)
+    ✔ failed status with failures passes (0.071414ms)
+    ✔ partial status passes (0.059161ms)
+    ✔ rejects complete status with failures (0.095819ms)
+    ✔ rejects invalid status value (0.059742ms)
+  ✔ EV4: Status Consistency (0.607539ms)
+  ▶ EV5: Evidence Hash Determinism
+    ✔ hash is deterministic for same evidence (0.666119ms)
+    ✔ hash is same regardless of ephemeral fields (0.145212ms)
+    ✔ hash differs for different core fields (0.140473ms)
+    ✔ hash is deterministic for complex evidence (6.814057ms)
+  ✔ EV5: Evidence Hash Determinism (7.923697ms)
+  ▶ All Invariants Combined
+    ✔ valid evidence passes all invariants (0.226926ms)
+    ✔ failed evidence passes all invariants (0.140524ms)
+    ✔ partial evidence passes all invariants (0.11206ms)
+  ✔ All Invariants Combined (0.609032ms)
+  ▶ EvidenceCore Computation
+    ✔ computeEvidenceCore excludes ephemeral fields (0.209432ms)
+    ✔ computeEvidenceCore sorts action_results by action_id (0.105247ms)
+    ✔ computeEvidenceCore sorts test_results by test_id (0.078387ms)
+  ✔ EvidenceCore Computation (0.481142ms)
+✔ Evidence Spec Invariants (16.433515ms)
+▶ Git Apply Spec Invariants
+  ▶ GA1: Schema Version Present
+    ✔ result includes git_apply_schema_version "1.0.0" (40.750563ms)
+  ✔ GA1: Schema Version Present (41.185207ms)
+  ▶ GA2: Git Repository Required
+    ✔ refuses if target is not a git repository (10.513925ms)
+    ✔ refuses if working tree is dirty without --allow-dirty (35.235541ms)
+    ✔ allows dirty working tree with --allow-dirty (44.783574ms)
+  ✔ GA2: Git Repository Required (91.121253ms)
+  ▶ GA3: No Path Traversal or Absolute Paths
+    ✔ refuses repo_root with path traversal (2.347752ms)
+    ✔ result repo_root has no absolute path (29.901429ms)
+    ✔ changed_files paths have no absolute paths (37.251411ms)
+  ✔ GA3: No Path Traversal or Absolute Paths (69.984019ms)
+  ▶ GA5: Deterministic Ordering
+    ✔ changed_files are sorted by path (30.351062ms)
+    ✔ violations are sorted by rule_id, path (1.467672ms)
+  ✔ GA5: Deterministic Ordering (32.085414ms)
+  ▶ GA6: Deterministic Branch Naming
+    ✔ uses apply/{run_id} when pack has run_id (29.570589ms)
+    ✔ uses apply/manual when pack has no run_id (26.575553ms)
+    ✔ uses provided --branch when specified (26.849887ms)
+  ✔ GA6: Deterministic Branch Naming (83.313202ms)
+  ▶ GA7: Dry-Run No State Changes
+    ✔ dry-run does not write files (18.87904ms)
+    ✔ dry-run preserves git state (23.994823ms)
+  ✔ GA7: Dry-Run No State Changes (43.124353ms)
+  ▶ GA10: Commit Requires Flag
+    ✔ no commit without --commit flag (27.610233ms)
+    ✔ creates commit with --commit flag (32.577717ms)
+    ✔ uses custom commit message when provided (30.694025ms)
+  ✔ GA10: Commit Requires Flag (91.266575ms)
+  ▶ GA11: Canonical JSON Output
+    ✔ result serializes to canonical JSON (13.289049ms)
+  ✔ GA11: Canonical JSON Output (13.460851ms)
+  ▶ GA12: Deterministic Diff Summary
+    ✔ content_hash uses sha256 format (27.801641ms)
+    ✔ delete operations have null content_hash (27.290864ms)
+  ✔ GA12: Deterministic Diff Summary (55.380906ms)
+  ▶ Determinism
+    ✔ same inputs produce identical results (excluding git SHAs) (31.261268ms)
+  ✔ Determinism (31.449361ms)
+  ▶ Pack Validation
+    ✔ refuses if pack has no patch.json (15.53504ms)
+  ✔ Pack Validation (15.729084ms)
+✔ Git Apply Spec Invariants (572.389729ms)
+▶ Harness: Plan-Only Mode
+  ✔ processes simple intent without execution (10.126067ms)
+  ✔ handles clarify result for vague intent (19.308746ms)
+  ✔ produces deterministic results for same intent (4.653225ms)
+✔ Harness: Plan-Only Mode (35.157475ms)
+▶ Harness: Execute-Sandbox Mode
+  ✔ executes proposal in sandbox and captures evidence (5.420314ms)
+  ✔ sandbox never writes outside sandbox dir (3.617093ms)
+  ✔ respects policy timeout (0.247103ms)
+✔ Harness: Execute-Sandbox Mode (9.653711ms)
+▶ Harness: Policy Profiles
+  ✔ strict policy has most restrictive settings (0.179356ms)
+  ✔ default policy is balanced (0.09049ms)
+  ✔ dev policy is relaxed (0.770705ms)
+  ✔ policy is included in result (2.228579ms)
+✔ Harness: Policy Profiles (3.536341ms)
+▶ Harness: Kernel Authority
+  ✔ kernel generates bundle (harness does not) (1.503579ms)
+  ✔ kernel validates evidence (harness does not decide) (2.563877ms)
+✔ Harness: Kernel Authority (4.251071ms)
+▶ Harness: Result Structure
+  ✔ result has all required fields (1.636148ms)
+  ✔ timestamps are valid ISO 8601 UTC (2.651092ms)
+✔ Harness: Result Structure (4.534002ms)
+▶ Ledger Spec Invariants
+  ▶ LD1: One Entry Per Line
+    ✔ valid single entry parses correctly (2.813977ms)
+    ✔ valid multiple entries parse correctly (0.230352ms)
+    ✔ rejects invalid JSON (0.572683ms)
+    ✔ rejects missing required fields (0.206777ms)
+    ✔ rejects invalid result_kind (0.659086ms)
+    ✔ rejects invalid mode (0.171972ms)
+    ✔ rejects invalid policy (0.221646ms)
+    ✔ accepts all valid result_kind values (0.337714ms)
+    ✔ accepts all valid mode values (0.33581ms)
+    ✔ accepts all valid policy values (0.308428ms)
+  ✔ LD1: One Entry Per Line (6.655059ms)
+  ▶ LD2: Monotonic Timestamps
+    ✔ ascending timestamps pass (0.533972ms)
+    ✔ equal timestamps pass (0.078217ms)
+    ✔ descending timestamps fail (0.076394ms)
+    ✔ single entry passes (0.038372ms)
+    ✔ empty array passes (0.044503ms)
+  ✔ LD2: Monotonic Timestamps (0.899026ms)
+  ▶ LD3: Unique Run IDs
+    ✔ unique run_ids pass (0.106079ms)
+    ✔ duplicate run_ids fail (0.089598ms)
+    ✔ single entry passes (0.039033ms)
+    ✔ empty array passes (0.030687ms)
+  ✔ LD3: Unique Run IDs (0.333466ms)
+  ▶ LD4: Valid Content Hashes
+    ✔ valid hashes pass (0.153027ms)
+    ✔ null bundle_sha256 passes (0.144441ms)
+    ✔ invalid intent_sha256 fails (0.107141ms)
+    ✔ invalid bundle_sha256 fails (0.07479ms)
+    ✔ hash without sha256 prefix fails (0.11208ms)
+    ✔ hash with wrong length fails (0.062818ms)
+  ✔ LD4: Valid Content Hashes (0.764644ms)
+  ▶ All Invariants Combined
+    ✔ valid ledger passes all checks (0.132899ms)
+    ✔ empty ledger passes (0.039073ms)
+    ✔ single valid entry passes (0.105247ms)
+  ✔ All Invariants Combined (0.428052ms)
+  ▶ serializeLedgerEntry
+    ✔ produces canonical JSON (0.098444ms)
+    ✔ produces valid JSON (0.050044ms)
+    ✔ serialized entry passes invariant checks (0.049593ms)
+  ✔ serializeLedgerEntry (0.262513ms)
+  ▶ createLedgerEntry
+    ✔ creates valid entry from HarnessRunResult (0.277441ms)
+    ✔ created entry passes invariant checks (0.113423ms)
+    ✔ handles null bundle correctly (0.055093ms)
+  ✔ createLedgerEntry (0.611998ms)
+  ▶ Content Hash Validation
+    ✔ isValidContentHash accepts valid hashes (0.115697ms)
+    ✔ isValidContentHash rejects invalid hashes (0.102643ms)
+  ✔ Content Hash Validation (0.27743ms)
+✔ Ledger Spec Invariants (10.774002ms)
+▶ Pack Export Invariants
+  ▶ T1: Plan-Only Pack Verification
+    ✔ exports plan-only pack that passes pack-verify (14.4095ms)
+    ✔ exported pack has no unknown files (PK2) (6.850366ms)
+  ✔ T1: Plan-Only Pack Verification (23.124471ms)
+  ▶ T2: Export Determinism
+    ✔ exports are byte-identical for same intent (11.952562ms)
+    ✔ files_written list is sorted and stable (6.453892ms)
+  ✔ T2: Export Determinism (18.800693ms)
+  ▶ T3: Outcome-Specific Requirements
+    ✔ invalid intent (empty goal) results in export failure (3.666044ms)
+    ✔ BUNDLE outcome includes bundle.json (3.09873ms)
+  ✔ T3: Outcome-Specific Requirements (7.101135ms)
+  ▶ T4: Model IO Integration
+    ✔ model_mode none produces no model_io.json (7.066901ms)
+  ✔ T4: Model IO Integration (7.317832ms)
+  ▶ T5: Output Directory Safety
+    ✔ refuses if out_dir exists and is non-empty (3.485726ms)
+    ✔ refuses if out_dir contains path traversal (0.741269ms)
+    ✔ allows empty existing directory (3.489373ms)
+    ✔ creates new directory if it does not exist (2.22416ms)
+    ✔ refuses if intent file does not exist (0.531908ms)
+  ✔ T5: Output Directory Safety (10.852981ms)
+  ▶ Additional Invariants
+    ✔ all JSON files use canonical format (6.345138ms)
+    ✔ ledger.jsonl has valid JSONL format (4.500148ms)
+    ✔ exports different policies correctly (6.712857ms)
+  ✔ Additional Invariants (17.952363ms)
+✔ Pack Export Invariants (90.351861ms)
+▶ Policy Spec Invariants
+  ▶ PL1: Profile Enum
+    ✔ strict profile has valid name (0.646773ms)
+    ✔ default profile has valid name (0.132318ms)
+    ✔ dev profile has valid name (0.088647ms)
+    ✔ listPolicies returns all three profiles (0.558518ms)
+  ✔ PL1: Profile Enum (3.865288ms)
+  ▶ PL2: Resolved Complete
+    ✔ strict profile is fully populated (0.157695ms)
+    ✔ default profile is fully populated (0.466445ms)
+    ✔ dev profile is fully populated (0.108373ms)
+    ✔ all profiles have no undefined values (0.410199ms)
+  ✔ PL2: Resolved Complete (1.958813ms)
+  ▶ PL3: Limits Within Bounds
+    ✔ strict profile limits are within bounds (0.583635ms)
+    ✔ default profile limits are within bounds (0.196939ms)
+    ✔ dev profile limits are within bounds (0.073168ms)
+    ✔ strict has most restrictive timeout (0.049232ms)
+    ✔ strict has most restrictive file limits (0.068248ms)
+    ✔ strict has most restrictive byte limits (0.06408ms)
+  ✔ PL3: Limits Within Bounds (1.420042ms)
+  ▶ PL4: Model Mode Strict/Default
+    ✔ strict allows only none mode (0.107482ms)
+    ✔ default allows only none mode (0.041799ms)
+    ✔ strict rejects record with PL4 error (0.316694ms)
+    ✔ strict rejects replay with PL4 error (0.100518ms)
+    ✔ default rejects record with PL4 error (0.093846ms)
+    ✔ default rejects replay with PL4 error (0.211867ms)
+    ✔ error message is stable and deterministic (0.086522ms)
+  ✔ PL4: Model Mode Strict/Default (1.111374ms)
+  ▶ PL5: Model Mode Dev
+    ✔ dev allows all modes (0.097423ms)
+    ✔ dev none mode requires no recording path (0.043461ms)
+    ✔ dev record mode requires recording path (0.098915ms)
+    ✔ dev replay mode requires recording path (0.075782ms)
+    ✔ dev record mode with path passes (0.107381ms)
+    ✔ dev replay mode with path passes (0.02693ms)
+    ✔ PL5 error message is stable (0.068488ms)
+  ✔ PL5: Model Mode Dev (0.641042ms)
+  ▶ PL6: Sandbox Constraints
+    ✔ strict allows only specified commands (0.101931ms)
+    ✔ default allows specified commands (0.043562ms)
+    ✔ dev allows all commands (empty list) (0.046528ms)
+    ✔ strict allows only specified write roots (0.069451ms)
+    ✔ default allows more write roots (0.115346ms)
+    ✔ dev allows all write paths (empty list) (0.094517ms)
+  ✔ PL6: Sandbox Constraints (0.588203ms)
+  ▶ PL7: Evidence Policy Binding
+    ✔ harness result includes full policy object (18.250362ms)
+    ✔ policy in result matches resolved policy exactly (3.848716ms)
+    ✔ policy binding is deterministic across runs (2.726613ms)
+  ✔ PL7: Evidence Policy Binding (25.108632ms)
+  ▶ Deterministic Resolution
+    ✔ loadPolicy returns identical object for same profile (0.142617ms)
+    ✔ loadPolicy is byte-identical across multiple calls (0.193633ms)
+    ✔ profile values match documented spec (0.104616ms)
+  ✔ Deterministic Resolution (0.551544ms)
+  ▶ All Invariants Combined
+    ✔ strict profile passes all invariants (0.09568ms)
+    ✔ default profile passes all invariants (0.04269ms)
+    ✔ dev profile passes all invariants (0.041538ms)
+  ✔ All Invariants Combined (0.485069ms)
+✔ Policy Spec Invariants (36.436684ms)
+▶ Run Spec Invariants
+  ▶ RS1: Schema Version Present
+    ✔ valid schema version passes (0.574608ms)
+    ✔ missing schema version fails (0.382047ms)
+    ✔ empty schema version fails (0.158537ms)
+  ✔ RS1: Schema Version Present (1.726788ms)
+  ▶ RS2: Outcome Coverage
+    ✔ BUNDLE outcome passes (0.214031ms)
+    ✔ CLARIFY outcome passes (0.105317ms)
+    ✔ REFUSE outcome passes (4.519595ms)
+    ✔ invalid outcome fails (0.294783ms)
+  ✔ RS2: Outcome Coverage (5.408741ms)
+  ▶ RS3: Outcome-Field Consistency
+    ✔ BUNDLE with non-null bundle passes (0.274836ms)
+    ✔ BUNDLE with null bundle fails (0.371356ms)
+    ✔ BUNDLE with clarify_questions fails (0.227877ms)
+    ✔ CLARIFY with clarify_questions passes (0.088636ms)
+    ✔ CLARIFY without clarify_questions fails (0.141495ms)
+    ✔ REFUSE with refuse_reason passes (0.067006ms)
+    ✔ REFUSE without refuse_reason fails (0.163988ms)
+  ✔ RS3: Outcome-Field Consistency (1.689668ms)
+  ▶ RS4: Reference Integrity
+    ✔ valid hashes pass (0.192782ms)
+    ✔ invalid intent hash fails (0.121187ms)
+    ✔ invalid bundle hash fails (0.103625ms)
+    ✔ empty bundle_id fails (0.109095ms)
+  ✔ RS4: Reference Integrity (0.648386ms)
+  ▶ RS5: Policy Binding
+    ✔ matching policy passes (0.258405ms)
+    ✔ modified policy fails (0.133721ms)
+  ✔ RS5: Policy Binding (0.472235ms)
+  ▶ RS6: No Leak
+    ✔ relative path passes (0.103524ms)
+    ✔ absolute path fails (0.114295ms)
+    ✔ Windows absolute path fails (0.108854ms)
+  ✔ RS6: No Leak (0.408496ms)
+  ▶ RS7: Canonical Output
+    ✔ valid result is canonically stable (0.209542ms)
+    ✔ result with arrays is canonically stable (0.126948ms)
+  ✔ RS7: Canonical Output (0.417373ms)
+  ▶ RS8: Decision Consistency
+    ✔ validated_by_kernel true passes (0.125646ms)
+    ✔ validated_by_kernel false fails (0.12272ms)
+    ✔ CLARIFY with accepted true fails (0.11205ms)
+    ✔ REFUSE with accepted true fails (0.103264ms)
+  ✔ RS8: Decision Consistency (0.563827ms)
+  ▶ All Invariants Combined
+    ✔ valid BUNDLE result passes all checks (0.179035ms)
+    ✔ valid CLARIFY result passes all checks (0.233708ms)
+    ✔ valid REFUSE result passes all checks (0.126878ms)
+  ✔ All Invariants Combined (0.631444ms)
+  ▶ Integration: Real Harness Run
+    ✔ runHarness produces spec-compliant result (33.264014ms)
+    ✔ runHarness uses sanitized intent path (2.987923ms)
+    ✔ runHarness produces canonical output (1.446502ms)
+  ✔ Integration: Real Harness Run (38.241557ms)
+✔ Run Spec Invariants (50.943976ms)
+▶ Security: Symlink Escape
+  ✔ refuses to follow symlinks in output directory (8.884059ms)
+  ✔ refuses to follow directory symlinks (1.724464ms)
+✔ Security: Symlink Escape (11.310929ms)
+▶ Security: Path Traversal
+  ✔ validates isPathSafe correctly (1.891507ms)
+  ✔ rejects absolute paths in output (1.297774ms)
+✔ Security: Path Traversal (3.486938ms)
+▶ Security: File Spam
+  ✔ respects max_output_files limit (67.231527ms)
+  ✔ respects max_total_output_bytes limit (42.737488ms)
+✔ Security: File Spam (110.377781ms)
+▶ Security: Deep Recursion
+  ✔ limits directory traversal depth (9.649103ms)
+  ✔ allows directories within depth limit (4.069912ms)
+✔ Security: Deep Recursion (14.084791ms)
+▶ Security: Combined Attacks
+  ✔ handles multiple security issues simultaneously (12.47388ms)
+✔ Security: Combined Attacks (12.667554ms)
+▶ Proposal Verification (Internal)
+  ▶ PR1: Schema Version Present
+    ✔ valid schema version passes (0.855193ms)
+    ✔ missing schema version fails (0.541545ms)
+    ✔ empty schema version fails (0.148829ms)
+    ✔ fixture: missing schema version fails (5.40204ms)
+  ✔ PR1: Schema Version Present (8.040968ms)
+  ▶ PR2: Source References Valid
+    ✔ valid source references pass (0.315051ms)
+    ✔ missing source_bundle_id fails (0.193984ms)
+    ✔ empty source_bundle_id fails (0.869361ms)
+    ✔ fixture: invalid source ref fails (8.163287ms)
+  ✔ PR2: Source References Valid (9.929699ms)
+  ▶ PR3: Actions Array Present
+    ✔ actions array present passes (0.4323ms)
+    ✔ empty actions array passes (0.200045ms)
+    ✔ missing actions array fails (0.142257ms)
+  ✔ PR3: Actions Array Present (0.955021ms)
+  ▶ PR4: Action IDs Unique
+    ✔ unique action IDs pass (0.164519ms)
+    ✔ duplicate action IDs fail (6.694503ms)
+  ✔ PR4: Action IDs Unique (7.083022ms)
+  ▶ PR5: Action Types Valid
+    ✔ valid action types pass (0.190908ms)
+    ✔ execute_command action passes (0.115907ms)
+    ✔ invalid action type fails (1.525761ms)
+  ✔ PR5: Action Types Valid (1.989451ms)
+  ▶ PR6: Action IDs Well-Formed
+    ✔ well-formed action IDs pass (0.070823ms)
+    ✔ malformed action ID fails in strict mode (0.088096ms)
+    ✔ malformed action ID passes in relaxed mode (0.043161ms)
+  ✔ PR6: Action IDs Well-Formed (0.264977ms)
+  ▶ PR7: Test IDs Unique
+    ✔ unique test IDs pass (0.061696ms)
+    ✔ duplicate test IDs fail (0.043682ms)
+  ✔ PR7: Test IDs Unique (0.136115ms)
+  ▶ PR8: Test Types Valid
+    ✔ valid test types pass (0.155031ms)
+    ✔ invalid test type fails (0.092433ms)
+  ✔ PR8: Test Types Valid (0.291116ms)
+  ▶ PR9: Confidence Range Valid
+    ✔ confidence 0 passes (0.058059ms)
+    ✔ confidence 100 passes (0.025989ms)
+    ✔ confidence -1 fails (0.035947ms)
+    ✔ confidence 101 fails (4.274315ms)
+    ✔ confidence as float fails (0.176912ms)
+  ✔ PR9: Confidence Range Valid (4.746972ms)
+  ▶ PR10: Summary Non-Empty
+    ✔ non-empty summary passes (0.113683ms)
+    ✔ missing summary fails (0.078056ms)
+    ✔ empty summary fails (0.061646ms)
+  ✔ PR10: Summary Non-Empty (0.335459ms)
+  ▶ PR11: Sorting Canonical
+    ✔ properly sorted actions pass (0.218199ms)
+    ✔ unsorted actions fail (1.163472ms)
+    ✔ unsorted tests fail (0.127509ms)
+  ✔ PR11: Sorting Canonical (1.864125ms)
+  ▶ PR12: File Actions Have Content
+    ✔ create_file with content passes (0.076283ms)
+    ✔ create_file without content fails (0.711935ms)
+    ✔ delete_file without content passes (0.07466ms)
+    ✔ delete_file with content fails (0.048812ms)
+  ✔ PR12: File Actions Have Content (0.988383ms)
+  ▶ Fixture: Valid Proposal
+    ✔ valid fixture passes all checks (0.57598ms)
+  ✔ Fixture: Valid Proposal (0.640291ms)
+  ▶ Stable Violations
+    ✔ violations are sorted by rule_id then path (0.396334ms)
+  ✔ Stable Violations (0.441318ms)
+  ▶ Schema Errors
+    ✔ null input fails (0.072816ms)
+    ✔ array input fails (0.049403ms)
+    ✔ empty object fails (0.084128ms)
+  ✔ Schema Errors (0.269956ms)
+✔ Proposal Verification (Internal) (38.811216ms)
+▶ MockModelAdapter
+  ✔ should return configured response for exact prompt (2.491892ms)
+  ✔ should throw AdapterError for unmatched prompt in strict mode (0.508093ms)
+  ✔ should echo prompt in echo mode (0.157856ms)
+  ✔ should return fixed content in fixed mode (0.145162ms)
+  ✔ should match substring patterns (0.155161ms)
+  ✔ should record interactions when enabled (0.45323ms)
+  ✔ should export recording session (0.177423ms)
+  ✔ should report ready state correctly (0.477656ms)
+  ✔ should have correct adapter_id and model_id (0.576091ms)
+  ✔ should estimate tokens from content length (0.213159ms)
+✔ MockModelAdapter (6.274154ms)
+▶ RecordingModelAdapter
+  ✔ should record interactions from delegate (0.33578ms)
+  ✔ should delegate transform calls correctly (0.29349ms)
+  ✔ should compute stats correctly (0.1922ms)
+  ✔ should respect max_interactions limit (0.166703ms)
+  ✔ should redact prompts when include_prompts is false (0.220213ms)
+  ✔ should delegate isReady and shutdown (0.239319ms)
+✔ RecordingModelAdapter (1.76523ms)
+▶ ReplayModelAdapter
+  ✔ should replay recorded response by prompt hash (0.306906ms)
+  ✔ should throw for unrecorded prompt in strict mode (0.158277ms)
+  ✔ should return empty content for unrecorded prompt in non-strict mode (0.077556ms)
+  ✔ should enforce sequence order in sequential mode (0.091722ms)
+  ✔ should fail in sequential mode if prompts are out of order (0.115206ms)
+  ✔ should report recording count (0.179887ms)
+  ✔ should check hasRecording correctly (0.107752ms)
+  ✔ should always be ready (0.12274ms)
+✔ ReplayModelAdapter (1.337067ms)
+▶ Record and Replay Integration
+  ✔ should produce identical results when replaying recorded session (0.63487ms)
+  ✔ should create adapter from recording session (0.294993ms)
+✔ Record and Replay Integration (2.560511ms)
+▶ Adapter Determinism
+  ✔ should produce identical results across multiple runs (0.212047ms)
+  ✔ should produce same hash for same prompt regardless of context metadata (0.12787ms)
+✔ Adapter Determinism (0.42133ms)
+▶ Adversarial: Unicode Normalization
+  ✔ A-umlaut: NFC and NFD produce identical normalized output (1.070287ms)
+  ✔ O-umlaut: NFC and NFD produce identical normalized output (0.126046ms)
+  ✔ U-umlaut: NFC and NFD produce identical normalized output (0.062828ms)
+  ✔ e-acute: NFC and NFD produce identical normalized output (0.185738ms)
+  ✔ n-tilde: NFC and NFD produce identical normalized output (0.06431ms)
+  ✔ c-cedilla: NFC and NFD produce identical normalized output (0.051176ms)
+  ✔ a-grave: NFC and NFD produce identical normalized output (0.11211ms)
+  ✔ mixed NFC/NFD in constraints produce identical hashes (0.706375ms)
+  ✔ Korean Hangul syllables (precomposed vs jamo) (26.388431ms)
+✔ Adversarial: Unicode Normalization (29.797303ms)
+▶ Adversarial: Zero-Width Characters
+  ✔ ZWSP at start of goal is handled (5.158523ms)
+  ✔ ZWSP at end of goal is handled (4.20258ms)
+  ✔ ZWSP in middle of goal is handled (6.358623ms)
+  ✔ multiple ZWSP in constraints are handled (6.070382ms)
+  ✔ ZWNJ at start of goal is handled (5.591375ms)
+  ✔ ZWNJ at end of goal is handled (6.028174ms)
+  ✔ ZWNJ in middle of goal is handled (3.287565ms)
+  ✔ multiple ZWNJ in constraints are handled (4.941295ms)
+  ✔ ZWJ at start of goal is handled (4.878959ms)
+  ✔ ZWJ at end of goal is handled (5.25309ms)
+  ✔ ZWJ in middle of goal is handled (3.841092ms)
+  ✔ multiple ZWJ in constraints are handled (4.120286ms)
+  ✔ BOM at start of goal is handled (3.772604ms)
+  ✔ BOM at end of goal is handled (4.668044ms)
+  ✔ BOM in middle of goal is handled (4.525826ms)
+  ✔ multiple BOM in constraints are handled (2.709942ms)
+  ✔ WJ at start of goal is handled (4.648486ms)
+  ✔ WJ at end of goal is handled (4.236053ms)
+  ✔ WJ in middle of goal is handled (3.152812ms)
+  ✔ multiple WJ in constraints are handled (4.108033ms)
+  ✔ NBSP at start of goal is handled (3.47662ms)
+  ✔ NBSP at end of goal is handled (3.428139ms)
+  ✔ NBSP in middle of goal is handled (2.985959ms)
+  ✔ multiple NBSP in constraints are handled (2.598292ms)
+  ✔ NNBSP at start of goal is handled (4.367991ms)
+  ✔ NNBSP at end of goal is handled (2.869631ms)
+  ✔ NNBSP in middle of goal is handled (4.797987ms)
+  ✔ multiple NNBSP in constraints are handled (3.27412ms)
+  ✔ RTL override characters are handled safely (0.41577ms)
+  ✔ combining diacritical marks are handled (2.991429ms)
+✔ Adversarial: Zero-Width Characters (124.547752ms)
+▶ Adversarial: Extremely Long Strings
+  ✔ goal with 10,000 characters (31.726671ms)
+  ✔ goal with 50,000 characters (76.272169ms)
+  ✔ 100 constraints each with 1,000 characters (238.650488ms)
+  ✔ single constraint with 100,000 characters (173.173301ms)
+  ✔ deeply nested context object (1.969644ms)
+  ✔ context with 1000 keys (2.777578ms)
+✔ Adversarial: Extremely Long Strings (524.900862ms)
+▶ Adversarial: Contradictory Constraints
+  ✔ handles sync/async contradiction gracefully (3.079344ms)
+  ✔ handles public/private contradiction gracefully (3.495995ms)
+  ✔ handles sql/nosql contradiction gracefully (2.25573ms)
+  ✔ handles rest/graphql contradiction gracefully (2.337543ms)
+  ✔ handles monolith/microservice contradiction gracefully (1.990863ms)
+  ✔ handles stateless/stateful contradiction gracefully (1.854408ms)
+  ✔ handles online/offline contradiction gracefully (1.929969ms)
+  ✔ handles single/multi-tenant contradiction gracefully (1.86671ms)
+  ✔ handles open/closed-source contradiction gracefully (1.940499ms)
+  ✔ handles real-time/batch contradiction gracefully (1.971136ms)
+  ✔ multiple contradictions in same intent (2.393208ms)
+  ✔ subtle contradiction: performance vs simplicity (3.639354ms)
+✔ Adversarial: Contradictory Constraints (29.087513ms)
+▶ Adversarial: List Ordering Attacks
+  ✔ shuffled constraints produce identical bundle hash (7.66886ms)
+  ✔ duplicates in different positions produce identical hash (3.874335ms)
+  ✔ whitespace variations in constraints produce identical hash (5.024582ms)
+  ✔ context key ordering is deterministic (0.28753ms)
+✔ Adversarial: List Ordering Attacks (16.993165ms)
+▶ Adversarial: Placeholder Density
+  ✔ handles "TBD" in goal (1.799875ms)
+  ✔ handles "TBD" in constraint (1.702662ms)
+  ✔ handles "TODO" in goal (2.374423ms)
+  ✔ handles "TODO" in constraint (1.706099ms)
+  ✔ handles "FIXME" in goal (1.556599ms)
+  ✔ handles "FIXME" in constraint (1.629205ms)
+  ✔ handles "???" in goal (1.486838ms)
+  ✔ handles "???" in constraint (1.607965ms)
+  ✔ handles "..." in goal (1.484794ms)
+  ✔ handles "..." in constraint (1.565506ms)
+  ✔ handles "[TBD]" in goal (1.493882ms)
+  ✔ handles "[TBD]" in constraint (1.893921ms)
+  ✔ handles "(TBD)" in goal (1.863143ms)
+  ✔ handles "(TBD)" in constraint (1.642249ms)
+  ✔ handles "TO BE DETERMINED" in goal (1.53042ms)
+  ✔ handles "TO BE DETERMINED" in constraint (2.51738ms)
+  ✔ handles "TO DO" in goal (1.531863ms)
+  ✔ handles "TO DO" in constraint (1.718001ms)
+  ✔ handles "PLACEHOLDER" in goal (1.651777ms)
+  ✔ handles "PLACEHOLDER" in constraint (1.622803ms)
+  ✔ handles "XXX" in goal (1.477901ms)
+  ✔ handles "XXX" in constraint (1.990191ms)
+  ✔ handles "<<INSERT HERE>>" in goal (1.546249ms)
+  ✔ handles "<<INSERT HERE>>" in constraint (1.831073ms)
+  ✔ handles "<TBD>" in goal (1.457342ms)
+  ✔ handles "<TBD>" in constraint (1.563612ms)
+  ✔ handles "{TBD}" in goal (1.427968ms)
+  ✔ handles "{TBD}" in constraint (1.55205ms)
+  ✔ handles "NEEDS_WORK" in goal (1.435342ms)
+  ✔ handles "NEEDS_WORK" in constraint (2.283742ms)
+  ✔ goal consisting entirely of placeholders (0.102162ms)
+  ✔ many placeholders increase entropy (4.210655ms)
+  ✔ mixed real content and placeholders (2.935184ms)
+  ✔ placeholder-like strings that are not placeholders (1.904381ms)
+✔ Adversarial: Placeholder Density (60.60928ms)
+▶ Adversarial Corpus Summary
+  ✔ corpus contains expected number of fixtures (0.048701ms)
+✔ Adversarial Corpus Summary (0.082906ms)
+▶ Bundle Spec Invariants
+  ▶ BS1: Schema Version Present
+    ✔ simple intent has schema_version (17.917307ms)
+    ✔ complex intent has schema_version (8.691999ms)
+  ✔ BS1: Schema Version Present (27.21428ms)
+  ▶ BS2: Hash Stability
+    ✔ simple intent produces stable hash (18.2286ms)
+    ✔ complex intent produces stable hash (22.94734ms)
+    ✔ minimal intent produces stable hash (1.772583ms)
+  ✔ BS2: Hash Stability (43.285886ms)
+  ▶ BS3: Artifact Path Sorted
+    ✔ simple intent outputs are sorted by path (6.893276ms)
+    ✔ complex intent outputs are sorted by path (8.218521ms)
+  ✔ BS3: Artifact Path Sorted (15.416538ms)
+  ▶ BS4: Constraints Sorted
+    ✔ simple intent constraints are sorted (5.421857ms)
+    ✔ complex intent constraints are sorted (8.108434ms)
+    ✔ constraint order in input does not affect sorting (0.625984ms)
+  ✔ BS4: Constraints Sorted (14.439516ms)
+  ▶ BS5: Questions Sorted
+    ✔ simple intent questions are sorted (3.911284ms)
+    ✔ complex intent questions are sorted (4.781806ms)
+  ✔ BS5: Questions Sorted (8.866847ms)
+  ▶ BS6: Terminal Nodes Sorted
+    ✔ simple intent terminal nodes are sorted (4.088947ms)
+    ✔ complex intent terminal nodes are sorted (4.870483ms)
+  ✔ BS6: Terminal Nodes Sorted (9.118549ms)
+  ▶ BS7: No Path Traversal
+    ✔ simple intent has no path traversal (4.325921ms)
+    ✔ complex intent has no path traversal (5.826315ms)
+  ✔ BS7: No Path Traversal (10.337795ms)
+  ▶ BS8: Canonical Idempotent
+    ✔ simple intent is canonically idempotent (4.393027ms)
+    ✔ complex intent is canonically idempotent (4.912211ms)
+  ✔ BS8: Canonical Idempotent (9.477913ms)
+  ▶ All Invariants Combined
+    ✔ simple intent passes all invariants (7.595273ms)
+    ✔ complex intent passes all invariants (5.45064ms)
+    ✔ minimal intent passes all invariants (0.412183ms)
+  ✔ All Invariants Combined (13.764089ms)
+  ▶ Real Intents from Manifest
+    ✔ loads manifest successfully (0.225703ms)
+    ✔ all non-refusing intents pass bundle spec invariants (79.556779ms)
+  ✔ Real Intents from Manifest (88.887725ms)
+✔ Bundle Spec Invariants (241.743398ms)
+▶ Canonical Serialization
+  ✔ produces stable output for objects with different key insertion order (0.540955ms)
+  ✔ produces stable output for nested objects (0.169267ms)
+  ✔ handles arrays in index order (0.113923ms)
+  ✔ round-trips through JSON parse (0.168987ms)
+  ✔ rejects unsupported values (0.450064ms)
+✔ Canonical Serialization (2.027271ms)
+▶ Hash Stability
+  ✔ produces identical hash for identical objects (0.44269ms)
+  ✔ produces different hash for different objects (0.101711ms)
+  ✔ produces consistent hash across multiple calls (0.702047ms)
+✔ Hash Stability (1.406408ms)
+▶ Transform Determinism
+  ✔ produces identical bundle for simple intent (same process) (26.256123ms)
+  ✔ produces identical bundle for complex intent (14.007365ms)
+  ✔ produces identical bundle for minimal intent (1.150117ms)
+  ✔ produces different bundle for different intents (14.519786ms)
+  ✔ constraint order does not affect output (1.142843ms)
+✔ Transform Determinism (57.54279ms)
+▶ Validation Gates
+  ✔ simple intent bundle passes all gates (10.267453ms)
+  ✔ complex intent bundle passes all gates (5.973822ms)
+  ✔ minimal intent bundle passes all gates (0.556714ms)
+✔ Validation Gates (17.02819ms)
+▶ Mutation Resistance
+  ✔ deliberately randomized key insertion produces identical output (0.365015ms)
+  ✔ repeated transforms produce identical bundle sequence (41.434455ms)
+✔ Mutation Resistance (42.062823ms)
+▶ Edge Cases
+  ✔ handles empty constraints (0.355156ms)
+  ✔ handles unicode in goal (7.539237ms)
+  ✔ handles special characters in constraints (0.592401ms)
+✔ Edge Cases (8.6874ms)
+▶ Golden Hash Verification
+  ✔ Golden Intent 001: User Authentication System (18.078781ms)
+  ✔ Golden Intent 002: Hello World (0.743074ms)
+  ✔ Golden Intent 003: REST API Server (7.856051ms)
+✔ Golden Hash Verification (28.855568ms)
+▶ Cross-Process Determinism
+  ✔ can serialize and deserialize bundle for verification (6.17039ms)
+✔ Cross-Process Determinism (6.405401ms)
+▶ I1: Canonicalization Idempotence
+  ✔ canonical(parse(canonical(x))) == canonical(x) for all seeds (4.583645ms)
+  ✔ canonicalize is stable for objects with shuffled keys (0.449734ms)
+  ✔ canonicalize round-trips through bytes (0.663244ms)
+✔ I1: Canonicalization Idempotence (6.4265ms)
+▶ I2: Normalization Idempotence
+  ✔ normalizeIntent(normalizeIntent(x)) produces same result (2.792747ms)
+  ✔ normalizeString is idempotent (0.573325ms)
+  ✔ normalizeConstraint is idempotent (0.344626ms)
+  ✔ normalizeConstraints is idempotent and sorted (1.324333ms)
+✔ I2: Normalization Idempotence (5.304667ms)
+▶ I3: Hash Stability
+  ✔ canonicalHash produces same result across N runs (2.039244ms)
+  ✔ bundle hash is stable across N transforms of same intent (149.624224ms)
+  ✔ different intents produce different hashes (0.448782ms)
+✔ I3: Hash Stability (152.342781ms)
+▶ I4: Ordering Invariants
+  ✔ outputs are always sorted by path (20.843163ms)
+  ✔ unresolved_questions are sorted by (priority desc, id asc) (25.522357ms)
+  ✔ terminal_nodes are sorted by id (22.181663ms)
+  ✔ constraints within nodes are always sorted (17.938818ms)
+✔ I4: Ordering Invariants (86.749576ms)
+▶ I5: Validator Completeness
+  ✔ empty goal always rejected (0.452358ms)
+  ✔ missing required field (goal) always rejected (0.264436ms)
+  ✔ contradictory constraints are detected and handled (55.727035ms)
+  ✔ unicode normalization is consistent (NFC vs NFD) (0.137108ms)
+  ✔ zero-width characters are handled consistently (44.29074ms)
+  ✔ extremely long strings are handled without crash (12.112994ms)
+  ✔ many constraints are handled deterministically (278.748867ms)
+✔ I5: Validator Completeness (392.024442ms)
+▶ Property Test Summary
+  ✔ ran property tests across 100 seeds (0.073457ms)
+✔ Property Test Summary (0.119133ms)
+▶ Contradictory Constraints
+  ✔ detects synchronous vs asynchronous contradiction (15.148976ms)
+  ✔ detects public vs private contradiction (8.094368ms)
+  ✔ detects required vs optional contradiction (0.255349ms)
+  ✔ handles contradictions gracefully without crashing (1.1094ms)
+✔ Contradictory Constraints (25.421619ms)
+▶ Underspecified Intents
+  ✔ handles minimal intent (just goal) (1.602735ms)
+  ✔ detects high entropy for vague goals (0.182522ms)
+  ✔ handles placeholder content (0.186209ms)
+  ✔ handles TODO markers in constraints (0.286717ms)
+✔ Underspecified Intents (2.971382ms)
+▶ Adversarial Wording
+  ✔ handles extremely long goal (43.856246ms)
+  ✔ handles extremely long constraints (12.943741ms)
+  ✔ handles many constraints (36.134337ms)
+  ✔ handles special characters in goal (4.754305ms)
+  ✔ handles unicode edge cases (5.704978ms)
+  ✔ handles newlines and whitespace (0.479559ms)
+  ✔ handles empty strings in constraints array (0.158487ms)
+  ✔ handles duplicate constraints (0.044894ms)
+✔ Adversarial Wording (104.713971ms)
+▶ Malformed Inputs
+  ✔ rejects empty goal (0.289122ms)
+  ✔ rejects whitespace-only goal (0.0855ms)
+  ✔ handles constraints as undefined (0.061996ms)
+  ✔ handles context as undefined (0.033893ms)
+✔ Malformed Inputs (0.539823ms)
+▶ Boundary Conditions
+  ✔ handles single character goal (0.363973ms)
+  ✔ produces deterministic output for near-identical inputs (6.341111ms)
+  ✔ handles maximum decomposition depth gracefully (4.145033ms)
+  ✔ handles zero entropy case (0.745117ms)
+✔ Boundary Conditions (11.814223ms)
+▶ Security Edge Cases
+  ✔ handles potential injection in goal (2.46378ms)
+  ✔ handles potential path traversal in constraints (0.242595ms)
+  ✔ handles extremely nested context (0.311784ms)
+✔ Security Edge Cases (3.166187ms)
+▶ Bundle CLI Functions
+  ▶ bundle-verify behavior
+    ✔ returns ok:true for valid bundle (6.007405ms)
+    ✔ returns ok:false with violations for invalid bundle (1.186374ms)
+    ✔ output is deterministic (2.294692ms)
+  ✔ bundle-verify behavior (10.156024ms)
+  ▶ bundle-summarize behavior
+    ✔ produces canonical JSON summary for valid bundle (1.750873ms)
+    ✔ summary includes all required fields (2.034334ms)
+    ✔ output keys are sorted (canonical) (1.857413ms)
+    ✔ output is byte-identical across runs (1.868684ms)
+  ✔ bundle-summarize behavior (10.406233ms)
+  ▶ Error handling patterns
+    ✔ verify handles malformed input gracefully (0.396163ms)
+    ✔ verify handles array input (0.123511ms)
+    ✔ verify handles primitive input (0.129382ms)
+  ✔ Error handling patterns (0.858941ms)
+✔ Bundle CLI Functions (21.926024ms)
+▶ Git Apply CLI
+  ▶ Basic Functionality
+    ✔ shows help with --help (49.704552ms)
+    ✔ shows help with -h (33.467986ms)
+    ✔ requires --pack argument (51.095982ms)
+    ✔ requires --repo argument (29.14983ms)
+    ✔ --message requires --commit (33.062497ms)
+  ✔ Basic Functionality (197.456976ms)
+  ▶ Successful Apply
+    ✔ applies create operation to git repo (54.031877ms)
+    ✔ uses deterministic branch naming (48.117636ms)
+    ✔ outputs canonical JSON (47.25027ms)
+  ✔ Successful Apply (149.96907ms)
+  ▶ Dry Run Mode
+    ✔ generates report without writing files (46.433068ms)
+    ✔ preserves git state in dry run (44.364128ms)
+  ✔ Dry Run Mode (91.085436ms)
+  ▶ Commit Mode
+    ✔ creates commit with --commit flag (53.002866ms)
+    ✔ uses custom commit message (51.745399ms)
+  ✔ Commit Mode (104.995249ms)
+  ▶ Error Handling
+    ✔ exits with IO error for missing pack directory (30.148031ms)
+    ✔ exits with validation error for non-git directory (24.778433ms)
+    ✔ exits with validation error for dirty working tree (38.465898ms)
+    ✔ allows dirty working tree with --allow-dirty (39.820619ms)
+    ✔ exits with validation error for pack without patch.json (34.171676ms)
+  ✔ Error Handling (167.760681ms)
+  ▶ Branch Options
+    ✔ uses --branch when specified (35.317735ms)
+    ✔ uses apply/manual when no run_id (37.134952ms)
+  ✔ Branch Options (72.621664ms)
+  ▶ Output Determinism
+    ✔ same invocation produces consistent output (dry run) (61.53225ms)
+  ✔ Output Determinism (61.649951ms)
+  ▶ Changed Files Output
+    ✔ changed_files are sorted by path (44.690741ms)
+    ✔ content_hash uses sha256 format (35.872165ms)
+    ✔ delete operations have null content_hash (39.03198ms)
+  ✔ Changed Files Output (119.773971ms)
+✔ Git Apply CLI (966.651307ms)
+▶ Verifier Report Ingestion
+  ▶ validateFolderName
+    ✔ accepts valid folder names (8.71428ms)
+    ✔ accepts folder names with underscores in verifier_id (1.087749ms)
+    ✔ accepts folder names with hyphens in verifier_id (2.0209ms)
+    ✔ rejects invalid format (1.225007ms)
+    ✔ rejects missing date (1.163883ms)
+    ✔ rejects invalid date (0.907812ms)
+  ✔ validateFolderName (16.173658ms)
+  ▶ validateRequiredFiles
+    ✔ passes when VERIFIER_REPORT.md exists (2.688461ms)
+    ✔ fails when VERIFIER_REPORT.md is missing (1.512716ms)
+  ✔ validateRequiredFiles (4.486783ms)
+  ▶ validateJsonSchema
+    ✔ accepts valid JSON with all required fields (2.23959ms)
+    ✔ rejects JSON missing required fields (1.587126ms)
+    ✔ rejects invalid schema_version (6.955021ms)
+    ✔ rejects malformed JSON (2.255449ms)
+  ✔ validateJsonSchema (13.430614ms)
+  ▶ parseMarkdownReport
+    ✔ parses valid markdown report correctly (1.442435ms)
+    ✔ fails with stable error when verifier_kind is missing (2.656732ms)
+    ✔ detects version mismatch (0.689322ms)
+    ✔ reports missing verifier_kind with stable error message (0.427702ms)
+    ✔ reports other missing fields after verifier_kind present (0.479359ms)
+  ✔ parseMarkdownReport (5.989131ms)
+  ▶ Index Entry Management
+    ✔ formats table row correctly (2.023034ms)
+    ✔ parses existing entries from index content (0.973976ms)
+    ✔ detects duplicates correctly (0.550222ms)
+  ✔ Index Entry Management (3.762605ms)
+  ▶ Valid submission with JSON passes and updates index deterministically
+    ✔ parses and validates correctly (3.525511ms)
+  ✔ Valid submission with JSON passes and updates index deterministically (3.697994ms)
+  ▶ Valid submission without JSON passes
+    ✔ parses markdown-only submission correctly (1.046422ms)
+  ✔ Valid submission without JSON passes (1.168942ms)
+  ▶ Invalid JSON fails with stable error message
+    ✔ produces consistent error for invalid JSON (1.289598ms)
+  ✔ Invalid JSON fails with stable error message (1.387893ms)
+✔ Verifier Report Ingestion (50.970666ms)
+▶ Model IO CLI
+  ▶ Valid Sessions
+    ✔ returns ok:true and exit 0 for valid_model_io.json (34.367894ms)
+  ✔ Valid Sessions (34.966356ms)
+  ▶ Invalid Sessions
+    ✔ returns exit 3 for invalid_bad_hash.json (35.595867ms)
+    ✔ returns exit 3 for invalid_non_contiguous_index.json (32.541068ms)
+    ✔ returns exit 3 for invalid_mode.json (30.220848ms)
+  ✔ Invalid Sessions (98.769234ms)
+  ▶ IO Errors
+    ✔ returns exit 1 for non-existent file (23.290613ms)
+  ✔ IO Errors (23.552393ms)
+  ▶ Parse Errors
+    ✔ returns exit 2 for invalid JSON (24.849726ms)
+  ✔ Parse Errors (25.146182ms)
+  ▶ Options
+    ✔ --no-response-hashes skips hash verification (23.355735ms)
+    ✔ --help shows usage (21.82811ms)
+  ✔ Options (45.471795ms)
+  ▶ Determinism
+    ✔ produces byte-identical output across runs (valid) (47.23444ms)
+    ✔ produces byte-identical output across runs (invalid) (47.25558ms)
+    ✔ violations are sorted deterministically (24.948592ms)
+  ✔ Determinism (119.775613ms)
+✔ Model IO CLI (348.233369ms)
+▶ Pack Apply CLI
+  ▶ Basic Functionality
+    ✔ shows help with --help (39.67269ms)
+    ✔ shows help with -h (27.916566ms)
+    ✔ requires --pack argument (31.959107ms)
+    ✔ requires --target argument (23.656078ms)
+  ✔ Basic Functionality (124.203877ms)
+  ▶ Successful Apply
+    ✔ applies create operation successfully (25.870892ms)
+    ✔ applies multiple operations in sorted order (31.665947ms)
+    ✔ outputs canonical JSON (25.303307ms)
+    ✔ creates parent directories when needed (23.402102ms)
+  ✔ Successful Apply (106.845368ms)
+  ▶ Dry Run Mode
+    ✔ generates report without writing files (23.912869ms)
+    ✔ computes hashes in dry run (24.682613ms)
+  ✔ Dry Run Mode (48.912136ms)
+  ▶ Error Handling
+    ✔ exits with code 2 for missing pack directory (25.269693ms)
+    ✔ exits with code 2 for pack without patch.json (24.069874ms)
+    ✔ exits with code 2 for non-directory target (21.867214ms)
+    ✔ exits with code 1 for partial failure (26.858192ms)
+    ✔ exits with code 1 for all operations failed (22.801947ms)
+  ✔ Error Handling (121.338004ms)
+  ▶ Target Safety
+    ✔ refuses path traversal in target (20.985991ms)
+    ✔ refuses target that is not a directory (22.394061ms)
+  ✔ Target Safety (43.592ms)
+  ▶ Output Determinism
+    ✔ same invocation produces identical stdout bytes (44.798593ms)
+    ✔ dry run produces same result as actual apply (except writes) (42.66369ms)
+  ✔ Output Determinism (87.643492ms)
+  ▶ Modify and Delete Operations
+    ✔ applies modify operation successfully (21.410477ms)
+    ✔ applies delete operation successfully (22.384623ms)
+  ✔ Modify and Delete Operations (44.006477ms)
+✔ Pack Apply CLI (577.803351ms)
+▶ Pack CLI
+  ▶ Valid Packs
+    ✔ returns ok:true for valid_pack_bundle (46.948895ms)
+    ✔ returns ok:true for valid_pack_clarify (35.988353ms)
+    ✔ returns ok:true for valid_pack_refuse (35.7465ms)
+    ✔ returns ok:true for valid_pack_full (26.916262ms)
+  ✔ Valid Packs (146.563895ms)
+  ▶ Invalid Packs
+    ✔ returns exit 1 for missing run.json (27.357228ms)
+    ✔ returns exit 1 for missing bundle.json (25.260997ms)
+    ✔ returns exit 1 for unknown file (25.900667ms)
+    ✔ returns exit 1 for hash mismatch (26.310135ms)
+  ✔ Invalid Packs (105.424102ms)
+  ▶ Determinism
+    ✔ produces byte-identical output across runs (valid) (55.476926ms)
+    ✔ produces byte-identical output across runs (invalid) (61.108946ms)
+    ✔ violations are sorted deterministically (30.241336ms)
+  ✔ Determinism (147.156376ms)
+  ▶ Error Handling
+    ✔ returns exit 2 for non-existent directory (26.747565ms)
+    ✔ returns exit 2 for file instead of directory (26.50482ms)
+  ✔ Error Handling (53.515418ms)
+  ▶ Options
+    ✔ --no-deep skips deep validation (27.296494ms)
+    ✔ --no-refs skips hash verification (23.420616ms)
+    ✔ --help shows usage (20.938692ms)
+  ✔ Options (71.991873ms)
+  ▶ Reference Checks
+    ✔ includes reference_checks in success output (22.806735ms)
+  ✔ Reference Checks (22.949383ms)
+✔ Pack CLI (548.224357ms)
+▶ Pack Export CLI
+  ▶ Basic Functionality
+    ✔ shows help with --help (51.738225ms)
+    ✔ shows help with -h (36.543654ms)
+    ✔ requires --intent argument (32.881056ms)
+    ✔ requires --out argument (32.35032ms)
+  ✔ Basic Functionality (154.322383ms)
+  ▶ Successful Export
+    ✔ exports pack successfully with plan mode (37.029975ms)
+    ✔ outputs canonical JSON (38.101585ms)
+    ✔ default policy is used when not specified (37.505357ms)
+    ✔ default mode is plan when not specified (37.584065ms)
+  ✔ Successful Export (150.803104ms)
+  ▶ Error Handling
+    ✔ fails with exit code 2 for non-empty output directory (29.691225ms)
+    ✔ fails with exit code 2 for missing intent file (34.290258ms)
+    ✔ fails with exit code 2 for invalid policy (28.746743ms)
+    ✔ fails with exit code 2 for invalid mode (25.664284ms)
+  ✔ Error Handling (118.775048ms)
+  ▶ Output Determinism
+    ✔ same invocation produces identical stdout bytes (66.500527ms)
+  ✔ Output Determinism (66.629107ms)
+  ▶ Different Outcomes
+    ✔ fails for invalid intent (empty goal) (26.125419ms)
+    ✔ handles BUNDLE outcome correctly (32.037915ms)
+  ✔ Different Outcomes (58.369089ms)
+  ▶ Model Mode Options
+    ✔ accepts --model-mode none (35.003796ms)
+    ✔ rejects invalid --model-mode (24.03581ms)
+  ✔ Model Mode Options (59.257926ms)
+✔ Pack Export CLI (609.363369ms)
+▶ Patch CLI
+  ▶ Valid Patch
+    ✔ returns ok:true for valid patch (45.100238ms)
+  ✔ Valid Patch (45.782007ms)
+  ▶ Invalid Patches
+    ✔ returns violations for absolute path (35.606026ms)
+    ✔ returns violations for traversal path (24.667455ms)
+    ✔ returns violations for duplicate paths (26.806656ms)
+    ✔ returns violations for binary content (26.018548ms)
+  ✔ Invalid Patches (113.632565ms)
+  ▶ Determinism
+    ✔ produces byte-identical output across runs (valid) (45.449604ms)
+    ✔ produces byte-identical output across runs (invalid) (46.282114ms)
+    ✔ violations are sorted deterministically (25.309599ms)
+  ✔ Determinism (117.511198ms)
+  ▶ Error Handling
+    ✔ returns exit 1 for missing file (20.604907ms)
+    ✔ returns exit 2 for invalid JSON (45.411983ms)
+  ✔ Error Handling (66.295331ms)
+  ▶ Options
+    ✔ --max-bytes enforces limit (19.73197ms)
+    ✔ --help shows usage (21.834803ms)
+  ✔ Options (41.793718ms)
+✔ Patch CLI (387.242356ms)
+▶ Repository State CLI
+  ▶ Verify Mode
+    ✔ returns ok:true and exit 0 for valid_repo_state.json (31.642303ms)
+    ✔ returns ok:true for dirty state (32.757013ms)
+    ✔ returns ok:false and exit 3 for invalid_absolute_path.json (28.04611ms)
+    ✔ returns ok:false for invalid_unsorted_paths.json (25.014285ms)
+    ✔ returns ok:false for invalid_bad_hash.json (32.255854ms)
+    ✔ returns ok:false for invalid_missing_schema.json (26.550876ms)
+  ✔ Verify Mode (177.346486ms)
+  ▶ Generate Mode
+    ✔ generates valid repo state to stdout (80.322114ms)
+    ✔ generates valid repo state to file with --out (81.232721ms)
+    ✔ generates state with --no-deps (77.637299ms)
+  ✔ Generate Mode (239.636006ms)
+  ▶ Exit Codes
+    ✔ returns exit 1 for non-existent file (24.466828ms)
+    ✔ returns exit 2 for invalid JSON file (23.786473ms)
+    ✔ returns exit 3 for validation error (22.549894ms)
+  ✔ Exit Codes (71.109289ms)
+  ▶ RS12: Output Determinism
+    ✔ verify output is deterministic (48.268499ms)
+    ✔ violations are sorted deterministically (45.199214ms)
+  ✔ RS12: Output Determinism (93.835463ms)
+  ▶ Canonical Output
+    ✔ generated state has sorted keys (65.804572ms)
+    ✔ verify output is valid JSON (20.321685ms)
+  ✔ Canonical Output (86.320771ms)
+✔ Repository State CLI (668.7836ms)
+▶ Runner Verify CLI
+  ▶ Help
+    ✔ shows help with --help (33.239278ms)
+    ✔ shows help with -h (28.749439ms)
+    ✔ shows help with no args (25.447677ms)
+  ✔ Help (88.1754ms)
+  ▶ File Verification
+    ✔ valid_basic.json passes with exit 0 (26.151287ms)
+    ✔ valid_with_phases.json passes (33.499355ms)
+    ✔ valid_with_ephemeral.json passes (23.94994ms)
+    ✔ valid_no_isolation.json passes (23.34763ms)
+    ✔ invalid_rn1_schema_version.json fails with exit 3 (22.176453ms)
+    ✔ invalid_rn2_runner_id.json fails with exit 3 (23.735998ms)
+    ✔ invalid_rn3_platform.json fails with exit 3 (29.593982ms)
+    ✔ invalid_rn4_sandbox.json fails with exit 3 (23.154658ms)
+    ✔ invalid_rn5_limits.json fails with exit 3 (27.018362ms)
+    ✔ invalid_rn6_commands.json fails with exit 3 (28.49931ms)
+    ✔ invalid_rn7_write_roots.json fails with exit 3 (27.487572ms)
+    ✔ invalid_rn8_context.json fails with exit 3 (26.44592ms)
+    ✔ invalid_rn9_timing.json fails with exit 3 (24.574119ms)
+    ✔ invalid_rn10_exit.json fails with exit 3 (24.358796ms)
+  ✔ File Verification (364.993576ms)
+  ▶ Error Handling
+    ✔ non-existent file fails with exit 1 (22.287252ms)
+    ✔ invalid JSON fails with exit 2 (20.682713ms)
+    ✔ non-object JSON fails with exit 3 (19.412812ms)
+  ✔ Error Handling (62.574524ms)
+  ▶ Stdin Input
+    ✔ reads from stdin with - (22.248108ms)
+    ✔ empty stdin fails with exit 1 (21.640389ms)
+    ✔ invalid JSON from stdin fails with exit 2 (19.062644ms)
+  ✔ Stdin Input (63.149042ms)
+  ▶ Output Format
+    ✔ success output is canonical JSON (20.776709ms)
+    ✔ failure output includes file path (17.970427ms)
+  ✔ Output Format (38.881898ms)
+✔ Runner Verify CLI (618.407879ms)
+▶ Reference Release Tagging
+  ▶ validateRelease
+    ✔ accepts valid release format (4.365946ms)
+    ✔ rejects invalid release format (0.936205ms)
+  ✔ validateRelease (5.900775ms)
+  ▶ validateDate
+    ✔ accepts valid date format (1.448977ms)
+    ✔ rejects invalid date format (1.233282ms)
+    ✔ requires date when not dry-run (1.39741ms)
+    ✔ allows missing date in dry-run mode (0.630572ms)
+  ✔ validateDate (5.05039ms)
+  ▶ parseMarkdownForVerification
+    ✔ parses internal verifier_kind (1.584792ms)
+    ✔ parses independent verifier_kind (1.271995ms)
+    ✔ returns null for missing verifier_kind (3.193328ms)
+  ✔ parseMarkdownForVerification (6.736251ms)
+  ▶ loadInternalReports
+    ✔ loads only internal reports from fixture (3.481939ms)
+    ✔ returns empty array when only independent reports exist (2.847469ms)
+    ✔ returns empty array when no verified folder (0.625233ms)
+  ✔ loadInternalReports (7.217153ms)
+  ▶ checkIndexAlreadyRecorded
+    ✔ returns false when Reference Tag not recorded (3.083923ms)
+    ✔ returns true when Reference Tag already recorded (0.551575ms)
+  ✔ checkIndexAlreadyRecorded (3.796318ms)
+  ▶ updateIndexWithReferenceTag
+    ✔ adds Reference Tag row to INDEX.md (1.070557ms)
+    ✔ produces deterministic output (1.770499ms)
+  ✔ updateIndexWithReferenceTag (2.990687ms)
+  ▶ createStubGitHelper
+    ✔ returns configured commit for rev-parse (0.882535ms)
+    ✔ reports tag existence correctly (1.6851ms)
+  ✔ createStubGitHelper (2.785824ms)
+  ▶ Threshold not met
+    ✔ returns exit code 2 when no internal reports exist (0.993893ms)
+    ✔ independent-only reports do NOT count toward reference threshold (1.443336ms)
+  ✔ Threshold not met (2.74672ms)
+  ▶ Threshold met dry-run
+    ✔ outputs JSON with expected reference tag name (2.266029ms)
+  ✔ Threshold met dry-run (2.361308ms)
+  ▶ Already recorded
+    ✔ refuses with stable message when INDEX.md already has Reference Tag (0.465413ms)
+  ✔ Already recorded (0.615905ms)
+  ▶ Determinism
+    ✔ produces stable error messages (3.244223ms)
+    ✔ produces stable report loading order (2.695915ms)
+    ✔ dry-run JSON output is byte-identical across runs (1.715016ms)
+  ✔ Determinism (7.974773ms)
+✔ Reference Release Tagging (49.105699ms)
+▶ Verified Release Tagging
+  ▶ validateRelease
+    ✔ accepts valid release format (5.533025ms)
+    ✔ rejects invalid release format (2.30393ms)
+  ✔ validateRelease (8.404579ms)
+  ▶ validateDate
+    ✔ accepts valid date format (3.003332ms)
+    ✔ rejects invalid date format (1.225297ms)
+    ✔ requires date when not dry-run (1.731527ms)
+    ✔ allows missing date in dry-run mode (1.78625ms)
+  ✔ validateDate (8.260479ms)
+  ▶ validateThreshold
+    ✔ accepts valid threshold (1.059547ms)
+    ✔ rejects invalid threshold (1.805856ms)
+  ✔ validateThreshold (3.15699ms)
+  ▶ parseMarkdownForVerification
+    ✔ parses valid verified report with verifier_kind (1.333511ms)
+    ✔ parses internal verifier_kind (1.487139ms)
+    ✔ returns null for missing verifier_kind (0.743594ms)
+    ✔ detects failed result (1.291582ms)
+    ✔ handles missing fields (0.50625ms)
+    ✔ handles placeholder fields (7.224497ms)
+  ✔ parseMarkdownForVerification (13.037036ms)
+  ▶ loadVerifiedReports
+    ✔ loads valid reports from fixture with verifier_kind (2.439594ms)
+    ✔ returns empty array when no verified folder (0.800311ms)
+    ✔ excludes reports with missing required fields (1.492318ms)
+    ✔ loads internal reports when present (1.100283ms)
+  ✔ loadVerifiedReports (6.117381ms)
+  ▶ checkIndexAlreadyRecorded
+    ✔ returns false when not recorded (2.446968ms)
+    ✔ returns true when already recorded (0.761468ms)
+  ✔ checkIndexAlreadyRecorded (3.362304ms)
+  ▶ updateIndexWithVerifiedTag
+    ✔ adds Verified Tag row to INDEX.md (1.120651ms)
+    ✔ produces deterministic output (0.750738ms)
+  ✔ updateIndexWithVerifiedTag (2.015489ms)
+  ▶ createStubGitHelper
+    ✔ returns configured commit for rev-parse (0.886032ms)
+    ✔ reports tag existence correctly (0.456206ms)
+  ✔ createStubGitHelper (1.743208ms)
+  ▶ Threshold not met
+    ✔ returns exit code 2 with exact error string for no reports (0.838903ms)
+    ✔ internal-only reports do NOT count toward verified threshold (1.380609ms)
+  ✔ Threshold not met (2.411813ms)
+  ▶ Threshold met dry-run
+    ✔ outputs JSON with expected tag name and verifier_kind counts (1.801519ms)
+  ✔ Threshold met dry-run (1.930911ms)
+  ▶ Invalid report with missing fields
+    ✔ tool refuses to count reports with missing OS/node/npm (1.977438ms)
+  ✔ Invalid report with missing fields (2.077796ms)
+  ▶ Already verified recorded
+    ✔ refuses with stable message when INDEX.md already has Verified Tag (0.638778ms)
+  ✔ Already verified recorded (0.724779ms)
+  ▶ Determinism
+    ✔ produces stable error messages (0.768221ms)
+    ✔ produces stable report loading order (1.41863ms)
+    ✔ dry-run JSON output is byte-identical across runs (1.067121ms)
+  ✔ Determinism (3.421906ms)
+✔ Verified Release Tagging (57.740911ms)
+▶ Workspace Snapshot CLI
+  ▶ Help
+    ✔ shows help with --help (35.821149ms)
+    ✔ shows help with -h (34.23803ms)
+  ✔ Help (70.824525ms)
+  ▶ Generate Mode
+    ✔ generates snapshot to stdout (37.45377ms)
+    ✔ generates snapshot to file with --out (34.740894ms)
+    ✔ includes policy hash (30.495693ms)
+    ✔ includes env allowlist (30.411726ms)
+    ✔ adds custom env vars with --env-allow (32.348027ms)
+    ✔ rejects forbidden env vars (32.326716ms)
+    ✔ sets tool_id with --tool (34.416134ms)
+    ✔ sets mode in args (32.84081ms)
+    ✔ sets dry_run in args (31.375452ms)
+    ✔ includes ephemeral fields (29.839763ms)
+  ✔ Generate Mode (327.089532ms)
+  ▶ Intent Reference
+    ✔ includes intent ref when --intent provided (31.909614ms)
+    ✔ fails when intent file does not exist (28.774966ms)
+  ✔ Intent Reference (60.902009ms)
+  ▶ Pack Reference
+    ✔ includes pack ref when --pack provided (33.364953ms)
+    ✔ fails when pack directory does not exist (25.359873ms)
+  ✔ Pack Reference (59.083279ms)
+  ▶ Verify Mode
+    ✔ verifies valid snapshot (27.174755ms)
+    ✔ rejects invalid snapshot (27.53427ms)
+    ✔ fails when file does not exist (25.025276ms)
+    ✔ fails on invalid JSON (19.5932ms)
+  ✔ Verify Mode (99.891259ms)
+  ▶ Safety
+    ✔ safety block has correct values (27.024144ms)
+    ✔ all paths in output are relative (27.787535ms)
+  ✔ Safety (54.921395ms)
+  ▶ Determinism
+    ✔ produces identical output for same inputs (54.106997ms)
+    ✔ output is canonical JSON (22.878831ms)
+  ✔ Determinism (77.101094ms)
+  ▶ Exit Codes
+    ✔ returns 0 on success (27.2306ms)
+    ✔ returns 1 on IO error (22.859825ms)
+    ✔ returns 2 on parse error (18.404511ms)
+    ✔ returns 3 on validation error (20.207422ms)
+  ✔ Exit Codes (88.872206ms)
+✔ Workspace Snapshot CLI (839.345683ms)
+ℹ tests 1095
+ℹ suites 360
+ℹ pass 1095
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1087.908308

@@ -1,0 +1,41 @@
+
+> context-engine-kernel@0.1.0 golden
+> npx tsx tools/run_golden_suite.ts
+
+
+Loaded 10 intents from manifest
+Loaded 10 existing golden records
+
+Running golden suite...
+
+  Running intent_001_api_spec... PASS (11ms)
+  Running intent_002_data_model... PASS (5ms)
+  Running intent_003_add_validation... PASS (1ms)
+  Running intent_004_error_handling... PASS (5ms)
+  Running intent_005_cli_tool... PASS (0ms)
+  Running intent_006_test_fixtures... PASS (5ms)
+  Running intent_007_deploy_staging... PASS (0ms)
+  Running intent_008_verify_determinism... PASS (6ms)
+  Running intent_009_empty_goal... PASS (0ms)
+  Running intent_010_contradictory... PASS (3ms)
+
+──────────────────────────────────────────────────────────────────────────────────────────
+GOLDEN SUITE RESULTS
+──────────────────────────────────────────────────────────────────────────────────────────
+Intent ID                          Category    Result    Status    Duration  
+──────────────────────────────────────────────────────────────────────────────────────────
+intent_001_api_spec                blueprint   CLARIFY   [32mPASS      [0m11ms      
+intent_002_data_model              blueprint   CLARIFY   [32mPASS      [0m5ms       
+intent_003_add_validation          patch       BUNDLE    [32mPASS      [0m1ms       
+intent_004_error_handling          patch       BUNDLE    [32mPASS      [0m5ms       
+intent_005_cli_tool                scaffold    BUNDLE    [32mPASS      [0m0ms       
+intent_006_test_fixtures           scaffold    BUNDLE    [32mPASS      [0m5ms       
+intent_007_deploy_staging          runbook     BUNDLE    [32mPASS      [0m0ms       
+intent_008_verify_determinism      runbook     CLARIFY   [32mPASS      [0m6ms       
+intent_009_empty_goal              edge_case   REFUSE    [32mPASS      [0m0ms       
+intent_010_contradictory           edge_case   CLARIFY   [32mPASS      [0m3ms       
+──────────────────────────────────────────────────────────────────────────────────────────
+
+Summary: 10 passed, 0 failed, 0 changed, 0 new
+──────────────────────────────────────────────────────────────────────────────────────────
+
