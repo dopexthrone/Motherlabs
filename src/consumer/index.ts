@@ -143,3 +143,42 @@ export {
   computeWorkspaceHash,
   serializeWorkspaceSnapshot,
 } from './workspace_verify.js';
+
+// Runner Types
+export type {
+  Runner,
+  RunnerCore,
+  RunnerPlatform,
+  RunnerSandbox,
+  RunnerLimits,
+  RunnerCommands,
+  RunnerContext,
+  RunnerTiming,
+  RunnerExit,
+  RunnerEphemeral,
+  ExecutionPhase,
+  RunnerViolation,
+  RunnerVerificationResult,
+  RunnerVerifyOptions,
+  ValidOS,
+  ValidArch,
+  SandboxBackend,
+  IsolationLevel,
+} from './runner_types.js';
+export {
+  RUNNER_SCHEMA_VERSION,
+  VALID_OS,
+  VALID_ARCH,
+  VALID_SANDBOX_BACKENDS,
+  VALID_ISOLATION_LEVELS,
+  FORBIDDEN_ENV_PREFIXES as RUNNER_FORBIDDEN_ENV_PREFIXES,
+  LIMIT_BOUNDS,
+} from './runner_types.js';
+
+// Runner Verification
+export {
+  verifyRunner,
+  computeRunnerCore,
+  computeRunnerHash,
+  serializeRunner,
+} from './runner_verify.js';

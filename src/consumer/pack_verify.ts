@@ -26,6 +26,7 @@ import { canonicalize, canonicalHash } from '../utils/canonical.js';
 import { verifyBundle } from './bundle_verify.js';
 import { verifyPatch } from './patch_verify.js';
 import { verifyModelIO } from './model_io_verify.js';
+import { verifyRunner } from './runner_verify.js';
 import type {
   PackVerifyResult,
   PackVerifySuccess,
@@ -633,6 +634,30 @@ export function verifyPack(packPath: string, options: PackVerifyOptions = {}): P
             violations.push({
               rule_id: RULES.PK8,
               path: 'model_io.json',
+              message: `${v.rule_id}: ${v.message}`,
+            });
+          }
+        }
+      }
+    }
+
+    // Validate runner.json
+    const runnerPath = join(resolvedPath, 'runner.json');
+    if (existsSync(runnerPath) && isRegularFile(runnerPath)) {
+      const runnerResult = readJsonFile(runnerPath);
+      if (!runnerResult.ok) {
+        violations.push({
+          rule_id: RULES.PK8,
+          path: 'runner.json',
+          message: `failed to parse: ${runnerResult.error}`,
+        });
+      } else {
+        const runnerVerify = verifyRunner(runnerResult.data);
+        if (!runnerVerify.valid) {
+          for (const v of runnerVerify.violations) {
+            violations.push({
+              rule_id: RULES.PK8,
+              path: 'runner.json',
               message: `${v.rule_id}: ${v.message}`,
             });
           }

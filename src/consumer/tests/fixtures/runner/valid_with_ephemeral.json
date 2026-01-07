@@ -1,0 +1,53 @@
+{
+  "commands": {
+    "allowlist": [],
+    "blocklist": ["rm", "sudo"],
+    "shell": "/bin/bash"
+  },
+  "context": {
+    "env_allowlist": ["LANG"],
+    "locale": "C",
+    "timezone": "UTC",
+    "working_dir": "."
+  },
+  "ephemeral": {
+    "host_id": "workstation-01",
+    "human_notes": "Test run",
+    "session_id": "session_123"
+  },
+  "exit": {
+    "code": 1,
+    "oom_killed": false,
+    "signal": "SIGTERM",
+    "timeout_killed": true
+  },
+  "limits": {
+    "max_cpu_seconds": 60,
+    "max_memory_bytes": 1073741824,
+    "max_output_files": 1000,
+    "max_total_output_bytes": 104857600,
+    "timeout_ms": 120000
+  },
+  "platform": {
+    "arch": "x64",
+    "node_version": "v20.0.0",
+    "npm_version": "9.0.0",
+    "os": "win32"
+  },
+  "runner_id": "runner_20260106_140000_def456",
+  "runner_schema_version": "1.0.0",
+  "runner_version": "0.3.15",
+  "sandbox": {
+    "backend": "vm",
+    "filesystem_readonly": false,
+    "isolation_level": "strict",
+    "network_blocked": false
+  },
+  "timing": {
+    "completed_at": "2026-01-06T14:02:00.000Z",
+    "duration_ms": 120000,
+    "started_at": "2026-01-06T14:00:00.000Z"
+  },
+  "warnings": ["execution timed out", "signal sent"],
+  "write_roots": ["out", "temp"]
+}

@@ -77,6 +77,7 @@ It does NOT validate:
 | `ledger.jsonl` | NO | LEDGER_SPEC.md | Audit ledger entry (single-line subset) |
 | `policy.json` | NO | POLICY_SPEC.md | Resolved policy used |
 | `model_io.json` | NO | MODEL_IO_SPEC.md | Model recording session (if model recording used) |
+| `runner.json` | NO | RUNNER_SPEC.md | Execution environment details (if runner captured) |
 | `meta.json` | NO | (none) | Arbitrary metadata (ignored by verifier) |
 
 ### 3.2 File Requirements by Outcome
@@ -330,6 +331,7 @@ if (evidence.json exists) { basic schema validation }
 if (policy.json exists) { basic schema validation }
 if (ledger.jsonl exists) { each line is valid JSON }
 if (model_io.json exists) { verifyModelIO(model_io.json).ok }
+if (runner.json exists) { verifyRunner(runner.json).valid }
 ```
 
 Optional files, when present, MUST pass their respective validations.
@@ -408,6 +410,7 @@ A verifier supporting spec version N MUST accept packs created under spec versio
 - [LEDGER_SPEC.md](./LEDGER_SPEC.md) - Audit trail contract
 - [POLICY_SPEC.md](./POLICY_SPEC.md) - Policy profiles contract
 - [MODEL_IO_SPEC.md](./MODEL_IO_SPEC.md) - Model recording session contract
+- [RUNNER_SPEC.md](./RUNNER_SPEC.md) - Execution environment details contract
 - [GIT_APPLY_SPEC.md](./GIT_APPLY_SPEC.md) - Git apply result contract
 
 ### 10.2 Implementation References
