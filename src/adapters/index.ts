@@ -145,3 +145,19 @@ export {
   createResilientExecutor,
   createAPIResilientExecutor,
 } from './resilience.js';
+
+// Multi-model orchestration
+export type {
+  TaskType,
+  ModelTier,
+  ProviderHealth,
+  OrchestratorConfig,
+  OrchestratorStats,
+} from './orchestrator.js';
+
+export {
+  ModelOrchestrator,
+  createOrchestrator,
+  createCostOptimizedOrchestrator,
+  createLoadBalancedOrchestrator,
+} from './orchestrator.js';
