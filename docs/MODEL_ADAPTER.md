@@ -18,6 +18,19 @@ The ModelAdapter abstraction decouples the context engine kernel from AI model i
 │              │     ModelAdapter          │                  │
 │              │     Interface             │                  │
 │              └───────────────────────────┘                  │
+│                            │                                │
+│         ┌──────────────────┼──────────────────┐             │
+│         │                  │                  │             │
+│  ┌──────▼──────┐  ┌───────▼───────┐  ┌──────▼──────┐      │
+│  │ClaudeAdapter│  │OpenAIAdapter  │  │GeminiAdapter│      │
+│  │ (Anthropic) │  │ (OpenAI)      │  │ (Google)    │      │
+│  └─────────────┘  └───────────────┘  └─────────────┘      │
+│         │                                                   │
+│  ┌──────▼──────┐  ┌───────────────────────────────┐        │
+│  │OllamaAdapter│  │ ResilientAdapter (wrapper)    │        │
+│  │ (Local)     │  │ - Circuit breaker             │        │
+│  └─────────────┘  │ - Retry with backoff          │        │
+│                   └───────────────────────────────┘        │
 └─────────────────────────────────────────────────────────────┘
                              │
                              ▼
@@ -156,6 +169,194 @@ const replay = await loadReplayAdapter('recordings/session.json');
 const result = await replay.transform(prompt, context);
 ```
 
+## Live Model Adapters
+
+### ClaudeAdapter (Anthropic)
+
+```typescript
+import { ClaudeAdapter, createClaudeAdapter } from './adapters/index.js';
+
+// Simple creation
+const claude = createClaudeAdapter();
+
+// With options
+const claude = new ClaudeAdapter({
+  model: 'claude-3-5-sonnet-20241022',
+  temperature: 0,
+  max_tokens: 4096,
+});
+```
+
+Requires `ANTHROPIC_API_KEY` environment variable.
+
+### OpenAIAdapter
+
+```typescript
+import { OpenAIAdapter, createOpenAIAdapter } from './adapters/index.js';
+
+const openai = createOpenAIAdapter();
+
+// With specific model
+const openai = new OpenAIAdapter({
+  model: 'gpt-4o',
+  temperature: 0,
+});
+```
+
+Requires `OPENAI_API_KEY` environment variable.
+
+### GeminiAdapter (Google)
+
+```typescript
+import { GeminiAdapter, createGeminiAdapter } from './adapters/index.js';
+
+const gemini = createGeminiAdapter();
+
+// With specific model
+const gemini = new GeminiAdapter({
+  model: 'gemini-2.0-flash',
+  temperature: 0,
+});
+```
+
+Requires `GOOGLE_API_KEY` or `GEMINI_API_KEY` environment variable.
+
+### OllamaAdapter (Local)
+
+```typescript
+import { OllamaAdapter, createOllamaAdapter, isOllamaAvailable } from './adapters/index.js';
+
+// Check if Ollama is running
+if (await isOllamaAvailable()) {
+  const ollama = createOllamaAdapter();
+}
+
+// With specific model
+const ollama = new OllamaAdapter({
+  model: 'llama3.3',
+  host: 'http://localhost:11434',
+});
+```
+
+Requires Ollama running locally.
+
+## Factory Functions
+
+### createAdapter
+
+Create adapters by provider name:
+
+```typescript
+import { createAdapter } from './adapters/index.js';
+
+const adapter = createAdapter({
+  provider: 'anthropic',  // 'openai' | 'google' | 'ollama' | 'mock'
+  model: 'claude-3-5-sonnet-20241022',
+  temperature: 0,
+});
+```
+
+### createAdapterWithFallback
+
+Create adapter with automatic fallback:
+
+```typescript
+import { createAdapterWithFallback } from './adapters/index.js';
+
+const adapter = createAdapterWithFallback({
+  provider: 'anthropic',
+  fallback_provider: 'openai',
+  fallback_model: 'gpt-4o',
+});
+```
+
+### createAutoAdapter
+
+Auto-detect best available adapter:
+
+```typescript
+import { createAutoAdapter } from './adapters/index.js';
+
+// Tries: Ollama -> Gemini -> OpenAI -> Claude -> Mock
+const adapter = await createAutoAdapter();
+```
+
+### createProductionAdapter
+
+Production-ready adapter with resilience:
+
+```typescript
+import { createProductionAdapter } from './adapters/index.js';
+
+const adapter = createProductionAdapter({
+  provider: 'anthropic',
+  fallback_provider: 'openai',
+});
+// Includes circuit breaker + retry with exponential backoff
+```
+
+## Resilience Patterns
+
+### ResilientAdapter
+
+Wraps any adapter with fault tolerance:
+
+```typescript
+import { createResilientAdapter } from './adapters/index.js';
+
+const resilient = createResilientAdapter({
+  provider: 'anthropic',
+  circuit_config: {
+    failureThreshold: 5,    // Open after 5 failures
+    resetTimeout: 30000,     // Try recovery after 30s
+    successThreshold: 2,     // Close after 2 successes
+  },
+  retry_config: {
+    maxAttempts: 3,
+    initialDelay: 1000,
+    maxDelay: 30000,
+    backoffMultiplier: 2,
+    jitter: 0.1,
+  },
+});
+
+// Get resilience stats
+const stats = resilient.getResilienceStats();
+console.log(stats.circuit.state);  // 'closed' | 'open' | 'half-open'
+```
+
+### Circuit Breaker States
+
+| State | Description |
+|-------|-------------|
+| `closed` | Normal operation, requests pass through |
+| `open` | Failures exceeded threshold, requests rejected |
+| `half-open` | Recovery mode, limited requests allowed |
+
+## Streaming Support
+
+For adapters that support streaming:
+
+```typescript
+import { isStreamingAdapter, simulateStream, collectStream } from './adapters/index.js';
+
+// Check if adapter supports streaming
+if (isStreamingAdapter(adapter)) {
+  // Native streaming
+  for await (const chunk of adapter.transformStream(prompt, context)) {
+    console.log(chunk.content);
+  }
+}
+
+// Simulate streaming for non-streaming adapters
+for await (const chunk of simulateStream(adapter, prompt, context)) {
+  console.log(chunk.content);
+}
+
+// Collect full result from stream
+const result = await collectStream(adapter.transformStream(prompt, context));
+```
+
 ## Evidence Logging
 
 When `model_mode` is `record`, model interactions are logged to:
@@ -197,14 +398,28 @@ Each line is a JSON object:
 - Strict/default policies reject non-none modes
 - All current kernel processing is rule-based (no model calls needed)
 
-## Future Integration
+## AI Agent System
 
-When model integration is added to the kernel:
+The `CodingAgent` uses adapters for code generation:
 
-1. Adapters will be instantiated based on `model_mode`
-2. Kernel will call adapter for transformations
-3. Recording will capture all model I/O for replay
-4. Golden suite will use replay for deterministic verification
+```typescript
+import { createCodingAgent } from './agent/index.js';
+
+const agent = createCodingAgent({
+  adapter,
+  mode: 'autonomous',
+  auto_style: true,
+  auto_security: true,
+  enable_rag: true,
+});
+
+const result = await agent.generate({
+  prompt: 'Implement a function to validate email addresses',
+  language: 'typescript',
+});
+```
+
+See `src/agent/` for the full agent system documentation.
 
 ## Security Notes
 
