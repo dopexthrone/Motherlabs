@@ -21,3 +21,4 @@ export * from './types.js';
 export * from './generator.js';
 export * from './verifier.js';
 export * from './agent.js';
+export * from './test_gen.js';
