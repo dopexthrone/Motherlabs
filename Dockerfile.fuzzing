@@ -1,0 +1,57 @@
+```dockerfile
+FROM ubuntu:22.04
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    git \
+    python3 \
+    python3-pip \
+    clang \
+    gdb \
+    curl \
+    wget \
+    file \
+    vim \
+    cmake
+
+# Install AFL++
+RUN git clone https://github.com/AFLplusplus/AFLplusplus.git
+WORKDIR /AFLplusplus
+RUN make distrib
+RUN make install
+
+# Set up environment variables for AFL++
+ENV AFL_NO_UI=1
+ENV AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1
+
+# Create a directory for the project
+WORKDIR /app
+
+# Copy the source code into the container
+COPY . /app
+
+# Install npm dependencies (if needed) - adjust as necessary for your project
+RUN apt-get update && apt-get install -y npm
+RUN npm install
+
+# Example: Build the project (adjust as necessary)
+# RUN npm run build
+
+# Copy the fuzzing script and target script
+COPY fuzzing.sh /app/fuzzing.sh
+COPY eval.js /app/eval.js
+
+# Make the fuzzing script executable
+RUN chmod +x /app/fuzzing.sh
+
+# Set the entrypoint to run the fuzzing script
+ENTRYPOINT ["/app/fuzzing.sh"]
+
+# Example: If you need to compile with afl-clang-fast:
+# RUN CC=afl-clang-fast CXX=afl-clang-fast++ cmake -S . -B build
+# RUN make -C build
+
+# Example: Fuzzing command after compilation
+# ENTRYPOINT ["afl-fuzz", "-i", "input", "-o", "output", "build/your_program", "@@"]
+```

@@ -1,0 +1,1789 @@
+
+> context-engine-kernel@0.1.0 deep-explore
+> npx tsx tools/deep_explore.ts --goal Create a coding agent that is 100% accurate and can work without context limits. Uses automated context engineering for deep exploration of problem space, chooses best variants and builds up front. Auto and human-in-the-loop modes. VSCode extension. --depth 15 --breadth 5 --survivors 30 --select 10 --provider google
+
+╔══════════════════════════════════════════════════════════════════╗
+║                    DEEP EXPLORATION ENGINE                       ║
+╚══════════════════════════════════════════════════════════════════╝
+
+Provider:  google
+Depth:     15
+Breadth:   5
+Survivors: 30
+Select:    10
+Goal:      "Create a coding agent that is 100% accurate and can work wit..."
+
+Adapter: gemini-2.0-flash
+Run ID: explore_ac74b835
+
+═══════════════════════════════════════════════════════════════════
+                         EXPLORING...                               
+═══════════════════════════════════════════════════════════════════
+
+[0ms] [L0] Generating 5 initial variants...
+[24.0s] [L0] Generated 5 variants in 24000ms
+[24.0s] [L1] Pruning 5 variants...
+[29.6s] [L1] Pruned 2, 3 survivors (5576ms)
+[29.6s] [L2] Expanding 3 survivors...
+[29.6s] [L2] Expanding 1/3: "Symbolic Execution with CodeT5..."
+[50.9s] [L2] Expanding 2/3: "Test-Driven Development with C..."
+[1.2m] [L2] Expanding 3/3: "Iterative Refinement with Code..."
+[1.5m] [L2] Generated 8 variants in 60007ms
+[1.5m] [L2] Pruning 8 variants...
+[1.6m] [L2] Pruned 4, 4 survivors (8206ms)
+[1.6m] [L2] Level complete. Total nodes: 14
+[1.6m] [L3] Expanding 4 survivors...
+[1.6m] [L3] Expanding 1/4: "Test-Driven Development with C..."
+[2.0m] [L3] Expanding 2/4: "Iterative Refinement with Code..."
+[2.3m] [L3] Expanding 3/4: "Constraint-Based Code Generati..."
+[2.6m] [L3] Expanding 4/4: "Multi-Agent Code Generation wi..."
+[2.9m] [L3] Generated 8 variants in 77121ms
+[2.9m] [L3] Pruning 8 variants...
+[3.1m] [L3] Pruned 4, 4 survivors (8938ms)
+[3.1m] [L3] Level complete. Total nodes: 22
+[3.1m] [L4] Expanding 4 survivors...
+[3.1m] [L4] Expanding 1/4: "Iterative Refinement with Huma..."
+[3.3m] [L4] Expanding 2/4: "Property-Based Testing with Co..."
+[3.6m] [L4] Expanding 3/4: "Formal Verification with Z3 an..."
+[3.9m] [L4] Expanding 4/4: "Test-Driven Development with C..."
+[4.2m] [L4] Generated 12 variants in 69873ms
+[4.2m] [L4] Pruning 12 variants...
+[4.4m] [L4] Pruned 5, 7 survivors (11742ms)
+[4.4m] [L4] Level complete. Total nodes: 34
+[4.4m] [L5] Expanding 7 survivors...
+[4.4m] [L5] Expanding 1/7: "Formal Verification Guided Cod..."
+[4.8m] [L5] Expanding 2/7: "Test-Driven Development with P..."
+[5.1m] [L5] Expanding 3/7: "Formal Verification with Z3 an..."
+[5.4m] [L5] Expanding 4/7: "Property-Based Testing with Hy..."
+[5.7m] [L5] Expanding 5/7: "CodeT5+ with Retrieval-Augment..."
+[6.0m] [L5] Expanding 6/7: "Test-Driven Development with C..."
+[6.4m] [L5] Expanding 7/7: "Behavior-Driven Development wi..."
+[6.7m] [L5] Generated 20 variants in 134925ms
+[6.7m] [L5] Pruning 20 variants...
+[7.0m] [L5] Pruned 9, 11 survivors (17793ms)
+[7.0m] [L5] Level complete. Total nodes: 54
+[7.0m] [L6] Expanding 11 survivors...
+[7.0m] [L6] Expanding 1/11: "Formal Verification Guided Cod..."
+[7.3m] [L6] Expanding 2/11: "Property-Based Testing Guided ..."
+[7.6m] [L6] Expanding 3/11: "Iterative Code Generation with..."
+[7.9m] [L6] Expanding 4/11: "Formal Verification with SMT S..."
+[8.3m] [L6] Expanding 5/11: "Iterative Refinement with Code..."
+[8.6m] [L6] Expanding 6/11: "Formal Verification with Z3 an..."
+[9.0m] [L6] Expanding 7/11: "Property-Based Testing with Hy..."
+[9.3m] [L6] Expanding 8/11: "Fuzzing with AFL++ and CodeT5+..."
+[9.6m] [L6] Expanding 9/11: "Formal Verification with Dafny..."
+[10.0m] [L6] Expanding 10/11: "CodeT5+ with RAG, Property-Bas..."
+[10.3m] [L6] Expanding 11/11: "CodeT5+ with Program Synthesis..."
+[10.8m] [L6] Generated 40 variants in 227353ms
+[10.8m] [L6] Pruning 40 variants...
+[11.3m] [L6] Pruned 23, 17 survivors (31662ms)
+[11.3m] [L6] Level complete. Total nodes: 94
+[11.3m] [L7] Expanding 17 survivors...
+[11.3m] [L7] Expanding 1/17: "Iterative Refinement with Unit..."
+[11.6m] [L7] Expanding 2/17: "Constraint Programming with Mi..."
+[12.0m] [L7] Expanding 3/17: "Property-Based Testing with Hy..."
+[12.3m] [L7] Expanding 4/17: "Property-Based Testing Guided ..."
+[12.6m] [L7] Expanding 5/17: "Iterative Code Generation with..."
+[13.0m] [L7] Expanding 6/17: "Retrieval-Augmented Code Gener..."
+[13.3m] [L7] Expanding 7/17: "Property-Based Testing with Hy..."
+[13.7m] [L7] Expanding 8/17: "Property-Based Testing with Hy..."
+[14.0m] [L7] Expanding 9/17: "Property-Based Testing with Hy..."
+[14.4m] [L7] Expanding 10/17: "Fuzzing with AFL++ and CodeT5+..."
+[14.7m] [L7] Expanding 11/17: "Mutation Testing with Stryker ..."
+[15.0m] [L7] Expanding 12/17: "Property-Based Testing with Hy..."
+[15.3m] [L7] Expanding 13/17: "Property-Based Testing with Hy..."
+[15.5m] [L7] Expanding 14/17: "CodeT5+ with RAG, Property-Bas..."
+[15.8m] [L7] Expanding 15/17: "CodeT5+ with Few-Shot Learning..."
+[16.2m] [L7] Expanding 16/17: "CodeT5+ with Retrieval-Augment..."
+[16.5m] [L7] Expanding 17/17: "Iterative Refinement with Huma..."
+[16.9m] [L7] Generated 52 variants in 336201ms
+[16.9m] [L7] Pruning 52 variants...
+[17.6m] [L7] Pruned 16, 36 survivors (40201ms)
+[17.6m] [L7] Level complete. Total nodes: 146
+[17.6m] [L8] Expanding 30 survivors...
+[17.6m] [L8] Expanding 1/30: "Symbolic Execution Guided Code..."
+[17.8m] [L8] Expanding 2/30: "Property-Based Testing with Hy..."
+[18.1m] [L8] Expanding 3/30: "Retrieval-Augmented Code Gener..."
+[18.4m] [L8] Expanding 4/30: "Property-Based Testing with Hy..."
+[18.8m] [L8] Expanding 5/30: "Iterative Code Generation with..."
+[19.1m] [L8] Expanding 6/30: "Property-Based Testing Guided ..."
+[19.4m] [L8] Expanding 7/30: "Symbolic Execution Guided Code..."
+[19.8m] [L8] Expanding 8/30: "Iterative Code Generation with..."
+[20.1m] [L8] Expanding 9/30: "Symbolic Execution Guided Code..."
+[20.5m] [L8] Expanding 10/30: "Property-Based Testing with Co..."
+[20.8m] [L8] Expanding 11/30: "Iterative Refinement with Exec..."
+[21.1m] [L8] Expanding 12/30: "Contextual Code Generation wit..."
+[21.4m] [L8] Expanding 13/30: "Property-Based Testing with Hy..."
+[21.8m] [L8] Expanding 14/30: "Formal Verification with TLA+..."
+[22.2m] [L8] Expanding 15/30: "Iterative Refinement with Huma..."
+[22.4m] [L8] Expanding 16/30: "Formal Verification with Dafny..."
+[22.8m] [L8] Expanding 17/30: "Symbolic Execution with KLEE a..."
+[23.2m] [L8] Expanding 18/30: "Mutation Testing with Stryker ..."
+[23.5m] [L8] Expanding 19/30: "Symbolic Execution with Z3 and..."
+[23.8m] [L8] Expanding 20/30: "Property-Based Testing with Hy..."
+[24.1m] [L8] Expanding 21/30: "Static Analysis with Semgrep a..."
+[24.4m] [L8] Expanding 22/30: "Symbolic Execution Guided Code..."
+[24.7m] [L8] Expanding 23/30: "Property-Based Testing with Hy..."
+[24.9m] [L8] Expanding 24/30: "Fuzzing with AFL++ and CodeT5+..."
+[25.2m] [L8] Expanding 25/30: "Formal Verification with Dafny..."
+[25.6m] [L8] Expanding 26/30: "Formal Verification with Dafny..."
+[25.8m] [L8] Expanding 27/30: "Symbolic Execution with KLEE a..."
+[26.1m] [L8] Expanding 28/30: "Fuzzing with AFL++ and CodeT5+..."
+[26.5m] [L8] Expanding 29/30: "Static Analysis with Semgrep a..."
+[26.8m] [L8] Expanding 30/30: "Formal Verification with Dafny..."
+[27.2m] [L8] Generated 112 variants in 577438ms
+[27.2m] [L8] Pruning 112 variants...
+[28.0m] [L8] Pruned 0, 112 survivors (49454ms)
+[28.0m] [L8] Level complete. Total nodes: 258
+[28.0m] [L9] Expanding 30 survivors...
+[28.0m] [L9] Expanding 1/30: "Formal Verification with Dafny..."
+[28.4m] [L9] Expanding 2/30: "Property-Based Testing with Hy..."
+[28.7m] [L9] Expanding 3/30: "Reinforcement Learning for Cod..."
+[29.1m] [L9] Expanding 4/30: "Constraint-Based Code Generati..."
+[29.4m] [L9] Expanding 5/30: "Property-Based Testing with Hy..."
+[29.8m] [L9] Expanding 6/30: "Symbolic Execution with Angr..."
+[30.0m] [L9] Expanding 7/30: "Fuzzing with AFL++..."
+[30.2m] [L9] Expanding 8/30: "Formal Verification with TLA+..."
+[30.5m] [L9] Expanding 9/30: "Formal Verification Augmented ..."
+[30.9m] [L9] Expanding 10/30: "Iterative Refinement with Unit..."
+[31.2m] [L9] Expanding 11/30: "Contextual Code Completion wit..."
+[31.5m] [L9] Expanding 12/30: "Constraint-Based Code Synthesi..."
+[31.9m] [L9] Expanding 13/30: "Property-Based Testing with Hy..."
+[32.2m] [L9] Expanding 14/30: "Formal Verification with Dafny..."
+[32.6m] [L9] Expanding 15/30: "Model Checking with TLA+..."
+[32.9m] [L9] Expanding 16/30: "Reinforcement Learning for Cod..."
+[33.2m] [L9] Expanding 17/30: "Iterative Refinement with Symb..."
+[33.6m] [L9] Expanding 18/30: "Reinforcement Learning for Cod..."
+[33.9m] [L9] Expanding 19/30: "Formal Specification and Model..."
+[34.3m] [L9] Expanding 20/30: "Genetic Algorithm-Based Code E..."
+[34.6m] [L9] Expanding 21/30: "Symbolic Execution Guided Code..."
+[34.9m] [L9] Expanding 22/30: "Property-Based Testing Guided ..."
+[35.3m] [L9] Expanding 23/30: "Formal Verification Guided Cod..."
+[35.6m] [L9] Expanding 24/30: "Reinforcement Learning Guided ..."
+[35.9m] [L9] Expanding 25/30: "Formal Verification Guided Cod..."
+[36.3m] [L9] Expanding 26/30: "Property-Based Testing with Co..."
+[36.6m] [L9] Expanding 27/30: "Reinforcement Learning for Cod..."
+[36.9m] [L9] Expanding 28/30: "Contextual Code Completion wit..."
+[37.3m] [L9] Expanding 29/30: "Formal Verification Guided Cod..."
+[37.6m] [L9] Expanding 30/30: "Property-Based Testing Guided ..."
+[38.0m] [L9] Generated 92 variants in 596881ms
+[38.0m] [L9] Pruning 92 variants...
+[38.8m] [L9] Pruned 0, 92 survivors (48484ms)
+[38.8m] [L9] Level complete. Total nodes: 350
+[38.8m] [L10] Expanding 30 survivors...
+[38.8m] [L10] Expanding 1/30: "Formal Verification with Dafny..."
+[39.1m] [L10] Expanding 2/30: "Property-Based Testing with Hy..."
+[39.4m] [L10] Expanding 3/30: "Symbolic Execution with KLEE a..."
+[39.7m] [L10] Expanding 4/30: "LLM-Driven Code Generation wit..."
+[40.0m] [L10] Expanding 5/30: "Symbolic Execution Guided Code..."
+[40.3m] [L10] Expanding 6/30: "Genetic Algorithm for Code Mut..."
+[40.6m] [L10] Expanding 7/30: "Constraint-Based Code Synthesi..."
+[40.9m] [L10] Expanding 8/30: "LLM-Based Code Completion with..."
+[41.2m] [L10] Expanding 9/30: "Constraint-Based Code Generati..."
+[41.5m] [L10] Expanding 10/30: "Probabilistic Code Synthesis w..."
+[41.9m] [L10] Expanding 11/30: "Test-Driven Code Generation wi..."
+[42.2m] [L10] Expanding 12/30: "Iterative Refinement with Form..."
+[42.5m] [L10] Expanding 13/30: "Formal Verification with Dafny..."
+[42.9m] [L10] Expanding 14/30: "Reinforcement Learning with Co..."
+[43.2m] [L10] Expanding 15/30: "Constraint Programming with Mi..."
+[43.5m] [L10] Expanding 16/30: "Iterative Refinement with Stat..."
+[43.9m] [L10] Expanding 17/30: "Symbolic Execution with Angr a..."
+[44.2m] [L10] Expanding 18/30: "Property-Based Testing with Hy..."
+[44.5m] [L10] Expanding 19/30: "Formal Verification with Z3 an..."
+[44.9m] [L10] Expanding 20/30: "Database-Backed Contextual Cod..."
+[45.1m] [L10] Expanding 21/30: "Symbolic Execution with Z3..."
+[45.4m] [L10] Expanding 22/30: "Property-Based Testing with Hy..."
+[45.6m] [L10] Expanding 23/30: "Formal Verification with TLA+..."
+[45.9m] [L10] Expanding 24/30: "Differential Fuzzing with Mult..."
+[46.2m] [L10] Expanding 25/30: "Formal Verification with Prope..."
+[46.5m] [L10] Expanding 26/30: "Iterative Refinement with Unit..."
+[46.9m] [L10] Expanding 27/30: "Constraint Programming for Cod..."
+[47.2m] [L10] Expanding 28/30: "Reinforcement Learning for Cod..."
+[47.4m] [L10] Expanding 29/30: "Formal Verification with Z3 SM..."
+[47.8m] [L10] Expanding 30/30: "Property-Based Testing with Hy..."
+[48.1m] [L10] Generated 104 variants in 557956ms
+[48.1m] [L10] Pruning 104 variants...
+[48.8m] [L10] Pruned 0, 104 survivors (46591ms)
+[48.8m] [L10] Level complete. Total nodes: 454
+[48.8m] [L11] Expanding 30 survivors...
+[48.8m] [L11] Expanding 1/30: "Formal Verification with Dafny..."
+[49.2m] [L11] Expanding 2/30: "Property-Based Testing with Hy..."
+[49.5m] [L11] Expanding 3/30: "Model-Based Testing with TLA+ ..."
+[49.8m] [L11] Expanding 4/30: "Fuzzing with AFL++ and LLM-bas..."
+[50.1m] [L11] Expanding 5/30: "Formal Verification with Z3 an..."
+[50.4m] [L11] Expanding 6/30: "Mutation Testing with Stryker ..."
+[50.7m] [L11] Expanding 7/30: "Static Analysis with SonarQube..."
+[51.0m] [L11] Expanding 8/30: "Fuzzing with AFL and LLM-Assis..."
+[51.3m] [L11] Expanding 9/30: "Formal Verification with Dafny..."
+[51.6m] [L11] Expanding 10/30: "Property-Based Testing with Hy..."
+[51.9m] [L11] Expanding 11/30: "Fuzzing with AFL++ and LLM-Gui..."
+[52.2m] [L11] Expanding 12/30: "Static Analysis with Semgrep a..."
+[52.5m] [L11] Expanding 13/30: "LLM-Driven Code Generation wit..."
+[52.9m] [L11] Expanding 14/30: "LLM-Driven Code Generation wit..."
+[53.2m] [L11] Expanding 15/30: "LLM-Driven Code Generation wit..."
+[53.6m] [L11] Expanding 16/30: "Human-in-the-Loop Code Generat..."
+[53.9m] [L11] Expanding 17/30: "Formal Verification Guided Cod..."
+[54.3m] [L11] Expanding 18/30: "Property-Based Testing Guided ..."
+[54.6m] [L11] Expanding 19/30: "Mutation Testing Guided Code R..."
+[54.9m] [L11] Expanding 20/30: "Static Analysis Guided Code Re..."
+[55.3m] [L11] Expanding 21/30: "Symbolic Execution Guided Code..."
+[55.6m] [L11] Expanding 22/30: "Large Language Model with Test..."
+[56.0m] [L11] Expanding 23/30: "Constraint Programming for Cod..."
+[56.3m] [L11] Expanding 24/30: "Program Synthesis with Deducti..."
+[56.7m] [L11] Expanding 25/30: "Symbolic Execution Guided Code..."
+[57.0m] [L11] Expanding 26/30: "Multi-Agent Code Repair with V..."
+[57.3m] [L11] Expanding 27/30: "Iterative Repair with Reinforc..."
+[57.6m] [L11] Expanding 28/30: "Constraint-Based Code Synthesi..."
+[57.9m] [L11] Expanding 29/30: "Constraint-Based Code Generati..."
+[58.3m] [L11] Expanding 30/30: "Iterative Code Generation with..."
+[58.6m] [L11] Generated 108 variants in 585669ms
+[58.6m] [L11] Pruning 108 variants...
+[59.4m] [L11] Pruned 0, 108 survivors (48313ms)
+[59.4m] [L11] Level complete. Total nodes: 562
+[59.4m] [L12] Expanding 30 survivors...
+[59.4m] [L12] Expanding 1/30: "Formal Verification with Dafny..."
+[59.7m] [L12] Expanding 2/30: "Property-Based Testing with Hy..."
+[60.1m] [L12] Expanding 3/30: "Fuzzing with AFL++ and LLM-bas..."
+[60.4m] [L12] Expanding 4/30: "Static Analysis with Semgrep a..."
+[60.7m] [L12] Expanding 5/30: "Formal Verification with Dafny..."
+[61.1m] [L12] Expanding 6/30: "Symbolic Execution with KLEE a..."
+[61.4m] [L12] Expanding 7/30: "Model Checking with TLA+ and L..."
+[61.7m] [L12] Expanding 8/30: "Constraint Solving with Z3 and..."
+[62.1m] [L12] Expanding 9/30: "Formal Verification with Dafny..."
+[62.5m] [L12] Expanding 10/30: "Property-Based Testing with Hy..."
+[62.8m] [L12] Expanding 11/30: "Symbolic Execution with KLEE a..."
+[63.1m] [L12] Expanding 12/30: "Runtime Verification with Trac..."
+[63.4m] [L12] Expanding 13/30: "Symbolic Execution with KLEE a..."
+[63.7m] [L12] Expanding 14/30: "Property-Based Testing with Hy..."
+[64.0m] [L12] Expanding 15/30: "Static Analysis with Semgrep a..."
+[64.3m] [L12] Expanding 16/30: "Differential Fuzzing with AFL+..."
+[64.7m] [L12] Expanding 17/30: "Formal Verification with Z3 an..."
+[65.0m] [L12] Expanding 18/30: "Property-Based Testing with LL..."
+[65.3m] [L12] Expanding 19/30: "Symbolic Execution with LLM-As..."
+[65.6m] [L12] Expanding 20/30: "Static Analysis with LLM-Assis..."
+[65.9m] [L12] Expanding 21/30: "Symbolic Execution with KLEE a..."
+[66.2m] [L12] Expanding 22/30: "Formal Verification with Dafny..."
+[66.6m] [L12] Expanding 23/30: "Property-Based Testing with Hy..."
+[67.0m] [L12] Expanding 24/30: "Fuzzing with AFL++ and LLM-Ass..."
+[67.2m] [L12] Expanding 25/30: "Symbolic Execution with Z3 and..."
+[67.5m] [L12] Expanding 26/30: "Property-Based Testing with Hy..."
+[67.8m] [L12] Expanding 27/30: "Static Analysis with SonarQube..."
+[68.1m] [L12] Expanding 28/30: "Differential Fuzzing with AFL ..."
+[68.4m] [L12] Expanding 29/30: "Formal Verification with Dafny..."
+[68.7m] [L12] Expanding 30/30: "Property-Based Testing with Hy..."
+[69.1m] [L12] Generated 96 variants in 579905ms
+[69.1m] [L12] Pruning 96 variants...
+[69.9m] [L12] Pruned 0, 96 survivors (47360ms)
+[69.9m] [L12] Level complete. Total nodes: 658
+[69.9m] [L13] Expanding 30 survivors...
+[69.9m] [L13] Expanding 1/30: "Formal Verification with Dafny..."
+[70.2m] [L13] Expanding 2/30: "Property-Based Testing with Hy..."
+[70.5m] [L13] Expanding 3/30: "Static Analysis with Semgrep a..."
+[70.8m] [L13] Expanding 4/30: "Fuzzing with AFL++ and LLM-Gui..."
+[71.1m] [L13] Expanding 5/30: "Property-Based Testing with Hy..."
+[71.5m] [L13] Expanding 6/30: "Symbolic Execution with Z3 and..."
+[71.7m] [L13] Expanding 7/30: "Fuzzing with AFL++ and LLM-bas..."
+[72.0m] [L13] Expanding 8/30: "Formal Verification with TLA+ ..."
+[72.3m] [L13] Expanding 9/30: "Symbolic Execution with KLEE a..."
+[72.5m] [L13] Expanding 10/30: "Property-Based Testing with Hy..."
+[72.9m] [L13] Expanding 11/30: "Static Analysis with Semgrep a..."
+[73.2m] [L13] Expanding 12/30: "Hybrid Fuzzing and Symbolic Ex..."
+[73.5m] [L13] Expanding 13/30: "Formal Verification with Z3 an..."
+[73.9m] [L13] Expanding 14/30: "Property-Based Testing with Hy..."
+[74.2m] [L13] Expanding 15/30: "Symbolic Execution with KLEE a..."
+[74.6m] [L13] Expanding 16/30: "Fuzzing with AFL++ and LLM-Gui..."
+[74.8m] [L13] Expanding 17/30: "Symbolic Execution with KLEE a..."
+[75.1m] [L13] Expanding 18/30: "Property-Based Testing with Hy..."
+[75.4m] [L13] Expanding 19/30: "Fuzzing with AFL++ and LLM-Gui..."
+[75.7m] [L13] Expanding 20/30: "Formal Verification with Dafny..."
+[76.0m] [L13] Expanding 21/30: "Formal Verification with Alloy..."
+[76.3m] [L13] Expanding 22/30: "Property-Based Testing with Hy..."
+[76.6m] [L13] Expanding 23/30: "Symbolic Execution with KLEE a..."
+[77.0m] [L13] Expanding 24/30: "Fuzzing with AFL++ and LLM-Ass..."
+[77.2m] [L13] Expanding 25/30: "Constraint Solving with Z3 and..."
+[77.6m] [L13] Expanding 26/30: "Property-Based Testing with LL..."
+[77.8m] [L13] Expanding 27/30: "Formal Verification with Dafny..."
+[78.1m] [L13] Expanding 28/30: "Reinforcement Learning for Cod..."
+[78.5m] [L13] Expanding 29/30: "Formal Verification with Dafny..."
+[78.8m] [L13] Expanding 30/30: "Property-Based Testing with Hy..."
+[79.2m] [L13] Generated 92 variants in 558368ms
+[79.2m] [L13] Pruning 92 variants...
+[80.0m] [L13] Pruned 0, 92 survivors (48616ms)
+[80.0m] [L13] Level complete. Total nodes: 750
+[80.0m] [L14] Expanding 30 survivors...
+[80.0m] [L14] Expanding 1/30: "Formal Verification with Dafny..."
+[80.3m] [L14] Expanding 2/30: "Property-Based Testing with Hy..."
+[80.5m] [L14] Expanding 3/30: "Model Checking with TLA+ and T..."
+[80.8m] [L14] Expanding 4/30: "Hybrid Approach: Dafny for Cri..."
+[81.1m] [L14] Expanding 5/30: "Dynamic Symbolic Execution wit..."
+[81.4m] [L14] Expanding 6/30: "Fuzzing with AFL++ and LLM-Bas..."
+[81.7m] [L14] Expanding 7/30: "Formal Verification with Dafny..."
+[82.0m] [L14] Expanding 8/30: "Hybrid Approach: Semgrep + Ang..."
+[82.4m] [L14] Expanding 9/30: "Formal Verification with Z3 an..."
+[82.7m] [L14] Expanding 10/30: "Mutation Testing with LLM-Gene..."
+[83.0m] [L14] Expanding 11/30: "Symbolic Execution with LLM-As..."
+[83.3m] [L14] Expanding 12/30: "LLM-Driven Code Repair with Te..."
+[83.7m] [L14] Expanding 13/30: "Symbolic Execution with Z3 and..."
+[84.0m] [L14] Expanding 14/30: "Fuzzing with LLM-Guided Input ..."
+[84.4m] [L14] Expanding 15/30: "Formal Verification with TLA+..."
+[84.6m] [L14] Expanding 16/30: "Hybrid Approach: Fuzzing + Sym..."
+[84.9m] [L14] Expanding 17/30: "Symbolic Execution with Z3 and..."
+[85.3m] [L14] Expanding 18/30: "Property-Based Testing with Hy..."
+[85.6m] [L14] Expanding 19/30: "Static Analysis with Semgrep a..."
+[85.9m] [L14] Expanding 20/30: "Hybrid Fuzzing with AFL++ and ..."
+[86.3m] [L14] Expanding 21/30: "Hybrid Fuzzing with AFL++ and ..."
+[86.6m] [L14] Expanding 22/30: "Static Analysis with Semgrep a..."
+[86.9m] [L14] Expanding 23/30: "Dynamic Taint Analysis with Fr..."
+[87.2m] [L14] Expanding 24/30: "Property-Based Testing with Hy..."
+[87.5m] [L14] Expanding 25/30: "Formal Verification with Z3 an..."
+[87.9m] [L14] Expanding 26/30: "Symbolic Execution with Angr a..."
+[88.2m] [L14] Expanding 27/30: "Fuzzing with AFL++ and LLM-Gen..."
+[88.5m] [L14] Expanding 28/30: "Reinforcement Learning for Tes..."
+[88.8m] [L14] Expanding 29/30: "Formal Verification with Z3 an..."
+[89.1m] [L14] Expanding 30/30: "Property-Based Testing with Hy..."
+[89.4m] [L14] Generated 68 variants in 566519ms
+[89.4m] [L14] Pruning 68 variants...
+[90.2m] [L14] Pruned 0, 68 survivors (47416ms)
+[90.2m] [L14] Level complete. Total nodes: 818
+[90.2m] [L15] Expanding 30 survivors...
+[90.2m] [L15] Expanding 1/30: "Iterative Refinement with Symb..."
+[90.5m] [L15] Expanding 2/30: "Property-Based Testing with Hy..."
+[90.8m] [L15] Expanding 3/30: "Formal Specification with TLA+..."
+[91.1m] [L15] Expanding 4/30: "Static Analysis with Semgrep a..."
+[91.4m] [L15] Expanding 5/30: "Formal Verification with Z3 an..."
+[91.7m] [L15] Expanding 6/30: "Mutation Testing with MutPy an..."
+[91.9m] [L15] Expanding 7/30: "Symbolic Execution with Angr a..."
+[92.1m] [L15] Expanding 8/30: "Contract-Based Testing with Py..."
+[92.4m] [L15] Expanding 9/30: "Formal Verification Core with ..."
+[92.7m] [L15] Expanding 10/30: "Property-Based Testing with Fu..."
+[93.0m] [L15] Expanding 11/30: "Microservices Architecture wit..."
+[93.3m] [L15] Expanding 12/30: "Reinforcement Learning for Cod..."
+[93.6m] [L15] Expanding 13/30: "Formal Verification with Dafny..."
+[94.0m] [L15] Expanding 14/30: "Property-Based Testing with Hy..."
+[94.3m] [L15] Expanding 15/30: "Static Analysis with Semgrep a..."
+[94.5m] [L15] Expanding 16/30: "Fuzzing with AFL++ and LLM-Gui..."
+[94.8m] [L15] Expanding 17/30: "Formal Verification with Dafny..."
+[95.2m] [L15] Expanding 18/30: "Property-Based Testing with Hy..."
+[95.5m] [L15] Expanding 19/30: "Symbolic Execution with KLEE a..."
+[95.9m] [L15] Expanding 20/30: "Fuzzing with AFL++ and LLM-Ass..."
+[96.1m] [L15] Expanding 21/30: "Formal Verification with Z3 an..."
+[96.5m] [L15] Expanding 22/30: "Property-Based Testing with Hy..."
+[96.8m] [L15] Expanding 23/30: "Static Analysis with SonarQube..."
+[97.1m] [L15] Expanding 24/30: "Fuzzing with AFL++ and LLM-Ass..."
+[97.4m] [L15] Expanding 25/30: "Formal Verification Guided Cod..."
+[97.6m] [L15] Expanding 26/30: "Multi-Agent Code Repair with V..."
+[97.9m] [L15] Expanding 27/30: "Reinforcement Learning for Cod..."
+[98.2m] [L15] Expanding 28/30: "Constraint Programming for Cod..."
+[98.6m] [L15] Expanding 29/30: "Symbolic Execution with Z3 and..."
+[98.9m] [L15] Expanding 30/30: "Fuzzing with Coverage Guidance..."
+[99.2m] [L15] Generated 108 variants in 536757ms
+[99.2m] [L15] Pruning 108 variants...
+[100.0m] [L15] Pruned 0, 108 survivors (49879ms)
+[100.0m] [L15] Level complete. Total nodes: 926
+[100.0m] [SELECT] Finding best from 926 total nodes...
+[100.0m] [SELECT] 633 leaf candidates
+[100.0m] [SELECT] Selected 10 final variants
+[100.0m] [SELECT] Best: "Contextual Code Generation with Human-in-the-Loop Refinement" (90%)
+
+╔══════════════════════════════════════════════════════════════════╗
+║                         EXPLORATION RESULTS                      ║
+╚══════════════════════════════════════════════════════════════════╝
+
+┌────────────────────────────────────────────────────────────────┐
+│                          METRICS                               │
+├────────────────────────────────────────────────────────────────┤
+│  Depth:           15         Breadth:        112       │
+│  Total Nodes:     926        Pruned:         62        │
+│  Selected:        10         Paths:          10        │
+├────────────────────────────────────────────────────────────────┤
+│  Tokens In:       377036     Tokens Out:     871632    │
+│  LLM Latency:     100.0m     Total Time:     100.0m    │
+├────────────────────────────────────────────────────────────────┤
+│  Nodes per Depth: L0:1 L1:5 L2:8 L3:8 L4:12 L5:20 L6:40 L7:52 L8:112 L9:92 L10:104 L11:108 L12:96 L13:92 L14:68 L15:108│
+└────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────┐
+│                      EXPLORATION TREE                          │
+│   ○ = explored   ✗ = pruned   ★ = selected                     │
+├────────────────────────────────────────────────────────────────┤
+│ └── ○ ROOT                                                       │
+│     ├── ○ Symbolic Execution with CodeT5+ Assistance [65%]       │
+│     ├── ○ Test-Driven Development with CodeT5+ and Fuzzing [75%] │
+│     │   ├── ○ Test-Driven Development with CodeT5+, Fuzzing, and Formal Verification [65%]│
+│     │   │   ├── ✗ Test-Driven Development with CodeT5+, Fuzzing, Formal Verification, and Symbolic Execution [40%]│
+│     │   │   ├── ○ Iterative Refinement with Human-in-the-Loop and Program Synthesis [65%]│
+│     │   │   │   ├── ○ Formal Verification Guided Code Generation [65%]│
+│     │   │   │   │   ├── ○ Formal Verification Guided Code Generation with Symbolic Execution [65%]│
+│     │   │   │   │   │   ├── ○ Iterative Refinement with Unit Test Generation and Mutation Testing [65%]│
+│     │   │   │   │   │   │   ├── ○ Symbolic Execution Guided Code Generation [60%]│
+│     │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-based Suggestion [70%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-based Suggestion (Refined) [70%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-based Suggestion (Refined) + Symbolic Execution [70%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny, LLM Suggestion, and KLEE Symbolic Execution [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny, LLM Suggestion, and Z3 SMT Solver [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny, LLM Suggestion, and Z3 SMT Solver (Refined) [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Iterative Refinement with Symbolic Execution and LLM Assistance [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM Assistance [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM Assistance [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Model Checking with TLA+ and LLM Assistance [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ AI-Assisted Fuzzing with AFL++ and LLM Guidance [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Driven Test Case Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Z3 and LLM-Assisted Specification Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Driven Path Constraint Generation [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Mutation Testing with Stryker and LLM-Driven Mutant Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ LLM-Driven Code Review and Static Analysis with Semgrep [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Specification with TLA+ and LLM-Assisted Specification Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Specification with TLA+ and LLM-Assisted Specification Generation (Z3 Refinement) [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Assisted Test Case Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Assisted Constraint Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Static Analysis with Semmle QL and LLM-Assisted Query Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Static Analysis with Semgrep and LLM-Driven Rule Generation [90%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Formal Verification with Z3 and LLM-Assisted Specification Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Symbolic Execution with KLEE and LLM-Driven Test Case Generation [75%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Fuzzing with AFL++ and LLM-Driven Seed Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │       └── ○ Property-Based Testing with Hypothesis and LLM-Driven Property Generation [85%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and Python, LLM for Test Case Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Z3 and Python [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Z3 and Symbolic Execution [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and CodeT5+ for Specification Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Static Analysis with Pylint and Custom Rules [90%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Hybrid Approach: Property-Based Testing with Fuzzing and Code Coverage [75%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Mutation Testing with MutPy and LLM-Assisted Mutant Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Assisted Property Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Assisted Constraint Generation [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Fuzzing with AFL++ and LLM-Assisted Seed Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with Angr and Python [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and Z3 [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and AFL++ [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Static Analysis with SonarQube and Pylint [90%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Model Checking with TLA+ and TLC [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Contract-Based Testing with PyContracts and LLM for Contract Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Contract-Based Testing with PyContracts, LLM Contract Generation, and SMT Solver Verification [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Property-Based Testing with Hypothesis and LLM for Property Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Symbolic Execution with Triton and LLM for Test Case Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │       └── ○ Mutation Testing with MutPy and LLM for Mutant Generation and Test Case Prioritization [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Model Checking with TLA+ and TLC, LLM for Specification Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Hybrid Approach: Dafny for Critical Sections, Python/Hypothesis for the Rest [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Formal Verification Core with LLM-Assisted Glue Code [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       │   ├── ○ Formal Verification Core with LLM-Assisted Glue Code and Symbolic Execution [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       │   ├── ○ Property-Based Testing with LLM-Assisted Test Case Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       │   ├── ○ Microservice Architecture with Rust Core and Python Orchestration [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       │   └── ○ Hybrid Approach: Formal Verification for Critical Sections, Property-Based Testing for Others [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Property-Based Testing with Fuzzing and LLM Assistance [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       │   ├── ○ Formal Verification with SMT Solver [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       │   ├── ○ Reinforcement Learning for Code Generation and Testing [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       │   ├── ○ Constraint Satisfaction Programming (CSP) with LLM Assistance [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       │   └── ○ Iterative Refinement with Human-in-the-Loop Feedback [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Microservices Architecture with Rust Core and Python Orchestration [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       │   ├── ○ Microservices with Formal Verification [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       │   ├── ○ Event-Driven Architecture with Kafka and Serverless Functions [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       │   ├── ○ Monolithic Architecture with In-Memory Database and Caching [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       │   └── ○ Graph Database with Knowledge Representation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       └── ○ Reinforcement Learning for Code Generation and Refinement [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Generated Tests [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Static Analysis with Semgrep and LLM-Based Rule Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Dynamic Symbolic Execution with Angr and LLM-Guided Exploration [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification (Refined) [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Assisted Property Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Assisted Constraint Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Fuzzing with AFL++ and LLM-Assisted Seed Generation [90%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Generated Test Cases [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Generated Test Cases (Refined) [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Assisted Constraint Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ and LLM-Guided Input Mutation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Formal Verification with TLA+ and LLM-Assisted Specification Generation [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Static Analysis with Semgrep and LLM-Assisted Rule Generation [85%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Dynamic Symbolic Execution with Angr and Z3 [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ and LLM-Assisted Test Case Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with TLA+ and Model Checking [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Hybrid Approach: Semgrep + Fuzzing + LLM [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Fuzzing with AFL++ and LLM-Guided Input Generation [75%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Symbolic Execution with KLEE and LLM-Assisted Constraint Solving [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Property-Based Testing with Hypothesis and LLM-Generated Test Cases [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Static Analysis with Semgrep and LLM-Enhanced Rule Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │       └── ○ Differential Fuzzing with AFL++ and LLM-Guided Variant Generation [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ and LLM-Based Test Case Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification Generation [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification Generation (Refined) [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification Generation (Refined) [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Assisted Test Case Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with Angr and LLM-Assisted Constraint Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Fuzzing with AFL++ and LLM-Assisted Seed Generation [90%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Assisted Property Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Assisted Property Generation (Refined) [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Assisted Constraint Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ and LLM-Assisted Seed Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Static Analysis with Semgrep and LLM-Assisted Rule Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Assisted Constraint Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Assisted Constraint Generation (Refined) [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with LLM-Guided Input Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with LLM-Generated Properties [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Static Analysis with LLM-Assisted Rule Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Fuzzing with AFL++ and LLM-Assisted Seed Generation [90%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Symbolic Execution with KLEE and LLM-Guided Constraints [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Property-Based Testing with Hypothesis and LLM-Generated Strategies [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Static Analysis with Semgrep and LLM-Assisted Rule Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │       └── ○ Differential Fuzzing with AFL++ and LLM-Assisted Variant Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Hybrid Approach: Semgrep + Angr with LLM Orchestration [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   └── ○ Fuzzing with AFL++ and LLM-Guided Input Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-based Test Case Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-based Test Case Generation (Refined) [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Z3 and LLM-Assisted Specification Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Z3 and LLM-Assisted Specification Generation (Refinement with Symbolic Execution) [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Z3 and LLM-Assisted Specification Generation (Refinement with Symbolic Execution) [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with LLM-Generated Properties and Fuzzing [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Static Analysis with Semgrep and LLM-Assisted Rule Generation [90%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Reinforcement Learning for Code Mutation and Testing [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Assisted Property Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Z3 and LLM-Assisted Specification Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Mutation Testing with LLM-Assisted Mutant Generation and Selection [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with LLM-Assisted Path Constraint Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Fuzzing with LLM-Assisted Input Generation and Coverage Guidance [90%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Static Analysis with SonarQube and LLM-Assisted Rule Customization [90%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Dynamic Analysis with Fuzzing and Symbolic Execution [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with TLA+ [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Contract-Based Testing with PyContracts [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Property-Based Testing with Hypothesis [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Fuzzing with AFL++ and LLM-Assisted Seed Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Symbolic Execution with Z3 and LLM-Guided Constraints [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Property-Based Testing with Hypothesis and LLM-Generated Strategies [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Static Analysis with Semgrep and LLM-Assisted Rule Generation [90%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │       └── ○ Differential Fuzzing with AFL++ and LLM-Assisted Variant Generation [75%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Mutation Testing with LLM-Generated Mutants [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with LLM-Assisted Path Constraint Generation [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   └── ○ LLM-Driven Code Repair with Test-Driven Development [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Formal Verification Guided Code Repair [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       │   ├── ○ Formal Verification Guided Code Repair with Symbolic Execution [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       │   ├── ○ Property-Based Testing Guided Code Repair [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       │   ├── ○ Reinforcement Learning Guided Code Repair [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       │   └── ○ Statistical Model Checking Guided Code Repair [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Multi-Agent Code Repair with Voting [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Reinforcement Learning for Code Repair [40%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       │   ├── ○ Symbolic Execution Guided Code Repair [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       │   ├── ○ Large Language Model with Test-Driven Repair [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       │   ├── ○ Constraint-Based Code Synthesis with SMT Solver [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       │   └── ○ Genetic Algorithm for Code Mutation and Testing [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       └── ○ Constraint Programming for Code Repair [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │           ├── ○ Constraint Programming with LLM-Guided Constraint Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │           ├── ○ Program Synthesis with Test-Driven Search [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │           ├── ○ Symbolic Execution with Path Exploration [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │           └── ○ Neural Code Completion with Reinforcement Learning [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with Z3 and LLM-based Constraint Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with Z3 and LLM-based Constraint Generation (Optimized for Performance) [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with Z3 and LLM-based Constraint Generation (Optimized for Performance) [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with Coverage Guidance and LLM-based Input Mutation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with LLM-Assisted Constraint Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with LLM-Generated Properties [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Differential Fuzzing with Multiple CodeT5+ Variants [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Static Analysis with LLM-Assisted Rule Generation and Prioritization [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Static Analysis with LLM-based Rule Generation and Custom Rule Engine [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Hybrid Approach: Combining Fuzzing and Symbolic Execution with LLM Orchestration [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with LLM-Guided Input Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with TLA+ [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with TLA+ and Symbolic Execution [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and Code Coverage [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Static Analysis with Semgrep and Custom Rules [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Runtime Verification with Trace Analysis and Temporal Logic [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Hybrid Approach: Fuzzing + Symbolic Execution [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Hybrid Approach: Fuzzing + Symbolic Execution + CodeT5+ for Repair [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Property-Based Testing with Hypothesis and Z3 [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Static Analysis with Semgrep and CodeQL [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       └── ○ Reinforcement Learning for Test Case Generation [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ and LLM-based Seed Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with Z3 and LLM-Guided Path Exploration [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Generated Test Cases [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Generated Constraints [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ and LLM-Generated Seeds [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Mutation Testing with MutPy and LLM-Generated Mutants [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Static Analysis with Semgrep and LLM-Based Rule Generation [90%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Dynamic Symbolic Execution with Z3 and LLM-Guided Test Case Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Hybrid Fuzzing with AFL++ and LLM-Based Input Mutation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Property-Based Testing with Hypothesis and LLM-Based Property Generation [90%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Hybrid Fuzzing with AFL++ and Symbolic Execution with Triton [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Reinforcement Learning Guided Code Generation with Formal Verification [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Property-Based Testing with Hypothesis and Code Mutation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       ├── ○ Static Analysis with Semgrep and Automated Code Repair with GPT-3.5 [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │       └── ○ Formal Specification with TLA+ and Model Checking with TLC [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   └── ○ Formal Verification with TLA+ and LLM-based Specification Generation [50%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ and LLM-based Seed Input Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Guided Constraint Solving [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Hybrid Fuzzing with AFL++ and LLM-Guided Input Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution Guided Code Generation and Verification [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Guided Test Case Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Static Analysis with Semgrep and LLM-Guided Rule Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Reinforcement Learning for Code Optimization [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Static Analysis with Semgrep and LLM-Guided Rule Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Dynamic Taint Analysis with Frida and LLM-Guided Taint Propagation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with Z3 and LLM-Guided Constraint Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with LLM-Guided Input Generation and Coverage Feedback [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Static Analysis with Semgrep and LLM-Guided Rule Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Hybrid Analysis with Static Analysis, Fuzzing, and LLM Orchestration [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Property-Based Testing with Hypothesis and LLM-Guided Property Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Generated Properties [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Z3 and LLM-Assisted Specification [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with Angr and LLM-Guided Exploration [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Guided Test Case Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ and LLM-Guided Input Mutation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Static Analysis with Semgrep and LLM-Guided Rule Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ and LLM-Generated Seeds [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with Z3 and LLM-Guided Constraints [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Generated Strategies [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Static Analysis with Semgrep and LLM-Assisted Rule Generation [90%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Differential Fuzzing with LLM-Generated Variants and AFL++ [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Reinforcement Learning for Test Case Generation [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Static Analysis with Semgrep and LLM-Enhanced Rule Generation [90%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Z3 and LLM-Assisted Specification [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Generated Test Cases [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with Angr and LLM-Assisted Constraint Generation [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Fuzzing with AFL++ and LLM-Guided Input Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   └── ○ Hybrid Fuzzing and Symbolic Execution with AFL++ and Triton [60%]│
+│     │   │   │   │   │   │   │   │   │   │   └── ○ Static Analysis with Semgrep and LLM-based Rule Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │       ├── ○ Formal Verification with Z3 and LLM-Assisted Specification Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │       │   ├── ○ Formal Verification with Z3 and LLM-Assisted Specification Generation (Iterative Refinement) [70%]│
+│     │   │   │   │   │   │   │   │   │   │       │   ├── ○ Property-Based Testing with LLM-Assisted Property Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │       │   ├── ○ Symbolic Execution with KLEE and LLM-Assisted Path Constraint Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │       │   └── ○ Fuzzing with AFL++ and LLM-Assisted Seed Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │       ├── ○ Property-Based Testing with Hypothesis and LLM-Generated Test Cases [70%]│
+│     │   │   │   │   │   │   │   │   │   │       ├── ○ Symbolic Execution with KLEE and LLM-Assisted Constraint Generation [50%]│
+│     │   │   │   │   │   │   │   │   │   │       │   ├── ○ Symbolic Execution with KLEE and LLM-Assisted Constraint Generation (Refined) [70%]│
+│     │   │   │   │   │   │   │   │   │   │       │   ├── ○ Fuzzing with AFL++ and LLM-Guided Input Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │       │   ├── ○ Property-Based Testing with Hypothesis and LLM-Assisted Property Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │       │   └── ○ Static Analysis with Semgrep and LLM-Assisted Rule Generation [90%]│
+│     │   │   │   │   │   │   │   │   │   │       └── ○ Fuzzing with AFL++ and LLM-Guided Input Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │           ├── ○ Symbolic Execution with KLEE and LLM-Assisted Constraint Solving [70%]│
+│     │   │   │   │   │   │   │   │   │   │           ├── ○ Property-Based Testing with Hypothesis and LLM-Generated Properties [80%]│
+│     │   │   │   │   │   │   │   │   │   │           ├── ○ Static Analysis with Semgrep and LLM-Assisted Rule Generation [85%]│
+│     │   │   │   │   │   │   │   │   │   │           └── ○ Differential Fuzzing with LibAFL and LLM-Guided Mutation Strategies [75%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-based Code Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification [70%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Generated Test Drivers [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Generated Test Drivers (Refined) [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Generated Examples [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ and LLM-Generated Seeds [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Runtime Verification with Trace Monitoring and LLM-Generated Monitors [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Generated Properties [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with Z3 and LLM-Guided Path Exploration [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ and LLM-Generated Seeds [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Static Analysis with Semgrep and LLM-Generated Rules [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ and LLM-Guided Input Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with Z3 and LLM-Assisted Constraint Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Generated Test Case Strategies [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Static Analysis with Semgrep and LLM-Assisted Rule Generation [90%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Differential Fuzzing with AFL++ and LLM-Guided Variant Selection [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   └── ○ Formal Verification with Dafny and LLM-Assisted Specification Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │       ├── ○ Formal Verification with Dafny and LLM-Assisted Specification Generation (Refined) [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │       ├── ○ Property-Based Testing with Hypothesis and LLM-Assisted Test Case Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │       ├── ○ Symbolic Execution with KLEE and LLM-Assisted Path Constraint Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │       └── ○ Runtime Verification with Trace Monitoring and LLM-Assisted Specification Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Model Checking with TLA+ and LLM-Assisted Specification [65%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Alloy and LLM-Assisted Specification [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Alloy and LLM-Assisted Specification (Refined) [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Model Checking with TLA+ and SMT Solver [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Assisted Test Case Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Symbolic Execution with K Framework and LLM-Assisted Program Understanding [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Assisted Test Case Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Assisted Test Case Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ and LLM-Assisted Seed Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Model Checking with TLA+ and LLM-Assisted Specification Generation [65%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Assisted Constraint Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Assisted Constraint Generation (Refined) [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ and LLM-Based Test Case Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with TLA+ and LLM-Assisted Specification Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Property-Based Testing with Hypothesis and LLM-Assisted Property Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   └── ○ Fuzzing with AFL++ and LLM-Assisted Seed Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │       ├── ○ Symbolic Execution with KLEE and LLM-Guided Constraint Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │       ├── ○ Property-Based Testing with Hypothesis and LLM-Assisted Property Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │       ├── ○ Static Analysis with Semgrep and LLM-Assisted Rule Generation [90%]│
+│     │   │   │   │   │   │   │   │   │   │   │       └── ○ Differential Fuzzing with AFL++ and LLM-Assisted Variant Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   └── ○ Constraint Solving with Z3 and LLM-Generated Constraints [75%]│
+│     │   │   │   │   │   │   │   │   │   │       ├── ○ Constraint Solving with Z3 and LLM-Generated Constraints (Iterative Refinement) [60%]│
+│     │   │   │   │   │   │   │   │   │   │       │   ├── ○ Constraint Solving with Z3 and LLM-Generated Constraints (Iterative Refinement with Symbolic Execution) [70%]│
+│     │   │   │   │   │   │   │   │   │   │       │   ├── ○ Property-Based Testing with LLM-Generated Properties (EvoSuite Integration) [80%]│
+│     │   │   │   │   │   │   │   │   │   │       │   ├── ○ Formal Verification with TLA+ and LLM-Assisted Specification (Model Checking) [60%]│
+│     │   │   │   │   │   │   │   │   │   │       │   └── ○ Runtime Verification with LLM-Generated Monitors (Aspect-Oriented Programming) [70%]│
+│     │   │   │   │   │   │   │   │   │   │       ├── ○ Property-Based Testing with LLM-Generated Test Cases [70%]│
+│     │   │   │   │   │   │   │   │   │   │       │   ├── ○ Formal Verification with SMT Solver [60%]│
+│     │   │   │   │   │   │   │   │   │   │       │   ├── ○ Model-Based Testing with State Machines [70%]│
+│     │   │   │   │   │   │   │   │   │   │       │   ├── ○ Fuzzing with Coverage-Guided Mutation [80%]│
+│     │   │   │   │   │   │   │   │   │   │       │   └── ○ Symbolic Execution with KLEE [50%]│
+│     │   │   │   │   │   │   │   │   │   │       ├── ○ Formal Verification with Dafny [50%]│
+│     │   │   │   │   │   │   │   │   │   │       └── ○ Reinforcement Learning for Code Generation with Unit Test Feedback [40%]│
+│     │   │   │   │   │   │   │   │   │   │           ├── ○ Symbolic Execution Guided Code Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │           ├── ○ Iterative Code Generation with Fuzzing and Mutation [60%]│
+│     │   │   │   │   │   │   │   │   │   │           ├── ○ Constraint Programming for Code Synthesis [50%]│
+│     │   │   │   │   │   │   │   │   │   │           └── ○ Program Synthesis with Deductive Reasoning [40%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Model-Based Testing with TLA+ and LLM-based Model Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Code Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Code Generation (Refined) [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Code Generation (Refined) [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Assisted Test Case Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Assisted Constraint Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   │   └── ○ Model Checking with TLA+ and LLM-Assisted Specification Generation [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Assisted Test Case Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Assisted Path Constraint Generation [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   └── ○ LLM-Driven Code Generation with Unit Test Synthesis and Mutation Testing [70%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Generated Test Cases [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Guided Path Exploration [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Mutation Testing with Stryker and LLM-Generated Mutants [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   └── ○ LLM-Driven Code Review and Static Analysis with Semgrep [90%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Assisted Constraint Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   └── ○ Runtime Verification with Trace Analysis and LLM-Assisted Anomaly Detection [70%]│
+│     │   │   │   │   │   │   │   │   │   │       ├── ○ Formal Verification with Z3 and LLM-Guided Property Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │       ├── ○ Property-Based Testing with Hypothesis and LLM-Driven Test Case Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │       ├── ○ Symbolic Execution with KLEE and LLM-Assisted Path Constraint Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │       └── ○ Mutation Testing with Stryker and LLM-Assisted Mutant Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   └── ○ Fuzzing with AFL++ and LLM-based Input Generation [90%]│
+│     │   │   │   │   │   │   │   │   │       ├── ○ Symbolic Execution with KLEE and LLM-Guided Path Exploration [70%]│
+│     │   │   │   │   │   │   │   │   │       │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification Generation [70%]│
+│     │   │   │   │   │   │   │   │   │       │   ├── ○ Property-Based Testing with Hypothesis and LLM-Driven Test Case Generation [80%]│
+│     │   │   │   │   │   │   │   │   │       │   ├── ○ Fuzzing with AFL++ and LLM-Guided Input Mutation [75%]│
+│     │   │   │   │   │   │   │   │   │       │   └── ○ Static Analysis with Semgrep and LLM-Assisted Rule Generation [85%]│
+│     │   │   │   │   │   │   │   │   │       ├── ○ Property-Based Testing with Hypothesis and LLM-Generated Properties [80%]│
+│     │   │   │   │   │   │   │   │   │       │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification [60%]│
+│     │   │   │   │   │   │   │   │   │       │   ├── ○ Symbolic Execution with KLEE and LLM-Guided Path Exploration [50%]│
+│     │   │   │   │   │   │   │   │   │       │   ├── ○ Abstract Interpretation with Infer and LLM-Assisted Error Pattern Identification [70%]│
+│     │   │   │   │   │   │   │   │   │       │   └── ○ Model Checking with TLA+ and LLM-Assisted Specification Generation [40%]│
+│     │   │   │   │   │   │   │   │   │       ├── ○ Static Analysis with Semgrep and LLM-Enhanced Rule Generation [85%]│
+│     │   │   │   │   │   │   │   │   │       │   ├── ○ Dynamic Symbolic Execution with KLEE and LLM-Guided Test Case Generation [70%]│
+│     │   │   │   │   │   │   │   │   │       │   ├── ○ Formal Verification with TLA+ and LLM-Assisted Specification Generation [60%]│
+│     │   │   │   │   │   │   │   │   │       │   ├── ○ Fuzzing with AFL++ and LLM-Guided Seed Generation [80%]│
+│     │   │   │   │   │   │   │   │   │       │   └── ○ Abstract Interpretation with Infer and LLM-Enhanced Error Message Explanation [75%]│
+│     │   │   │   │   │   │   │   │   │       └── ○ Differential Fuzzing with AFL++ and LLM-Based Variant Generation [75%]│
+│     │   │   │   │   │   │   │   │   │           ├── ○ Differential Fuzzing with AFL++ and LLM-Based Variant Generation (Z3 Constraint Solving) [70%]│
+│     │   │   │   │   │   │   │   │   │           ├── ○ Symbolic Execution with KLEE and LLM-Based Test Case Generation [60%]│
+│     │   │   │   │   │   │   │   │   │           ├── ○ Property-Based Testing with Hypothesis and LLM-Based Property Generation [80%]│
+│     │   │   │   │   │   │   │   │   │           └── ○ Static Analysis with Semgrep and LLM-Based Rule Generation [90%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-based Test Case Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Z3 and LLM-Assisted Specification Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Z3 and LLM-Assisted Specification Generation (Iterative Refinement) [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Driven Test Case Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Assisted Property Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ and LLM-Assisted Seed Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   └── ○ Static Analysis with SonarQube and LLM-Assisted Rule Customization [80%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with LLM-Assisted Property Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with SMT Solver [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Differential Fuzzing with AFL++ [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   └── ○ Runtime Verification with Trace Analysis [70%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with LLM-Assisted Path Constraint Generation [50%]│
+│     │   │   │   │   │   │   │   │   │   │   └── ○ Static Analysis with LLM-Assisted Rule Generation and Code Repair [80%]│
+│     │   │   │   │   │   │   │   │   │   │       ├── ○ Symbolic Execution with SMT Solver and LLM-Guided Repair [70%]│
+│     │   │   │   │   │   │   │   │   │   │       ├── ○ Fuzzing with LLM-Guided Test Case Generation and Oracle Creation [80%]│
+│     │   │   │   │   │   │   │   │   │   │       ├── ○ Formal Verification with TLA+ and LLM-Assisted Specification Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │       └── ○ Property-Based Testing with LLM-Assisted Property Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Mutation Testing with Stryker and LLM-Assisted Mutant Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Guided Test Case Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Guided Property Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ and LLM-Guided Seed Generation [75%]│
+│     │   │   │   │   │   │   │   │   │   │   │   └── ○ Static Analysis with Semgrep and LLM-Guided Rule Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification Generation (Refined) [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with LLM-Assisted Test Case Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with LLM-Assisted Constraint Generation [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   └── ○ LLM-Driven Code Generation with Unit Test Synthesis and Verification [60%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Assisted Property Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Assisted Test Case Generation [50%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ and LLM-Assisted Input Mutation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   └── ○ Static Analysis with Semgrep and LLM-Assisted Rule Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   └── ★ Fuzzing with AFL++ and LLM-Assisted Seed Generation [90%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Static Analysis with SonarQube and LLM-Assisted Rule Customization [80%]│
+│     │   │   │   │   │   │   │   │   │   └── ○ Fuzzing with AFL and LLM-Assisted Input Generation [70%]│
+│     │   │   │   │   │   │   │   │   │       ├── ○ Symbolic Execution with Z3 and LLM-Guided Constraints [60%]│
+│     │   │   │   │   │   │   │   │   │       │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification [70%]│
+│     │   │   │   │   │   │   │   │   │       │   ├── ○ Property-Based Testing with Hypothesis and LLM-Generated Strategies [80%]│
+│     │   │   │   │   │   │   │   │   │       │   ├── ○ Fuzzing with AFL++ and LLM-Guided Input Mutation [70%]│
+│     │   │   │   │   │   │   │   │   │       │   └── ○ Runtime Verification with Trace Analysis and LLM-Generated Monitors [75%]│
+│     │   │   │   │   │   │   │   │   │       ├── ○ Property-Based Testing with Hypothesis and LLM-Generated Strategies [70%]│
+│     │   │   │   │   │   │   │   │   │       │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification [70%]│
+│     │   │   │   │   │   │   │   │   │       │   ├── ○ Symbolic Execution with KLEE and LLM-Guided Test Case Generation [60%]│
+│     │   │   │   │   │   │   │   │   │       │   ├── ○ Mutation Testing with Stryker and LLM-Assisted Mutant Generation [80%]│
+│     │   │   │   │   │   │   │   │   │       │   └── ○ Runtime Verification with Trace Analysis and LLM-Based Anomaly Detection [70%]│
+│     │   │   │   │   │   │   │   │   │       ├── ○ Static Analysis with SonarQube and LLM-Assisted Rule Customization [80%]│
+│     │   │   │   │   │   │   │   │   │       └── ○ Differential Fuzzing with AFL and LLM-Assisted Variant Generation [60%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-based Path Constraint Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification Generation (Iterative Refinement) [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification Generation (Iterative Refinement) [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Assisted Property Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Assisted Test Case Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   └── ○ Static Analysis with SonarQube and LLM-Assisted Rule Customization [80%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Assisted Property Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Assisted Test Case Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   ├── ○ Model Checking with TLA+ and LLM-Assisted Specification Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   │   └── ○ Mutation Testing with MutPy and LLM-Assisted Mutant Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ SMT Solving with Z3 and LLM-Assisted Constraint Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   └── ○ LLM-Based Code Generation with Unit Test Synthesis and Execution [50%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Driven Test Case Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Driven Constraint Generation [60%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Mutation Testing with Stryker and LLM-Driven Mutant Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   └── ○ Property-Based Testing with QuickCheck and LLM-Driven Property Refinement [75%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ and LLM-Guided Input Mutation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with Z3 and LLM-Guided Constraints [70%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Guided Property Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Static Analysis with Semgrep and LLM-Guided Rule Generation [90%]│
+│     │   │   │   │   │   │   │   │   │   │   └── ○ Differential Fuzzing with AFL++ and LLM-Guided Input Selection [80%]│
+│     │   │   │   │   │   │   │   │   │   └── ○ Static Analysis with Semgrep and LLM-Assisted Rule Generation [80%]│
+│     │   │   │   │   │   │   │   │   │       ├── ○ Formal Verification with Dafny and LLM-Assisted Specification Generation [60%]│
+│     │   │   │   │   │   │   │   │   │       ├── ○ Property-Based Testing with Hypothesis and LLM-Assisted Test Case Generation [70%]│
+│     │   │   │   │   │   │   │   │   │       ├── ○ Symbolic Execution with KLEE and LLM-Assisted Constraint Generation [50%]│
+│     │   │   │   │   │   │   │   │   │       └── ○ Fuzzing with AFL++ and LLM-Assisted Seed Generation [80%]│
+│     │   │   │   │   │   │   │   │   └── ○ LLM-Driven Code Generation with Formal Specification and Runtime Verification [50%]│
+│     │   │   │   │   │   │   │   │       ├── ○ LLM-Driven Code Generation with Formal Specification, Runtime Verification, and SMT-based Error Localization [70%]│
+│     │   │   │   │   │   │   │   │       │   ├── ○ LLM-Driven Code Generation with Formal Specification, Runtime Verification, SMT-based Error Localization, and VSCode Integration [70%]│
+│     │   │   │   │   │   │   │   │       │   ├── ○ LLM-Driven Code Generation with Property-Based Testing and Mutation Testing [80%]│
+│     │   │   │   │   │   │   │   │       │   ├── ○ LLM-Driven Code Generation with Retrieval-Augmented Generation and Unit Testing [80%]│
+│     │   │   │   │   │   │   │   │       │   └── ○ LLM-Driven Code Generation with Static Analysis and Security Auditing [80%]│
+│     │   │   │   │   │   │   │   │       ├── ○ LLM-Driven Code Generation with Property-Based Testing and Mutation Testing [80%]│
+│     │   │   │   │   │   │   │   │       │   ├── ○ Formal Verification with SMT Solver [60%]│
+│     │   │   │   │   │   │   │   │       │   ├── ○ Reinforcement Learning with Code Coverage Reward [50%]│
+│     │   │   │   │   │   │   │   │       │   ├── ○ Constraint Programming with MiniZinc [70%]│
+│     │   │   │   │   │   │   │   │       │   └── ○ Iterative Refinement with Human-in-the-Loop Feedback [80%]│
+│     │   │   │   │   │   │   │   │       ├── ○ LLM-Driven Code Generation with Retrieval-Augmented Generation and Code Similarity Search [75%]│
+│     │   │   │   │   │   │   │   │       │   ├── ○ Formal Verification-Guided Code Generation [70%]│
+│     │   │   │   │   │   │   │   │       │   ├── ○ Test-Driven Code Generation with Property-Based Testing [80%]│
+│     │   │   │   │   │   │   │   │       │   ├── ○ Iterative Refinement with Human-in-the-Loop Code Review [90%]│
+│     │   │   │   │   │   │   │   │       │   └── ○ Modular Code Generation with Component Composition [85%]│
+│     │   │   │   │   │   │   │   │       └── ○ Human-in-the-Loop Code Generation with Interactive Refinement and Feedback [85%]│
+│     │   │   │   │   │   │   │   │           ├── ○ Formal Verification Guided Code Generation [60%]│
+│     │   │   │   │   │   │   │   │           ├── ○ Test-Driven Code Generation with Mutation Testing [70%]│
+│     │   │   │   │   │   │   │   │           ├── ○ Iterative Code Generation with User-Guided Refinement and Example-Based Learning [75%]│
+│     │   │   │   │   │   │   │   │           └── ○ Modular Code Generation with Component Library and Assembly [65%]│
+│     │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-based Test Case Generation [80%]│
+│     │   │   │   │   │   │   │   ├── ○ Reinforcement Learning for Code Repair with Test-Driven Development [60%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution Guided Code Repair [70%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification Guided Code Repair with Frama-C [70%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification Guided Code Repair with Frama-C and LLM-assisted Test Case Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution Guided Code Repair with KLEE and LLM-assisted Constraint Solving [60%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-assisted Property Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   │   └── ○ Static Analysis with Semgrep and LLM-assisted Rule Generation [90%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing Guided Code Repair with Hypothesis and CodeT5 [75%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing Guided Code Repair with Hypothesis and CodeT5 + Formal Verification [70%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Context-Aware Code Repair with Retrieval-Augmented Generation and CodeT5 [80%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Iterative Code Repair with Reinforcement Learning and CodeT5 [60%]│
+│     │   │   │   │   │   │   │   │   │   │   └── ○ Human-in-the-Loop Code Repair with CodeT5 and Interactive Debugging [90%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Mutation Testing Guided Code Repair with MutPy and CodeT5 [70%]│
+│     │   │   │   │   │   │   │   │   │   └── ○ Static Analysis Guided Code Repair with SonarQube and CodeT5 [80%]│
+│     │   │   │   │   │   │   │   │   │       ├── ○ Formal Verification Guided Code Repair with Dafny and CodeT5 [60%]│
+│     │   │   │   │   │   │   │   │   │       ├── ○ Symbolic Execution Guided Code Repair with KLEE and CodeT5 [70%]│
+│     │   │   │   │   │   │   │   │   │       ├── ○ Fuzzing Guided Code Repair with AFL++ and CodeT5 [80%]│
+│     │   │   │   │   │   │   │   │   │       └── ○ Constraint-Based Code Repair with Z3 and CodeT5 [50%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Genetic Algorithm for Code Mutation and Test-Driven Evolution [60%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution Guided Code Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Large Language Model with Test-Driven Refinement [80%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution Guided Code Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Formal Specification and Model Checking [60%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Constraint Programming for Code Synthesis [50%]│
+│     │   │   │   │   │   │   │   │   │   │   └── ○ Iterative Code Generation with Property-Based Testing [80%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Constraint Programming for Code Synthesis [60%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Constraint Programming with LLM-Assisted Constraint Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Program Synthesis with Evolutionary Algorithms and Test-Driven Development [60%]│
+│     │   │   │   │   │   │   │   │   │   │   ├── ○ Sketch-Based Program Synthesis with LLM-Guided Completion [80%]│
+│     │   │   │   │   │   │   │   │   │   │   └── ○ Formal Verification-Guided Code Generation [50%]│
+│     │   │   │   │   │   │   │   │   │   └── ○ Program Synthesis with Deductive Reasoning [50%]│
+│     │   │   │   │   │   │   │   │   │       ├── ○ Program Synthesis with Deductive Reasoning and SMT Solving [60%]│
+│     │   │   │   │   │   │   │   │   │       ├── ○ Program Synthesis with Large Language Models and Verification [50%]│
+│     │   │   │   │   │   │   │   │   │       ├── ○ Iterative Refinement with Test-Driven Development and LLM Assistance [70%]│
+│     │   │   │   │   │   │   │   │   │       └── ○ Program Synthesis with Genetic Algorithms and Test-Driven Fitness [60%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Constraint-Based Code Synthesis with SMT Solver [70%]│
+│     │   │   │   │   │   │   │   │   └── ○ LLM-Based Code Completion with Contextual Test Case Integration [80%]│
+│     │   │   │   │   │   │   │   │       ├── ○ Symbolic Execution Guided Code Repair [70%]│
+│     │   │   │   │   │   │   │   │       │   ├── ○ Formal Verification Guided Code Repair with Dafny [70%]│
+│     │   │   │   │   │   │   │   │       │   ├── ○ Property-Based Testing with LLM-Generated Test Cases [80%]│
+│     │   │   │   │   │   │   │   │       │   ├── ○ Contrastive Code Debugging with LLM-Generated Alternatives [60%]│
+│     │   │   │   │   │   │   │   │       │   └── ○ Reinforcement Learning for Code Repair with Test-Driven Rewards [50%]│
+│     │   │   │   │   │   │   │   │       ├── ○ Multi-Agent Code Repair with Voting [60%]│
+│     │   │   │   │   │   │   │   │       │   ├── ○ Formal Verification Guided Code Repair [70%]│
+│     │   │   │   │   │   │   │   │       │   ├── ○ Reinforcement Learning Guided Fuzzing for Code Repair [60%]│
+│     │   │   │   │   │   │   │   │       │   ├── ○ Constraint-Based Code Repair with Program Synthesis [70%]│
+│     │   │   │   │   │   │   │   │       │   └── ○ Iterative Repair with Test Case Generation and Validation [60%]│
+│     │   │   │   │   │   │   │   │       ├── ○ Iterative Repair with Reinforcement Learning [50%]│
+│     │   │   │   │   │   │   │   │       │   ├── ○ Symbolic Execution Guided Repair [70%]│
+│     │   │   │   │   │   │   │   │       │   ├── ○ Large Language Model Fine-tuning with Test Suite Feedback [80%]│
+│     │   │   │   │   │   │   │   │       │   ├── ○ Constraint-Based Code Synthesis [60%]│
+│     │   │   │   │   │   │   │   │       │   └── ○ Program Repair via Abstract Interpretation and Patch Templates [90%]│
+│     │   │   │   │   │   │   │   │       └── ○ Constraint-Based Code Synthesis [40%]│
+│     │   │   │   │   │   │   │   │           ├── ○ Constraint-Based Code Synthesis with SMT Solver and CodeT5+ Guidance [60%]│
+│     │   │   │   │   │   │   │   │           ├── ○ Program Synthesis with Evolutionary Algorithms and Test-Driven Fitness [50%]│
+│     │   │   │   │   │   │   │   │           ├── ○ Template-Based Code Generation with CodeT5+ Completion and Test-Driven Validation [70%]│
+│     │   │   │   │   │   │   │   │           └── ○ Neural Program Repair with Sequence-to-Sequence Models and Attention Mechanisms [40%]│
+│     │   │   │   │   │   │   │   └── ○ Constraint-Based Code Generation with Rosette and LLM-based Constraint Suggestion [70%]│
+│     │   │   │   │   │   │   │       ├── ○ Constraint-Based Code Generation with Rosette and LLM-based Constraint Suggestion (Refined) [70%]│
+│     │   │   │   │   │   │   │       │   ├── ○ Constraint-Based Code Generation with Rosette, LLM-based Constraint Suggestion, and Active Learning [70%]│
+│     │   │   │   │   │   │   │       │   │   ├── ○ Reinforcement Learning for Constraint Suggestion and Code Generation [70%]│
+│     │   │   │   │   │   │   │       │   │   ├── ○ Constraint-Based Code Generation with Program Synthesis and Deductive Verification [60%]│
+│     │   │   │   │   │   │   │       │   │   ├── ○ Constraint-Based Code Generation with Test Case Generation and Mutation Testing [80%]│
+│     │   │   │   │   │   │   │       │   │   └── ○ Constraint-Based Code Generation with Formal Specification and Model Checking [50%]│
+│     │   │   │   │   │   │   │       │   ├── ○ Iterative Code Generation with Test-Driven Development and LLM-based Test Case Generation [70%]│
+│     │   │   │   │   │   │   │       │   │   ├── ○ Formal Verification Guided Code Generation [60%]│
+│     │   │   │   │   │   │   │       │   │   ├── ○ Reinforcement Learning for Code Generation with Environment Feedback [50%]│
+│     │   │   │   │   │   │   │       │   │   ├── ○ Constraint Programming for Code Synthesis [60%]│
+│     │   │   │   │   │   │   │       │   │   └── ○ Retrieval-Augmented Code Generation with Vector Database [70%]│
+│     │   │   │   │   │   │   │       │   ├── ○ Formal Verification with Dafny and LLM-based Specification Generation [60%]│
+│     │   │   │   │   │   │   │       │   └── ○ Modular Code Generation with LLM-based Module Selection and Assembly [80%]│
+│     │   │   │   │   │   │   │       ├── ○ Probabilistic Code Synthesis with Program Sketching and LLM-based Completion [60%]│
+│     │   │   │   │   │   │   │       │   ├── ○ Formal Verification Guided Code Synthesis [60%]│
+│     │   │   │   │   │   │   │       │   ├── ○ Test-Driven Code Synthesis with Evolutionary Algorithms [70%]│
+│     │   │   │   │   │   │   │       │   ├── ○ Constraint Programming with LLM-Assisted Constraint Generation [65%]│
+│     │   │   │   │   │   │   │       │   └── ○ Retrieval-Augmented Code Generation with Vector Database [75%]│
+│     │   │   │   │   │   │   │       ├── ○ Test-Driven Code Generation with Mutation Testing and LLM-based Test Case Generation [50%]│
+│     │   │   │   │   │   │   │       │   ├── ○ Formal Verification Guided Code Generation [70%]│
+│     │   │   │   │   │   │   │       │   ├── ○ Property-Based Testing with LLM-Generated Properties [80%]│
+│     │   │   │   │   │   │   │       │   ├── ○ Reinforcement Learning for Code Generation with Environment Feedback [60%]│
+│     │   │   │   │   │   │   │       │   └── ★ Sketch-Based Code Generation with LLM Completion [90%]│
+│     │   │   │   │   │   │   │       └── ○ Iterative Refinement with Formal Verification and LLM-based Code Suggestion [40%]│
+│     │   │   │   │   │   │   │           ├── ○ Reinforcement Learning with Formal Verification Reward [60%]│
+│     │   │   │   │   │   │   │           ├── ○ Constraint Programming with LLM-based Constraint Generation [70%]│
+│     │   │   │   │   │   │   │           ├── ○ Program Synthesis with Deductive Reasoning and LLM-based Heuristics [50%]│
+│     │   │   │   │   │   │   │           └── ○ Hybrid Approach: LLM Code Generation with Formal Verification and Repair [80%]│
+│     │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis [60%]│
+│     │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and Z3 [70%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and Rosette [70%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Reinforcement Learning with Code Execution and Reward Shaping [60%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Constraint Programming with MiniZinc and Gecode [70%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and Roslyn Analyzer [60%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and Pytest [80%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLVM [50%]│
+│     │   │   │   │   │   │   │   │   │   └── ○ Reinforcement Learning with CodeT5+ and a Code Execution Environment [40%]│
+│     │   │   │   │   │   │   │   │   └── ○ Iterative Refinement with Static Analysis and Mutation Testing [80%]│
+│     │   │   │   │   │   │   │   │       ├── ○ Formal Verification with Z3 SMT Solver [70%]│
+│     │   │   │   │   │   │   │   │       ├── ○ Reinforcement Learning with Code Execution Feedback [60%]│
+│     │   │   │   │   │   │   │   │       ├── ○ Constraint Programming with MiniZinc [70%]│
+│     │   │   │   │   │   │   │   │       └── ○ Genetic Programming with Test-Driven Development [50%]│
+│     │   │   │   │   │   │   │   ├── ○ Symbolic Execution with Angr [60%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with Angr and LLM-Guided Repair [70%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Guided Synthesis [60%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Guided Test Case Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ and LLM-Guided Seed Input Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   └── ○ Model Checking with TLA+ and LLM-Guided Specification Refinement [50%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and Code Generation [80%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and Code Generation (Refined with SMT Solver) [70%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ and Code Coverage Analysis [60%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and Test Case Generation [50%]│
+│     │   │   │   │   │   │   │   │   │   └── ○ Reinforcement Learning for Code Improvement with LLM Feedback [40%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Z3 and Code Generation [60%]│
+│     │   │   │   │   │   │   │   │   └── ○ Database-Backed Contextual Code Generation and Retrieval [70%]│
+│     │   │   │   │   │   │   │   │       ├── ○ Database-Backed Contextual Code Generation and Retrieval with Formal Verification [70%]│
+│     │   │   │   │   │   │   │   │       ├── ○ Iterative Code Generation with Test-Driven Development and Feedback Loop [80%]│
+│     │   │   │   │   │   │   │   │       ├── ○ Contextual Code Generation with Knowledge Graph Integration [60%]│
+│     │   │   │   │   │   │   │   │       └── ★ Human-in-the-Loop Code Generation with Active Learning [90%]│
+│     │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ [80%]   │
+│     │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with Z3 [70%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with Z3 and Fuzzing [70%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis [80%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with TLA+ [60%]│
+│     │   │   │   │   │   │   │   │   │   └── ○ Reinforcement Learning for Code Improvement [50%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis [80%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny [60%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE [50%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ [70%]│
+│     │   │   │   │   │   │   │   │   │   └── ○ Static Analysis with SonarQube [80%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Formal Verification with TLA+ [60%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with TLA+ and Symbolic Execution [60%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and Code Generation [70%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Static Analysis with Semgrep and Custom Rules [80%]│
+│     │   │   │   │   │   │   │   │   │   └── ○ Reinforcement Learning for Code Generation and Testing [40%]│
+│     │   │   │   │   │   │   │   │   └── ○ Differential Fuzzing with Multiple Code Models [70%]│
+│     │   │   │   │   │   │   │   │       ├── ○ Differential Fuzzing with Symbolic Execution and CodeT5+ [70%]│
+│     │   │   │   │   │   │   │   │       ├── ○ Property-Based Testing with CodeT5+ and Hypothesis [80%]│
+│     │   │   │   │   │   │   │   │       ├── ○ Formal Verification with CodeT5+ and Dafny [60%]│
+│     │   │   │   │   │   │   │   │       └── ○ Reinforcement Learning for Code Improvement with CodeT5+ [50%]│
+│     │   │   │   │   │   │   │   └── ○ Formal Verification with TLA+ [50%]│
+│     │   │   │   │   │   │   ├── ○ Retrieval-Augmented Code Generation with Vector Database [55%]│
+│     │   │   │   │   │   │   │   ├── ○ Formal Verification Augmented Code Generation [70%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Property-Based Testing [70%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Property-Based Testing and LLM-Guided Repair [70%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Iterative Refinement with Execution-Guided Mutation [60%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Constraint Programming with MiniZinc [50%]│
+│     │   │   │   │   │   │   │   │   │   └── ○ Reinforcement Learning with Code Execution Feedback [40%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Iterative Refinement with Unit Tests and Code Coverage [80%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with SMT Solver [60%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis [70%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Reinforcement Learning for Code Repair [50%]│
+│     │   │   │   │   │   │   │   │   │   └── ○ Contextual Code Completion with Vector Database [60%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Constraint Programming for Code Synthesis [60%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Constraint Programming with Formal Specification and Z3 [60%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ CodeT5+ Fine-tuning with Unit Test Feedback [70%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Program Synthesis with Deductive Reasoning and Rosette [50%]│
+│     │   │   │   │   │   │   │   │   │   └── ○ Neuro-Symbolic Code Synthesis with LLM and Formal Verification [60%]│
+│     │   │   │   │   │   │   │   │   └── ○ Reinforcement Learning for Code Generation with Reward Shaping [50%]│
+│     │   │   │   │   │   │   │   │       ├── ○ Formal Verification Guided Code Generation [60%]│
+│     │   │   │   │   │   │   │   │       ├── ○ Test-Driven Code Generation with Evolutionary Algorithms [70%]│
+│     │   │   │   │   │   │   │   │       ├── ○ Contextual Code Completion with Retrieval-Augmented Generation [80%]│
+│     │   │   │   │   │   │   │   │       └── ★ Human-in-the-Loop Code Generation with Interactive Refinement [90%]│
+│     │   │   │   │   │   │   │   ├── ○ Iterative Refinement with Unit Test Generation and Execution [80%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Z3 SMT Solver [60%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Z3 and Symbolic Execution [70%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and CodeT5+ [80%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Reinforcement Learning for Code Repair with Test-Driven Development [60%]│
+│     │   │   │   │   │   │   │   │   │   └── ○ Multi-Agent Code Generation and Verification with LLMs [60%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis [70%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny [60%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE [50%]│
+│     │   │   │   │   │   │   │   │   │   ├── ○ Model Checking with TLA+ [40%]│
+│     │   │   │   │   │   │   │   │   │   └── ○ Fuzzing with AFL++ [70%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Reinforcement Learning for Code Repair [50%]│
+│     │   │   │   │   │   │   │   │   └── ○ Database-Backed Contextual Retrieval with pgvector [80%]│
+│     │   │   │   │   │   │   │   ├── ○ Contextual Code Completion with Real-Time API Lookup [85%]│
+│     │   │   │   │   │   │   │   └── ○ Constraint-Based Code Synthesis with DSL [65%]│
+│     │   │   │   │   │   │   └── ✗ Reinforcement Learning for Code Generation with Test-Driven Reward [40%]│
+│     │   │   │   │   │   ├── ○ Constraint Programming with MiniZinc [55%]│
+│     │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis [50%]│
+│     │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and Z3 [75%]│
+│     │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and Z3 (Refined) [70%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Iterative Refinement with Symbolic Execution and Human-in-the-Loop [70%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and CodeT5+ [60%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Model-Based Testing with TLA+ and CodeT5+ [50%]│
+│     │   │   │   │   │   │   │   │   └── ○ Reinforcement Learning for Code Generation and Testing [40%]│
+│     │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny [60%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and CodeT5+ Refinement [60%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and CodeT5+ [70%]│
+│     │   │   │   │   │   │   │   │   ├── ○ SMT Solving with Z3 and CodeT5+ [50%]│
+│     │   │   │   │   │   │   │   │   └── ○ Iterative Code Generation and Unit Testing with Coverage Guidance [80%]│
+│     │   │   │   │   │   │   │   ├── ○ Model Checking with TLA+ [50%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Model Checking with TLA+ and Symbolic Execution [70%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and CodeT5+ [80%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny [60%]│
+│     │   │   │   │   │   │   │   │   └── ○ Reinforcement Learning for Code Improvement with Unit Test Feedback [50%]│
+│     │   │   │   │   │   │   │   └── ○ Reinforcement Learning for Code Generation and Testing [40%]│
+│     │   │   │   │   │   │   │       ├── ○ Formal Verification with SMT Solver [60%]│
+│     │   │   │   │   │   │   │       ├── ○ Property-Based Testing with LLM-Generated Properties [70%]│
+│     │   │   │   │   │   │   │       ├── ○ Iterative Code Generation with Test-Driven Development and Human-in-the-Loop [80%]│
+│     │   │   │   │   │   │   │       └── ○ Retrieval-Augmented Generation with Vector Database [70%]│
+│     │   │   │   │   │   │   ├── ○ Iterative Code Generation with Unit Tests and Feedback Loop [50%]│
+│     │   │   │   │   │   │   ├── ✗ Formal Verification with TLA+ [30%]│
+│     │   │   │   │   │   │   └── ✗ Reinforcement Learning for Code Generation and Testing [20%]│
+│     │   │   │   │   │   └── ✗ Formal Specification with TLA+ [40%]│
+│     │   │   │   │   ├── ○ Property-Based Testing Guided Code Generation [75%]│
+│     │   │   │   │   │   ├── ○ Property-Based Testing Guided Code Generation with Formal Verification [75%]│
+│     │   │   │   │   │   │   ├── ○ Property-Based Testing Guided Code Generation with Formal Verification and LLM-Based Repair [80%]│
+│     │   │   │   │   │   │   │   ├── ○ Iterative Refinement with Symbolic Execution and LLM-Assisted Repair [70%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Property-Driven Code Generation with Formal Verification [60%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Model-Based Testing with LLM-Driven Test Case Generation [70%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Constraint-Based Code Synthesis with SMT Solving [50%]│
+│     │   │   │   │   │   │   │   │   └── ○ Evolutionary Code Generation with Genetic Algorithms and LLM-Assisted Mutation [40%]│
+│     │   │   │   │   │   │   │   ├── ○ Reinforcement Learning for Code Generation with Property-Based Rewards [60%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Formal Verification Guided Code Generation [70%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Iterative Code Generation with Property-Based Testing and Mutation [60%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Constraint-Based Code Generation with SMT Solving [50%]│
+│     │   │   │   │   │   │   │   │   └── ○ Retrieval-Augmented Code Generation with Vector Database [70%]│
+│     │   │   │   │   │   │   │   ├── ○ Formal Specification and Model Checking with TLA+ [80%]│
+│     │   │   │   │   │   │   │   └── ○ Genetic Algorithm-Based Code Evolution with Property-Based Fitness [50%]│
+│     │   │   │   │   │   │   ├── ○ Symbolic Execution Guided Code Generation [60%]│
+│     │   │   │   │   │   │   │   ├── ○ Symbolic Execution Guided Code Generation with Fuzzing [70%]│
+│     │   │   │   │   │   │   │   ├── ○ Property-Based Testing Guided Code Generation [80%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing Guided Code Generation with Formal Verification [70%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Iterative Code Generation with Execution-Based Feedback [80%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Constraint-Based Code Generation with PostgreSQL Storage [60%]│
+│     │   │   │   │   │   │   │   │   └── ○ Reinforcement Learning Guided Code Generation with Code Coverage Reward [50%]│
+│     │   │   │   │   │   │   │   ├── ○ Formal Verification Guided Code Generation [60%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Formal Verification Guided Code Generation with Z3 [60%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing Guided Code Generation [80%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Execution-Guided Code Generation with Dynamic Analysis [70%]│
+│     │   │   │   │   │   │   │   │   └── ○ Reinforcement Learning Guided Code Generation with Execution Feedback [50%]│
+│     │   │   │   │   │   │   │   └── ○ Reinforcement Learning Guided Code Generation with Unit Test Feedback [70%]│
+│     │   │   │   │   │   │   │       ├── ○ Formal Verification Guided Code Generation [60%]│
+│     │   │   │   │   │   │   │       ├── ○ Iterative Refinement with Property-Based Testing [70%]│
+│     │   │   │   │   │   │   │       ├── ○ Constraint-Based Code Generation with Search [50%]│
+│     │   │   │   │   │   │   │       └── ○ Neuro-Symbolic Code Generation with Program Synthesis [40%]│
+│     │   │   │   │   │   │   ├── ✗ Reinforcement Learning Guided Code Generation with Unit Test Feedback [30%]│
+│     │   │   │   │   │   │   └── ○ Iterative Code Generation with Static Analysis and Mutation Testing [50%]│
+│     │   │   │   │   │   │       ├── ○ Formal Verification Guided Code Generation [60%]│
+│     │   │   │   │   │   │       │   ├── ○ Formal Verification Guided Code Generation with LLM-Assisted Specification [70%]│
+│     │   │   │   │   │   │       │   ├── ○ Property-Based Testing Guided Code Generation [80%]│
+│     │   │   │   │   │   │       │   ├── ○ Reinforcement Learning Guided Code Generation with Test-Driven Development [60%]│
+│     │   │   │   │   │   │       │   └── ★ Iterative Code Generation with Human-in-the-Loop Refinement and Unit Testing [90%]│
+│     │   │   │   │   │   │       ├── ○ Property-Based Testing with Code Generation [70%]│
+│     │   │   │   │   │   │       │   ├── ○ Property-Based Testing with Formal Verification [70%]│
+│     │   │   │   │   │   │       │   ├── ○ Reinforcement Learning for Code Repair [60%]│
+│     │   │   │   │   │   │       │   ├── ○ Iterative Code Generation with Human-in-the-Loop Feedback [80%]│
+│     │   │   │   │   │   │       │   └── ○ Constraint-Based Code Generation with SMT Solving [70%]│
+│     │   │   │   │   │   │       ├── ○ Reinforcement Learning for Code Generation with Reward Shaping [50%]│
+│     │   │   │   │   │   │       │   ├── ○ Formal Verification Guided Code Generation [60%]│
+│     │   │   │   │   │   │       │   ├── ○ Test-Driven Code Generation with Evolutionary Algorithms [70%]│
+│     │   │   │   │   │   │       │   ├── ○ Constraint Satisfaction Problem (CSP) Based Code Generation [50%]│
+│     │   │   │   │   │   │       │   └── ○ Program Synthesis with Deductive Reasoning [40%]│
+│     │   │   │   │   │   │       └── ○ Contextual Code Completion with Retrieval-Augmented Generation [80%]│
+│     │   │   │   │   │   │           ├── ○ Formal Verification Augmented Code Completion [70%]│
+│     │   │   │   │   │   │           ├── ○ Iterative Refinement with Unit Test Generation and Execution [80%]│
+│     │   │   │   │   │   │           ├── ○ Contextual Code Completion with Knowledge Graph Integration [60%]│
+│     │   │   │   │   │   │           └── ○ Human-in-the-Loop Code Completion with Active Learning [70%]│
+│     │   │   │   │   │   ├── ○ Iterative Code Generation with Execution-Based Feedback [50%]│
+│     │   │   │   │   │   │   ├── ○ Symbolic Execution Guided Code Generation [60%]│
+│     │   │   │   │   │   │   │   ├── ○ Formal Verification Guided Code Generation [60%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Formal Verification Guided Code Generation with Z3 [60%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing Guided Code Generation [70%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Iterative Code Generation with Unit Test Feedback [70%]│
+│     │   │   │   │   │   │   │   │   └── ○ Context Engineering with Vector Database and Retrieval Augmented Generation [60%]│
+│     │   │   │   │   │   │   │   ├── ○ Property-Based Testing Guided Code Generation [70%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Property-Based Testing Guided Code Generation with Formal Verification [70%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Iterative Code Generation with Execution-Based Feedback and Reinforcement Learning [60%]│
+│     │   │   │   │   │   │   │   │   ├── ○ Constraint-Based Code Generation with Declarative Specifications [70%]│
+│     │   │   │   │   │   │   │   │   └── ○ Multi-Agent Code Generation with Code Review and Refinement [60%]│
+│     │   │   │   │   │   │   │   ├── ○ Runtime Verification Guided Code Generation [50%]│
+│     │   │   │   │   │   │   │   └── ○ Reinforcement Learning Guided Code Generation with Test-Driven Development [40%]│
+│     │   │   │   │   │   │   ├── ✗ PostgreSQL-Based Code Storage and Retrieval with Vector Similarity Search [40%]│
+│     │   │   │   │   │   │   ├── ✗ Formal Specification and Verification with TLA+ [20%]│
+│     │   │   │   │   │   │   └── ✗ Reinforcement Learning with Code Execution Environment [30%]│
+│     │   │   │   │   │   ├── ✗ Constraint-Based Code Generation with SMT Solving [35%]│
+│     │   │   │   │   │   └── ○ Retrieval-Augmented Code Generation with Vector Database [60%]│
+│     │   │   │   │   ├── ○ Iterative Code Generation with Unit Test Feedback [60%]│
+│     │   │   │   │   └── ✗ Constraint Programming Guided Code Generation [40%]│
+│     │   │   │   ├── ○ Test-Driven Development with Property-Based Testing [60%]│
+│     │   │   │   │   ├── ○ Formal Verification with SMT Solver [55%]│
+│     │   │   │   │   │   ├── ✗ Formal Verification with SMT Solver and Interactive Refinement [45%]│
+│     │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and Code Generation [55%]│
+│     │   │   │   │   │   │   ├── ○ Property-Based Testing with CodeT5+ and Z3 Constraint Solving [70%]│
+│     │   │   │   │   │   │   │   ├── ○ Property-Based Testing with CodeT5+ and Z3 Constraint Solving (Refined with Fuzzing) [70%]│
+│     │   │   │   │   │   │   │   ├── ○ CodeT5+ with Retrieval-Augmented Generation and Formal Verification [60%]│
+│     │   │   │   │   │   │   │   ├── ○ Iterative Refinement with Human-in-the-Loop and Symbolic Execution [65%]│
+│     │   │   │   │   │   │   │   └── ○ Formal Specification with TLA+ and Code Generation with CodeT5+ [55%]│
+│     │   │   │   │   │   │   ├── ○ Iterative Refinement with Execution Feedback and Program Repair [50%]│
+│     │   │   │   │   │   │   │   ├── ○ Formal Verification with Z3 [60%]│
+│     │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis [70%]│
+│     │   │   │   │   │   │   │   ├── ○ Reinforcement Learning with Execution Environment [50%]│
+│     │   │   │   │   │   │   │   └── ○ Constraint Solving with MiniZinc [60%]│
+│     │   │   │   │   │   │   ├── ○ Contextual Code Generation with Retrieval-Augmented Generation (RAG) [60%]│
+│     │   │   │   │   │   │   │   ├── ○ Contextual Code Generation with RAG and Formal Verification [70%]│
+│     │   │   │   │   │   │   │   ├── ○ Iterative Code Generation with Unit Testing and Feedback [80%]│
+│     │   │   │   │   │   │   │   ├── ★ Contextual Code Generation with Human-in-the-Loop Refinement [90%]│
+│     │   │   │   │   │   │   │   └── ○ Contextual Code Generation with Reinforcement Learning from Human Feedback (RLHF) [60%]│
+│     │   │   │   │   │   │   └── ✗ Multi-Agent Code Generation with Consensus and Verification [40%]│
+│     │   │   │   │   │   ├── ✗ Execution-Guided Code Generation with Dynamic Analysis [40%]│
+│     │   │   │   │   │   └── ✗ Reinforcement Learning for Code Generation with Reward Shaping [25%]│
+│     │   │   │   │   ├── ✗ Reinforcement Learning with Code Execution Feedback [45%]│
+│     │   │   │   │   ├── ✗ Constraint Satisfaction Programming with MiniZinc [35%]│
+│     │   │   │   │   └── ○ Iterative Refinement with Code Review and Static Analysis [50%]│
+│     │   │   │   │       ├── ✗ Formal Verification with Dafny [30%]│
+│     │   │   │   │       ├── ○ Property-Based Testing with Hypothesis [70%]│
+│     │   │   │   │       │   ├── ○ Property-Based Testing with Hypothesis and Symbolic Execution [70%]│
+│     │   │   │   │       │   ├── ○ Formal Verification with TLA+ [60%]│
+│     │   │   │   │       │   │   ├── ○ Formal Verification with TLA+ and Code Refinement [60%]│
+│     │   │   │   │       │   │   ├── ○ Property-Based Testing with Hypothesis and Code Generation [70%]│
+│     │   │   │   │       │   │   ├── ○ Symbolic Execution with KLEE and Code Generation [50%]│
+│     │   │   │   │       │   │   └── ○ Iterative Refinement with Unit Tests and Human-in-the-Loop [80%]│
+│     │   │   │   │       │   ├── ✗ Reinforcement Learning with Code Coverage Feedback [30%]│
+│     │   │   │   │       │   └── ○ Iterative Refinement with Human-in-the-Loop Feedback and Static Analysis [60%]│
+│     │   │   │   │       │       ├── ○ Formal Verification Guided Code Generation [70%]│
+│     │   │   │   │       │       ├── ○ Test-Driven Code Generation with Property-Based Testing [80%]│
+│     │   │   │   │       │       ├── ○ Multi-Agent Code Generation with Conflict Resolution [60%]│
+│     │   │   │   │       │       └── ○ Reinforcement Learning for Code Generation with Environment Feedback [50%]│
+│     │   │   │   │       ├── ✗ Reinforcement Learning with Code Execution Feedback [20%]│
+│     │   │   │   │       └── ✗ Constraint Solving with Z3 [30%]   │
+│     │   │   │   ├── ✗ Constraint Satisfaction Problem (CSP) Solving [40%]│
+│     │   │   │   └── ✗ Genetic Algorithm-Based Code Optimization [35%]│
+│     │   │   ├── ○ Property-Based Testing with CodeT5+ and Hypothesis [75%]│
+│     │   │   └── ✗ Reinforcement Learning for Code Generation and Testing [30%]│
+│     │   ├── ○ Iterative Refinement with CodeT5+, Human-in-the-Loop, and Active Learning [75%]│
+│     │   │   ├── ○ Formal Verification with Z3 and CodeT5+ Assisted Synthesis [55%]│
+│     │   │   │   ├── ○ Formal Verification with Z3 and CodeT5+ Assisted Synthesis (Optimized for Performance) [75%]│
+│     │   │   │   │   ├── ○ Formal Verification with Z3 and CodeT5+ Assisted Synthesis (Optimized for Performance) [60%]│
+│     │   │   │   │   │   ├── ✗ Formal Verification with Z3 and CodeT5+ Assisted Synthesis (Optimized for Performance) [40%]│
+│     │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and CodeT5+ Assisted Test Generation [60%]│
+│     │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and CodeT5+ Assisted Specification Generation [70%]│
+│     │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and CodeT5+ Assisted Specification Generation (Refined) [70%]│
+│     │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and CodeT5+ Assisted Test Case Generation [80%]│
+│     │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and CodeT5+ Assisted Constraint Generation [60%]│
+│     │   │   │   │   │   │   │   └── ○ Fuzzing with AFL++ and CodeT5+ Assisted Seed Generation [70%]│
+│     │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and CodeT5+ Assisted Test Case Generation [60%]│
+│     │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification Generation [60%]│
+│     │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Assisted Property Generation [70%]│
+│     │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ and LLM-Assisted Seed Generation [70%]│
+│     │   │   │   │   │   │   │   └── ○ Static Analysis with Semgrep and LLM-Assisted Rule Generation [80%]│
+│     │   │   │   │   │   │   ├── ○ Mutation Testing with Stryker and CodeT5+ Assisted Mutant Generation [50%]│
+│     │   │   │   │   │   │   │   ├── ○ Symbolic Execution Guided Mutation with KLEE and GPT-4 [70%]│
+│     │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and CodeT5+ Assisted Test Case Generation [80%]│
+│     │   │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ and CodeT5+ Seed Generation [80%]│
+│     │   │   │   │   │   │   │   └── ○ Formal Verification with TLA+ and CodeT5+ Specification Generation [60%]│
+│     │   │   │   │   │   │   └── ✗ Reinforcement Learning for Test Case Generation with CodeT5+ as Reward Function [30%]│
+│     │   │   │   │   │   ├── ✗ Symbolic Execution with KLEE and CodeT5+ Assisted Path Constraint Generation [35%]│
+│     │   │   │   │   │   └── ○ Fuzzing with AFL++ and CodeT5+ Assisted Seed Generation [50%]│
+│     │   │   │   │   │       ├── ○ Symbolic Execution with Z3 and LLVM IR [60%]│
+│     │   │   │   │   │       │   ├── ○ Formal Verification with Dafny and Roslyn Analyzer [70%]│
+│     │   │   │   │   │       │   ├── ○ Property-Based Testing with Hypothesis and Coverage-Guided Fuzzing with AFL++ [80%]│
+│     │   │   │   │   │       │   ├── ★ Static Analysis with SonarQube and Custom Rules [90%]│
+│     │   │   │   │   │       │   └── ○ Model Checking with TLA+ and TLC [60%]│
+│     │   │   │   │   │       ├── ○ Property-Based Testing with Hypothesis and CodeT5+ Assisted Test Case Generation [60%]│
+│     │   │   │   │   │       │   ├── ○ Formal Verification with Dafny and CodeT5+ Assisted Specification Generation [70%]│
+│     │   │   │   │   │       │   ├── ○ Symbolic Execution with KLEE and CodeT5+ Assisted Constraint Generation [60%]│
+│     │   │   │   │   │       │   ├── ○ Fuzzing with AFL++ and CodeT5+ Assisted Seed Generation [80%]│
+│     │   │   │   │   │       │   └── ★ Static Analysis with Semgrep and CodeT5+ Assisted Rule Generation [90%]│
+│     │   │   │   │   │       ├── ○ Static Analysis with Semgrep and Custom Rules [50%]│
+│     │   │   │   │   │       │   ├── ○ Symbolic Execution with KLEE and LLVM IR [60%]│
+│     │   │   │   │   │       │   ├── ○ Fuzzing with AFL++ and Code Coverage Guidance [70%]│
+│     │   │   │   │   │       │   ├── ○ Formal Verification with TLA+ and Model Checking [50%]│
+│     │   │   │   │   │       │   └── ○ Property-Based Testing with Hypothesis [80%]│
+│     │   │   │   │   │       └── ✗ Differential Fuzzing with AFL++ and LibAFL [40%]│
+│     │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and CodeT5+ Assisted Test Generation [80%]│
+│     │   │   │   │   │   ├── ✗ Formal Verification with Dafny and CodeT5+ Assisted Specification Generation [30%]│
+│     │   │   │   │   │   ├── ✗ Symbolic Execution with KLEE and CodeT5+ Assisted Test Case Generation [35%]│
+│     │   │   │   │   │   ├── ○ Mutation Testing with Stryker and CodeT5+ Assisted Mutant Generation [50%]│
+│     │   │   │   │   │   │   ├── ○ Symbolic Execution Guided Code Generation and Verification [70%]│
+│     │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and CodeT5+ [70%]│
+│     │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and CodeT5+ [80%]│
+│     │   │   │   │   │   │   │   ├── ★ Runtime Verification with Contracts and CodeT5+ [90%]│
+│     │   │   │   │   │   │   │   └── ○ Fuzzing with AFL++ and CodeT5+ [80%]│
+│     │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and CodeT5+ Assisted Test Case Generation [80%]│
+│     │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and VSCode Integration [70%]│
+│     │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLVM IR [60%]│
+│     │   │   │   │   │   │   │   ├── ○ Mutation Testing with StrykerJS and Code Coverage Analysis [80%]│
+│     │   │   │   │   │   │   │   └── ○ Static Analysis with Semgrep and Custom Rule Creation [80%]│
+│     │   │   │   │   │   │   ├── ○ Fuzzing with AFL++ and CodeT5+ Seed Generation [50%]│
+│     │   │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and LLM-Guided Constraint Solving [70%]│
+│     │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and CodeT5+ Property Generation [80%]│
+│     │   │   │   │   │   │   │   ├── ○ Formal Verification with TLA+ and LLM-Assisted Specification Generation [60%]│
+│     │   │   │   │   │   │   │   └── ○ Differential Fuzzing with LibAFL and CodeT5+ Variant Generation [70%]│
+│     │   │   │   │   │   │   └── ○ Formal Verification with Dafny and CodeT5+ Specification Generation [70%]│
+│     │   │   │   │   │   │       ├── ○ Formal Verification with Dafny and CodeT5+ Specification Generation (Refined) [70%]│
+│     │   │   │   │   │   │       ├── ○ Property-Based Testing with Hypothesis and CodeT5+ Test Case Generation [60%]│
+│     │   │   │   │   │   │       ├── ○ Symbolic Execution with KLEE and CodeT5+ Constraint Generation [50%]│
+│     │   │   │   │   │   │       └── ○ SMT Solving with Z3 and CodeT5+ Formula Generation [65%]│
+│     │   │   │   │   │   └── ✗ Reinforcement Learning for Test Case Generation with CodeT5+ as Reward Function [15%]│
+│     │   │   │   │   ├── ✗ Symbolic Execution with KLEE and CodeT5+ Assisted Path Constraint Generation [40%]│
+│     │   │   │   │   └── ○ Fuzzing with AFL++ and CodeT5+ Assisted Seed Generation [50%]│
+│     │   │   │   │       ├── ✗ Symbolic Execution with Z3 and LLVM IR [30%]│
+│     │   │   │   │       ├── ○ Property-Based Testing with Hypothesis and CodeT5+ Assisted Test Case Generation [55%]│
+│     │   │   │   │       │   ├── ○ Formal Verification with Dafny and CodeT5+ Assisted Specification Generation [70%]│
+│     │   │   │   │       │   │   ├── ○ Formal Verification with Dafny and Iterative Refinement via Fuzzing [70%]│
+│     │   │   │   │       │   │   ├── ○ Property-Based Testing with Hypothesis and CodeT5+ Assisted Test Case Generation [80%]│
+│     │   │   │   │       │   │   ├── ○ Symbolic Execution with KLEE and CodeT5+ Assisted Constraint Generation [60%]│
+│     │   │   │   │       │   │   └── ★ Static Analysis with SonarQube and CodeT5+ Assisted Rule Customization [90%]│
+│     │   │   │   │       │   ├── ○ Symbolic Execution with KLEE and CodeT5+ Assisted Constraint Generation [60%]│
+│     │   │   │   │       │   │   ├── ○ Formal Verification with Dafny and LLM-Assisted Specification Generation [70%]│
+│     │   │   │   │       │   │   ├── ○ Property-Based Testing with Hypothesis and LLM-Assisted Property Generation [80%]│
+│     │   │   │   │       │   │   ├── ○ Fuzzing with AFL++ and LLM-Assisted Seed Generation [75%]│
+│     │   │   │   │       │   │   └── ○ Static Analysis with Semgrep and LLM-Assisted Rule Generation [80%]│
+│     │   │   │   │       │   ├── ○ Fuzzing with AFL++ and CodeT5+ Assisted Seed Generation [50%]│
+│     │   │   │   │       │   │   ├── ○ Symbolic Execution with KLEE and LLM-Guided Constraint Solving [60%]│
+│     │   │   │   │       │   │   ├── ○ Property-Based Testing with Hypothesis and CodeT5+ for Test Case Generation [70%]│
+│     │   │   │   │       │   │   ├── ○ Static Analysis with Semgrep and LLM-Based Rule Generation [80%]│
+│     │   │   │   │       │   │   └── ○ Hybrid Fuzzing with AFL++ and Symbolic Execution with Triton [50%]│
+│     │   │   │   │       │   └── ○ Static Analysis with Semgrep and CodeT5+ Assisted Rule Generation [50%]│
+│     │   │   │   │       │       ├── ○ Dynamic Symbolic Execution with KLEE and LLM-Guided Test Case Generation [70%]│
+│     │   │   │   │       │       ├── ○ Fuzzing with AFL++ and LLM-Based Seed Generation [80%]│
+│     │   │   │   │       │       ├── ○ Formal Verification with TLA+ and LLM-Assisted Specification Generation [50%]│
+│     │   │   │   │       │       └── ○ Hybrid Approach: Semgrep + CodeQL with LLM-Driven Query Refinement [70%]│
+│     │   │   │   │       ├── ✗ Static Analysis with Semgrep and Custom Rules [45%]│
+│     │   │   │   │       └── ✗ Differential Fuzzing with AFL++ and LibAFL [40%]│
+│     │   │   │   ├── ○ Property-Based Testing with Hypothesis and CodeT5+ Assisted Synthesis [70%]│
+│     │   │   │   │   ├── ○ Formal Verification with Dafny and CodeT5+ Assisted Synthesis [50%]│
+│     │   │   │   │   │   ├── ✗ Formal Verification with Dafny and CodeT5+ Assisted Synthesis (Refined) [35%]│
+│     │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and CodeT5+ [60%]│
+│     │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and CodeT5+ [70%]│
+│     │   │   │   │   │   │   │   ├── ○ Formal Verification with Dafny and CodeT5+ (Iterative Refinement) [70%]│
+│     │   │   │   │   │   │   │   ├── ○ Property-Based Testing with Hypothesis and CodeT5+ [80%]│
+│     │   │   │   │   │   │   │   ├── ○ Symbolic Execution with Z3 and CodeT5+ [60%]│
+│     │   │   │   │   │   │   │   └── ○ Reinforcement Learning for Code Generation and Testing [50%]│
+│     │   │   │   │   │   │   ├── ○ Symbolic Execution with KLEE and CodeT5+ [60%]│
+│     │   │   │   │   │   │   ├── ✗ Reinforcement Learning with CodeT5+ and Test-Driven Development [30%]│
+│     │   │   │   │   │   │   └── ○ Constraint Solving with Z3 and CodeT5+ [60%]│
+│     │   │   │   │   │   ├── ✗ Symbolic Execution with KLEE and CodeT5+ [30%]│
+│     │   │   │   │   │   └── ✗ Reinforcement Learning for Code Generation with Test-Driven Development [20%]│
+│     │   │   │   │   ├── ✗ Symbolic Execution with KLEE and CodeT5+ Assisted Synthesis [30%]│
+│     │   │   │   │   ├── ✗ Fuzzing with AFL++ and CodeT5+ Assisted Synthesis [40%]│
+│     │   │   │   │   └── ✗ Reinforcement Learning for Code Improvement with CodeT5+ as Initial Policy [40%]│
+│     │   │   │   ├── ○ CodeT5+ with Retrieval-Augmented Generation and Unit Testing [55%]│
+│     │   │   │   │   ├── ○ CodeT5+ with RAG, Property-Based Testing, and Formal Verification [60%]│
+│     │   │   │   │   │   ├── ○ CodeT5+ with RAG, Property-Based Testing, and Formal Verification [80%]│
+│     │   │   │   │   │   │   ├── ○ CodeT5+ with RAG, Property-Based Testing, and Formal Verification (Optimized for Speed) [70%]│
+│     │   │   │   │   │   │   ├── ✗ CodeT5+ with Evolutionary Algorithm and Fuzzing [40%]│
+│     │   │   │   │   │   │   ├── ○ CodeT5+ with Human-in-the-Loop Refinement and Static Analysis [60%]│
+│     │   │   │   │   │   │   └── ✗ CodeT5+ with Formal Verification and Refinement Types [30%]│
+│     │   │   │   │   │   ├── ○ CodeT5+ with Few-Shot Learning and Human-in-the-Loop Refinement [70%]│
+│     │   │   │   │   │   ├── ✗ CodeT5+ with Reinforcement Learning from Code Execution [25%]│
+│     │   │   │   │   │   └── ✗ CodeT5+ with Program Synthesis using Deductive Reasoning [30%]│
+│     │   │   │   │   ├── ✗ CodeT5+ with Evolutionary Algorithm and Test Case Generation [30%]│
+│     │   │   │   │   ├── ○ CodeT5+ with Program Synthesis and SMT Solving [50%]│
+│     │   │   │   │   │   ├── ✗ CodeT5+ with Program Synthesis, SMT Solving, and Unit Test Feedback [40%]│
+│     │   │   │   │   │   ├── ○ CodeT5+ with Retrieval-Augmented Generation and Code Search [65%]│
+│     │   │   │   │   │   │   ├── ○ CodeT5+ with Formal Verification using Z3 [70%]│
+│     │   │   │   │   │   │   ├── ○ CodeT5+ with Test-Driven Generation and Mutation Testing [60%]│
+│     │   │   │   │   │   │   ├── ○ CodeT5+ with Iterative Refinement and Human-in-the-Loop Feedback [60%]│
+│     │   │   │   │   │   │   └── ✗ CodeT5+ with Program Synthesis using Rosette [30%]│
+│     │   │   │   │   │   ├── ○ Iterative Refinement with Human-in-the-Loop Feedback [70%]│
+│     │   │   │   │   │   └── ✗ Formal Specification Generation from Natural Language with CodeT5+ and Refinement [45%]│
+│     │   │   │   │   └── ✗ CodeT5+ with Reinforcement Learning and Code Coverage Feedback [40%]│
+│     │   │   │   └── ✗ CodeT5+ with Evolutionary Algorithm and Unit Testing [45%]│
+│     │   │   ├── ○ Test-Driven Development with CodeT5+ and Property-Based Testing [60%]│
+│     │   │   │   ├── ○ Test-Driven Development with CodeT5+ and Property-Based Testing (Refined) [68%]│
+│     │   │   │   ├── ○ Behavior-Driven Development with Cucumber and CodeT5+ [50%]│
+│     │   │   │   ├── ✗ Formal Verification with TLA+ and CodeT5+ [30%]│
+│     │   │   │   └── ✗ Reinforcement Learning for Code Generation and Testing [25%]│
+│     │   │   ├── ✗ Reinforcement Learning for Code Generation with Execution Feedback [25%]│
+│     │   │   └── ✗ Constraint Programming with MiniZinc and CodeT5+ Assisted Modeling [45%]│
+│     │   ├── ○ Constraint-Based Code Generation with Rosette and CodeT5+ [55%]│
+│     │   └── ○ Multi-Agent Code Generation with CodeT5+, GPT-4, and Ensemble Learning [60%]│
+│     ├── ○ Iterative Refinement with CodeT5+ and Static Analysis [55%]│
+│     │   ├── ✗ Formal Verification with Dafny and CodeT5+ [45%]   │
+│     │   ├── ✗ Property-Based Testing with Hypothesis and CodeT5+ [50%]│
+│     │   ├── ✗ Symbolic Execution with KLEE and CodeT5+ [35%]     │
+│     │   └── ✗ Reinforcement Learning for Code Improvement with PPO and CodeT5+ [40%]│
+│     ├── ✗ Constraint Programming with MiniZinc and CodeT5+ for Problem Modeling [40%]│
+│     └── ✗ Reinforcement Learning with CodeT5+ for Code Completion and Refinement [30%]│
+└────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────┐
+│                      SELECTED VARIANTS                         │
+└────────────────────────────────────────────────────────────────┘
+
+══════════════════════════════════════════════════════════════════════
+★ Contextual Code Generation with Human-in-the-Loop Refinement [Score: 90%]
+──────────────────────────────────────────────────────────────────────
+Approach: This approach involves a human developer in the code generation process. CodeT5+ generates code, which is then reviewed and refined by a human. The human provides feedback to the system, which is used to improve the code generation process.
+Complexity: complex
+
+Technologies:
+  • Python 3.11
+  • CodeT5+ 770M
+  • PostgreSQL 16 with pgvector extension
+  • VSCode Extension API
+  • React (for the VSCode extension UI)
+
+Key Challenges:
+  ⚠ Obtaining high-quality feedback from human developers can be challenging.
+    → Provide clear and concise instructions to the developers. Offer incentives for providing detailed and helpful feedback. Use a structured feedback form to ensure consistency.
+  ⚠ Integrating human feedback into the code generation process can be difficult.
+    → Use machine learning techniques to analyze the human feedback and identify patterns. Train the code generation model on the human feedback to improve its performance.
+  ⚠ Maintaining consistency between the generated code and the human-refined code can be challenging.
+    → Use version control to track changes to the code. Implement a code review process to ensure that the human-refined code meets the required standards.
+
+Limitations:
+  ✗ The quality of the generated code depends on the expertise and availability of human developers.
+  ✗ The human-in-the-loop process can be time-consuming and expensive.
+  ✗ The system may not be able to learn from human feedback effectively if the feedback is inconsistent or incomplete.
+
+Data Flow: Input -> CodeT5+ (with RAG) -> Generated Code -> Human Review and Refinement (VSCode Extension) -> Feedback Collection -> Prompt Refinement -> CodeT5+ (with RAG) -> Output
+
+Decisions:
+  - Use CodeT5+ for initial code generation.
+  - Create a vector database to store relevant code snippets, documentation, and examples.
+  - Use semantic search to find relevant information in the vector database.
+  - Augment the code generation prompt with the retrieved information.
+  - Use PostgreSQL 16 with pgvector for the vector database.
+  - Present the generated code to a human developer for review and refinement.
+  - Collect feedback from the human developer and use it to improve the code generation process.
+  - Implement a VSCode extension for seamless integration with the development environment.
+
+Pros:
+  + Improved code quality through human expertise and judgment.
+  + Flexibility to handle complex or ambiguous requirements.
+
+Cons:
+  - Increased cost and time compared to fully automated approaches.
+  - Reliance on human availability and expertise.
+
+Path: Root → Test-Driven Development with CodeT5+ and Fuzzing → Test-Driven Development with CodeT5+, Fuzzing, and Formal Verification → Iterative Refinement with Human-in-the-Loop and Program Synthesis → Test-Driven Development with Property-Based Testing → Formal Verification with SMT Solver → Property-Based Testing with Hypothesis and Code Generation → Contextual Code Generation with Retrieval-Augmented Generation (RAG) → Contextual Code Generation with Human-in-the-Loop Refinement
+
+══════════════════════════════════════════════════════════════════════
+★ Static Analysis with SonarQube and Custom Rules [Score: 90%]
+──────────────────────────────────────────────────────────────────────
+Approach: This approach uses static analysis with SonarQube to identify potential bugs, code smells, and security vulnerabilities in the code. Custom rules are defined to enforce specific coding standards and best practices. A VSCode extension provides real-time feedback on static analysis results.
+Complexity: moderate
+
+Technologies:
+  • Java 17 (for SonarQube server)
+  • SonarQube 10.x
+  • SonarLint (VSCode extension)
+  • Custom SonarQube Rules (written in Java)
+  • Supported languages: Python, C#, Java, JavaScript, etc.
+
+Key Challenges:
+  ⚠ Defining effective custom rules requires a deep understanding of the codebase and potential vulnerabilities.
+    → Involve experienced developers and security experts in the rule definition process. Use code examples and documentation to illustrate the purpose and impact of each rule. Consider using LLMs to suggest custom rules based on code patterns and security best practices (but without claiming 100% accuracy).
+  ⚠ SonarQube can generate a large number of false positives, which can be distracting and time-consuming to analyze.
+    → Fine-tune SonarQube's configuration to reduce the number of false positives. Use SonarQube's issue management features to track and resolve issues. Provide training to developers on how to interpret and address SonarQube's findings.
+  ⚠ Static analysis might not find all bugs, especially bugs that are triggered by runtime conditions or complex interactions between components.
+    → Combine static analysis with other testing techniques, such as unit testing and integration testing. Use dynamic analysis tools to complement static analysis. Regularly review and update SonarQube's rules to address new vulnerabilities and coding standards.
+
+Limitations:
+  ✗ Cannot guarantee that all bugs will be found.
+  ✗ Requires developers to define custom rules and analyze SonarQube results.
+  ✗ Can generate false positives.
+  ✗ Limited support for analyzing code that interacts with external systems.
+
+Data Flow: Code -> SonarQube Scanner -> SonarQube Server (Static Analysis) -> VSCode Extension (Analysis Results)
+
+Decisions:
+  - Use SonarQube for static analysis.
+  - Define custom rules to enforce specific coding standards and best practices.
+  - Integrate SonarQube results into a VSCode extension.
+  - Regularly update SonarQube and custom rules to address new vulnerabilities and coding standards.
+
+Pros:
+  + Can identify potential bugs, code smells, and security vulnerabilities early in the development process.
+  + Enforces coding standards and best practices.
+  + Improves code quality and maintainability.
+
+Cons:
+  - Requires developers to define custom rules and analyze SonarQube results.
+  - Can generate false positives.
+  - Cannot guarantee that all bugs will be found.
+
+Path: Root → Test-Driven Development with CodeT5+ and Fuzzing → Iterative Refinement with CodeT5+, Human-in-the-Loop, and Active Learning → Formal Verification with Z3 and CodeT5+ Assisted Synthesis → Formal Verification with Z3 and CodeT5+ Assisted Synthesis (Optimized for Performance) → Formal Verification with Z3 and CodeT5+ Assisted Synthesis (Optimized for Performance) → Fuzzing with AFL++ and CodeT5+ Assisted Seed Generation → Symbolic Execution with Z3 and LLVM IR → Static Analysis with SonarQube and Custom Rules
+
+══════════════════════════════════════════════════════════════════════
+★ Static Analysis with Semgrep and CodeT5+ Assisted Rule Generation [Score: 90%]
+──────────────────────────────────────────────────────────────────────
+Approach: This approach uses static analysis with Semgrep to identify potential security vulnerabilities and code quality issues. CodeT5+ is used to generate initial Semgrep rules based on the code and problem description. The VSCode extension displays the results and allows users to customize the rules.
+Complexity: moderate
+
+Technologies:
+  • Python 3.11 (for VSCode extension)
+  • CodeT5+ 770M
+  • Semgrep 1.30
+  • VSCode
+
+Key Challenges:
+  ⚠ Static analysis can produce false positives, requiring manual review of the results.
+    → Use CodeT5+ to generate high-quality Semgrep rules that minimize false positives. Allow users to customize the rules and suppress false positives.
+  ⚠ Generating effective Semgrep rules is difficult, especially for complex code patterns.
+    → Use CodeT5+ fine-tuned on a dataset of code and corresponding Semgrep rules. Implement a feedback loop where user feedback reinforces CodeT5+'s learning.
+  ⚠ Semgrep requires a good understanding of code patterns and security vulnerabilities.
+    → Provide extensive documentation and tutorials within the VSCode extension. Offer CodeT5+ generated examples and explanations of Semgrep syntax and semantics.
+
+Limitations:
+  ✗ Cannot find all security vulnerabilities or code quality issues.
+  ✗ Static analysis is limited by the expressiveness of the Semgrep rule language.
+  ✗ False positives can require significant manual review.
+
+Data Flow: Code + Problem Description -> CodeT5+ -> Semgrep Rules -> Semgrep Analyzer -> Vulnerabilities + Code Quality Issues -> VSCode Extension
+
+Decisions:
+  - Use Semgrep for static analysis.
+  - Employ CodeT5+ to suggest Semgrep rules.
+  - Integrate Semgrep results into the VSCode extension.
+  - Use Semgrep's support for custom rules to tailor the analysis to specific needs.
+
+Pros:
+  + Can find a wide range of security vulnerabilities and code quality issues automatically.
+  + Requires less manual effort than other verification techniques.
+  + Semgrep is fast and scalable.
+
+Cons:
+  - Cannot guarantee that all vulnerabilities will be found.
+  - False positives can require significant manual review.
+  - Limited to code patterns that can be expressed in Semgrep rules.
+
+Path: Root → Test-Driven Development with CodeT5+ and Fuzzing → Iterative Refinement with CodeT5+, Human-in-the-Loop, and Active Learning → Formal Verification with Z3 and CodeT5+ Assisted Synthesis → Formal Verification with Z3 and CodeT5+ Assisted Synthesis (Optimized for Performance) → Formal Verification with Z3 and CodeT5+ Assisted Synthesis (Optimized for Performance) → Fuzzing with AFL++ and CodeT5+ Assisted Seed Generation → Property-Based Testing with Hypothesis and CodeT5+ Assisted Test Case Generation → Static Analysis with Semgrep and CodeT5+ Assisted Rule Generation
+
+══════════════════════════════════════════════════════════════════════
+★ Runtime Verification with Contracts and CodeT5+ [Score: 90%]
+──────────────────────────────────────────────────────────────────────
+Approach: This approach uses runtime verification with contracts to check that the generated code satisfies specified conditions during execution. CodeT5+ generates the code, and contracts (preconditions, postconditions, and invariants) are added to the code to check for violations at runtime.
+Complexity: moderate
+
+Technologies:
+  • Python 3.11
+  • CodeT5+ 770M
+  • A Python library for contracts (e.g., `deal` or `icontract`)
+  • VSCode
+  • pytest
+
+Key Challenges:
+  ⚠ Adding contracts to the code can be time-consuming and requires understanding of the code's behavior.
+    → Provide templates and examples for common contracts. Develop tools to automatically suggest contracts based on code comments or function signatures. Encourage developers to write contracts before writing code.
+  ⚠ Runtime verification can add overhead to the execution time.
+    → Optimize the contracts and the runtime verification library. Use conditional compilation to disable contracts in production environments. Profile the code to identify performance bottlenecks.
+  ⚠ Contracts may not cover all possible errors.
+    → Combine runtime verification with other testing techniques, such as unit testing and integration testing. Continuously refine the contracts based on feedback from testing.
+
+Limitations:
+  ✗ Only detects errors that occur during execution.
+  ✗ Requires effort to add contracts to the code.
+  ✗ Can add overhead to the execution time.
+
+Data Flow: Input -> CodeT5+ -> Python Code -> Contract Insertion -> Instrumented Code -> Execution -> Contract Violation Detection -> Error Report -> VSCode Extension
+
+Decisions:
+  - Use contracts (preconditions, postconditions, invariants) for runtime verification.
+  - Add contracts to the generated code.
+  - Check for contract violations at runtime.
+  - Integrate runtime verification with VSCode for easy debugging.
+
+Pros:
+  + Detects errors at runtime.
+  + Can provide more informative error messages than traditional testing.
+
+Cons:
+  - Only detects errors that occur during execution.
+  - Can add overhead to the execution time.
+
+Path: Root → Test-Driven Development with CodeT5+ and Fuzzing → Iterative Refinement with CodeT5+, Human-in-the-Loop, and Active Learning → Formal Verification with Z3 and CodeT5+ Assisted Synthesis → Formal Verification with Z3 and CodeT5+ Assisted Synthesis (Optimized for Performance) → Property-Based Testing with Hypothesis and CodeT5+ Assisted Test Generation → Mutation Testing with Stryker and CodeT5+ Assisted Mutant Generation → Symbolic Execution Guided Code Generation and Verification → Runtime Verification with Contracts and CodeT5+
+
+══════════════════════════════════════════════════════════════════════
+★ Static Analysis with SonarQube and CodeT5+ Assisted Rule Customization [Score: 90%]
+──────────────────────────────────────────────────────────────────────
+Approach: This approach uses static analysis with SonarQube to identify potential bugs and code quality issues. CodeT5+ is used to suggest custom rules based on the code and problem description, tailoring the analysis to the specific project requirements. The VSCode extension provides an interface for viewing SonarQube results and customizing the analysis rules.
+Complexity: moderate
+
+Technologies:
+  • Java 17
+  • SonarQube 10.3
+  • SonarLint 10.3
+  • CodeT5+ 770M
+  • VSCode 1.85
+
+Key Challenges:
+  ⚠ False positives in static analysis results.
+    → Customize the SonarQube rules to reduce the number of false positives. Use CodeT5+ to suggest rules that are specific to the project's codebase and coding style.
+  ⚠ Ensuring that the static analysis rules are comprehensive and cover all potential issues.
+    → Use CodeT5+ to suggest rules that address common vulnerabilities and coding errors. Regularly review and update the rules based on code changes and security threats.
+  ⚠ Integrating SonarQube into the development workflow.
+    → Use SonarLint for real-time analysis in the editor. Automate SonarQube analysis as part of the CI/CD pipeline.
+
+Limitations:
+  ✗ Cannot guarantee full functional correctness, as static analysis is inherently incomplete. May produce false positives. Requires careful configuration of the analysis rules to ensure effectiveness.
+
+Data Flow: Input -> CodeT5+ (initial rule suggestion) -> Developer (rule refinement) -> SonarQube (static analysis) -> SonarLint (real-time analysis) -> Output
+
+Decisions:
+  - Use SonarQube for static analysis.
+  - Employ CodeT5+ to suggest custom SonarQube rules.
+  - Integrate SonarQube results into the VSCode extension.
+  - Use SonarLint for real-time analysis in the editor.
+
+Pros:
+  + Identifies potential bugs and code quality issues early in the development process.
+  + Enforces coding standards and best practices.
+
+Cons:
+  - May produce false positives.
+  - Requires careful configuration of the analysis rules.
+
+Path: Root → Test-Driven Development with CodeT5+ and Fuzzing → Iterative Refinement with CodeT5+, Human-in-the-Loop, and Active Learning → Formal Verification with Z3 and CodeT5+ Assisted Synthesis → Formal Verification with Z3 and CodeT5+ Assisted Synthesis (Optimized for Performance) → Fuzzing with AFL++ and CodeT5+ Assisted Seed Generation → Property-Based Testing with Hypothesis and CodeT5+ Assisted Test Case Generation → Formal Verification with Dafny and CodeT5+ Assisted Specification Generation → Static Analysis with SonarQube and CodeT5+ Assisted Rule Customization
+
+══════════════════════════════════════════════════════════════════════
+★ Iterative Code Generation with Human-in-the-Loop Refinement and Unit Testing [Score: 90%]
+──────────────────────────────────────────────────────────────────────
+Approach: This approach focuses on an iterative process where CodeT5+ generates code, developers review and refine it, and unit tests are written and executed. The process repeats until the code meets the required quality standards. A VSCode extension facilitates the interaction between the developer, the code generation model, and the testing framework.
+Complexity: complex
+
+Technologies:
+  • Python 3.11
+  • CodeT5+ 770M
+  • pytest
+  • Coverage.py
+  • PostgreSQL 16
+  • VSCode Extension API
+
+Key Challenges:
+  ⚠ Ensuring consistent code quality across multiple developers can be challenging.
+    → Establish clear coding standards and guidelines. Use code linters and static analysis tools to enforce these standards. Conduct regular code reviews to identify and address potential issues.
+  ⚠ The iterative refinement process can be time-consuming and expensive.
+    → Optimize the code generation process to reduce the amount of manual refinement required. Provide developers with tools and resources to help them quickly identify and fix issues.
+  ⚠ Maintaining a comprehensive and up-to-date unit test suite can be difficult.
+    → Enforce a strict test-driven development process. Use code coverage tools to identify areas that are not adequately tested. Automate the process of generating and running unit tests.
+
+Limitations:
+  ✗ The quality of the generated code is heavily dependent on the skills and experience of the developers.
+  ✗ The iterative refinement process can be time-consuming and expensive.
+  ✗ This approach may not be suitable for projects with tight deadlines or limited resources.
+
+Data Flow: Requirements -> CodeT5+ -> Code -> Developer Review/Edit -> Unit Tests -> Execution -> Code Quality Metrics -> Iteration
+
+Decisions:
+  - Use CodeT5+ for initial code generation.
+  - Implement a VSCode extension that allows developers to easily review, edit, and test the generated code.
+  - Enforce a strict unit testing process.
+  - Use code coverage tools to ensure that the unit tests cover all critical code paths.
+  - Track code quality metrics (e.g., cyclomatic complexity, code duplication) to identify areas for improvement.
+
+Pros:
+  + Leverages the expertise of human developers to ensure code quality.
+  + Allows for flexibility and adaptability to changing requirements.
+
+Cons:
+  - Can be more time-consuming and expensive than fully automated approaches.
+  - Requires a skilled and experienced development team.
+
+Path: Root → Test-Driven Development with CodeT5+ and Fuzzing → Test-Driven Development with CodeT5+, Fuzzing, and Formal Verification → Iterative Refinement with Human-in-the-Loop and Program Synthesis → Formal Verification Guided Code Generation → Property-Based Testing Guided Code Generation → Property-Based Testing Guided Code Generation with Formal Verification → Iterative Code Generation with Static Analysis and Mutation Testing → Formal Verification Guided Code Generation → Iterative Code Generation with Human-in-the-Loop Refinement and Unit Testing
+
+══════════════════════════════════════════════════════════════════════
+★ Sketch-Based Code Generation with LLM Completion [Score: 90%]
+──────────────────────────────────────────────────────────────────────
+Approach: This approach combines human-provided code sketches with LLM-based code completion. The user provides a partial code structure (a 'sketch') outlining the key components and logic. The LLM then fills in the missing details, generating complete code based on the sketch and the surrounding context. The VSCode extension provides an interface for creating and editing sketches, and for invoking the LLM to complete the code.
+Complexity: moderate
+
+Technologies:
+  • Python 3.11
+  • CodeT5+ 770M
+  • VSCode Extension API
+  • Abstract Syntax Tree (AST) parsing for sketch analysis
+  • JSON Schema for defining sketch structure (optional)
+
+Key Challenges:
+  ⚠ Creating effective code sketches requires some programming knowledge and design skills.
+    → Provide examples of good code sketches in the VSCode extension. Offer templates for common programming patterns. Use the LLM to suggest sketch improvements.
+  ⚠ The LLM may generate code that is inconsistent with the sketch or that introduces errors.
+    → Use static analysis to check the generated code for consistency and errors. Provide feedback to the LLM based on the analysis results. Allow users to review and edit the generated code.
+  ⚠ The LLM's code completion may be limited by the context provided in the sketch.
+    → Allow users to provide additional context, such as comments or documentation. Use a larger LLM with a longer context window. Use techniques like retrieval-augmented generation to provide the LLM with relevant information from external sources.
+
+Limitations:
+  ✗ Requires users to have some programming knowledge and design skills.
+  ✗ The quality of the generated code is dependent on the quality of the sketch.
+  ✗ May not be suitable for generating code for completely novel or complex tasks.
+
+Data Flow: User (Code Sketch) -> LLM (Code Completion) -> Static Analysis (Error Checking) -> User (Code Review & Editing) -> Complete Code
+
+Decisions:
+  - Use code sketches as a starting point for code generation.
+  - Employ an LLM (CodeT5+) to complete the code based on the sketch.
+  - Provide a user-friendly interface in the VSCode extension for creating and editing sketches.
+  - Allow users to provide constraints and hints to guide the LLM's code completion.
+
+Pros:
+  + Combines human expertise with LLM-based code generation.
+  + Provides more control over the generated code compared to purely LLM-based approaches.
+  + Can be used to generate code for a wider range of tasks compared to purely sketch-based approaches.
+
+Cons:
+  - Requires users to create code sketches, which can be time-consuming.
+  - The quality of the generated code is dependent on both the sketch and the LLM.
+  - May require some manual review and editing of the generated code.
+
+Path: Root → Test-Driven Development with CodeT5+ and Fuzzing → Test-Driven Development with CodeT5+, Fuzzing, and Formal Verification → Iterative Refinement with Human-in-the-Loop and Program Synthesis → Formal Verification Guided Code Generation → Formal Verification Guided Code Generation with Symbolic Execution → Iterative Refinement with Unit Test Generation and Mutation Testing → Symbolic Execution Guided Code Generation → Constraint-Based Code Generation with Rosette and LLM-based Constraint Suggestion → Test-Driven Code Generation with Mutation Testing and LLM-based Test Case Generation → Sketch-Based Code Generation with LLM Completion
+
+══════════════════════════════════════════════════════════════════════
+★ Human-in-the-Loop Code Generation with Active Learning [Score: 90%]
+──────────────────────────────────────────────────────────────────────
+Approach: This approach focuses on a human-in-the-loop workflow where CodeT5+ generates code snippets, and a human expert reviews and corrects them. The system uses active learning to identify the most informative code snippets for human review, maximizing the impact of human feedback. The corrected code snippets are then used to fine-tune CodeT5+, improving its future performance. The VSCode extension provides a user interface for reviewing and correcting code snippets.
+Complexity: complex
+
+Technologies:
+  • Python 3.11
+  • CodeT5+ 770M
+  • VSCode extension API
+  • Active Learning Libraries (e.g., modAL)
+  • PostgreSQL 16 (for storing code, feedback, and model versions)
+
+Key Challenges:
+  ⚠ Selecting the most informative code snippets for human review is challenging.
+    → Use uncertainty sampling, query-by-committee, or expected model change strategies to select the most informative code snippets. Experiment with different active learning strategies to find the best one for the specific task.
+  ⚠ Ensuring the quality and consistency of human feedback is crucial.
+    → Provide clear guidelines and training for human reviewers. Implement a mechanism for reviewers to provide feedback on the quality of the generated code and the active learning process. Use inter-rater reliability metrics to assess the consistency of human feedback.
+  ⚠ Fine-tuning CodeT5+ with human feedback can be computationally expensive.
+    → Use techniques such as transfer learning and incremental learning to reduce the computational cost of fine-tuning. Implement a mechanism to track the performance of the model over time and identify when fine-tuning is necessary.
+
+Limitations:
+  ✗ The effectiveness of this approach depends on the quality and quantity of human feedback. Requires a human expert to review and correct code snippets. The active learning process can be slow and inefficient if the human expert is not available or if the active learning strategy is not well-tuned.
+
+Data Flow: Input -> CodeT5+ (Code Generation) -> Active Learning (Snippet Selection) -> Human Review (VSCode Extension) -> CodeT5+ (Fine-tuning) -> VSCode Extension
+
+Decisions:
+  - Use CodeT5+ for initial code generation.
+  - Implement an active learning strategy to select the most informative code snippets for human review.
+  - Provide a VSCode extension for reviewing and correcting code snippets.
+  - Use the corrected code snippets to fine-tune CodeT5+.
+
+Pros:
+  + Improved code quality through human review and correction.
+  + Reduced development time through automated code generation and active learning.
+  + Increased model accuracy through fine-tuning with human feedback.
+
+Cons:
+  - Requires a human expert to review and correct code snippets.
+  - The active learning process can be slow and inefficient.
+  - Requires expertise in active learning and human-computer interaction.
+
+Path: Root → Test-Driven Development with CodeT5+ and Fuzzing → Test-Driven Development with CodeT5+, Fuzzing, and Formal Verification → Iterative Refinement with Human-in-the-Loop and Program Synthesis → Formal Verification Guided Code Generation → Formal Verification Guided Code Generation with Symbolic Execution → Iterative Refinement with Unit Test Generation and Mutation Testing → Property-Based Testing with Hypothesis → Symbolic Execution with Angr → Database-Backed Contextual Code Generation and Retrieval → Human-in-the-Loop Code Generation with Active Learning
+
+══════════════════════════════════════════════════════════════════════
+★ Human-in-the-Loop Code Generation with Interactive Refinement [Score: 90%]
+──────────────────────────────────────────────────────────────────────
+Approach: This approach combines the strengths of large language models with human expertise by allowing developers to interactively refine the generated code. The agent generates initial code, presents it to the developer for review, and incorporates the developer's feedback to improve the code.
+Complexity: moderate
+
+Technologies:
+  • Python 3.11
+  • CodeT5+ 770M
+  • VSCode Extension API
+  • Myers diff algorithm
+  • WebSockets for real-time communication
+
+Key Challenges:
+  ⚠ Effectively incorporating developer feedback into the code generation process is crucial for the success of this approach.
+    → Use a combination of techniques like reinforcement learning and supervised learning to train CodeT5+ to generate code that is more likely to be accepted by developers. Implement a mechanism to track the reasons why developers make changes to the generated code.
+  ⚠ Maintaining consistency between the generated code and the developer's changes can be challenging.
+    → Use a version control system (e.g., Git) to track the changes made to the code. Implement a mechanism to automatically merge the developer's changes with the generated code.
+  ⚠ Providing a seamless and intuitive user experience is essential for encouraging developers to use this approach.
+    → Design a VSCode extension that is easy to use and provides helpful feedback to the developer. Implement features like code completion, syntax highlighting, and error checking.
+
+Limitations:
+  ✗ The quality of the generated code is limited by the expertise and availability of the developers. Requires a significant amount of developer time and effort. May not be suitable for projects with limited developer resources.
+
+Data Flow: CodeT5+ -> Generated Code -> VSCode -> Developer Feedback -> (Feedback to CodeT5+)
+
+Decisions:
+  - Use CodeT5+ 770M as the initial code generator.
+  - Implement a VSCode extension that allows developers to view and edit the generated code.
+  - Use a diffing algorithm (e.g., Myers diff algorithm) to track the changes made by the developer.
+  - Fine-tune CodeT5+ on a dataset of code examples that have been refined by developers.
+
+Pros:
+  + Can generate high-quality code that meets the specific needs of the project.
+  + Leverages human expertise to improve code quality and maintainability.
+
+Cons:
+  - Requires significant developer time and effort.
+  - The quality of the generated code is dependent on the expertise of the developers.
+  - Can be more expensive than purely automated approaches.
+
+Path: Root → Test-Driven Development with CodeT5+ and Fuzzing → Test-Driven Development with CodeT5+, Fuzzing, and Formal Verification → Iterative Refinement with Human-in-the-Loop and Program Synthesis → Formal Verification Guided Code Generation → Formal Verification Guided Code Generation with Symbolic Execution → Iterative Refinement with Unit Test Generation and Mutation Testing → Retrieval-Augmented Code Generation with Vector Database → Formal Verification Augmented Code Generation → Reinforcement Learning for Code Generation with Reward Shaping → Human-in-the-Loop Code Generation with Interactive Refinement
+
+══════════════════════════════════════════════════════════════════════
+★ Fuzzing with AFL++ and LLM-Assisted Seed Generation [Score: 90%]
+──────────────────────────────────────────────────────────────────────
+Approach: This approach uses AFL++, a coverage-guided fuzzer, to automatically generate test inputs that trigger crashes or other unexpected behavior in the code. A fine-tuned CodeT5+ 770M model assists in generating initial seed inputs for the fuzzer, based on code structure and potential vulnerabilities. The system then uses AFL++ to mutate these seed inputs and execute the code, monitoring for crashes and other errors. A VSCode extension provides an interface for configuring and running AFL++ and visualizing the fuzzing results.
+Complexity: complex
+
+Technologies:
+  • Python 3.11
+  • CodeT5+ 770M
+  • AFL++ (Coverage-Guided Fuzzer)
+  • VSCode Extension API
+
+Key Challenges:
+  ⚠ Fuzzing can be computationally expensive and may require significant resources to run effectively.
+    → Use a distributed fuzzing infrastructure to parallelize the fuzzing process. Employ techniques like input prioritization and energy scheduling to focus fuzzing efforts on the most promising areas of the code.
+  ⚠ Generating effective seed inputs that cover a wide range of code paths is crucial for the success of fuzzing.
+    → Fine-tune the CodeT5+ model on a dataset of code examples and known vulnerabilities. Use static analysis techniques to identify potential areas of interest for fuzzing.
+
+Limitations:
+  ✗ Cannot guarantee that all possible vulnerabilities will be found by fuzzing. Fuzzing relies on random mutation, which may not explore all possible input combinations.
+  ✗ Fuzzing may not be suitable for code that requires specific input formats or protocols.
+  ✗ The effectiveness of the seed input generation depends on the quality of the training data and the LLM's ability to generalize.
+
+Data Flow: Code -> CodeT5+ (Seed Input Generation) -> AFL++ (Fuzzing) -> VSCode Extension (Visualization)
+
+Decisions:
+  - Use AFL++ for fuzzing.
+  - Employ a fine-tuned CodeT5+ 770M model to generate initial seed inputs for the fuzzer.
+  - Integrate AFL++ and the LLM into the development workflow using the VSCode extension API.
+  - Use Python 3.11 for scripting and integration.
+
+Pros:
+  + Can automatically discover a wide range of vulnerabilities, including memory corruption errors, buffer overflows, and denial-of-service attacks.
+  + Requires minimal human effort to set up and run.
+
+Cons:
+  - Can be computationally expensive and may require significant resources.
+  - May not be suitable for all types of code.
+
+Path: Root → Test-Driven Development with CodeT5+ and Fuzzing → Test-Driven Development with CodeT5+, Fuzzing, and Formal Verification → Iterative Refinement with Human-in-the-Loop and Program Synthesis → Formal Verification Guided Code Generation → Formal Verification Guided Code Generation with Symbolic Execution → Iterative Refinement with Unit Test Generation and Mutation Testing → Symbolic Execution Guided Code Generation → Formal Verification with Dafny and LLM-based Suggestion → Property-Based Testing with Hypothesis and LLM-based Test Case Generation → Mutation Testing with Stryker and LLM-Assisted Mutant Generation → Fuzzing with AFL++ and LLM-Assisted Seed Generation
+
+═══════════════════════════════════════════════════════════════════
+                              DONE                                  
+═══════════════════════════════════════════════════════════════════

@@ -100,6 +100,65 @@ export interface TransformResult {
 }
 
 // =============================================================================
+// Streaming Types
+// =============================================================================
+
+/**
+ * A chunk of streamed content.
+ */
+export interface StreamChunk {
+  /**
+   * The content fragment.
+   */
+  content: string;
+
+  /**
+   * Whether this is the final chunk.
+   */
+  done: boolean;
+
+  /**
+   * Tokens generated so far (optional, may not be available during streaming).
+   */
+  tokens_so_far?: number;
+
+  /**
+   * Index of this chunk in the stream.
+   */
+  index: number;
+}
+
+/**
+ * Final result after stream completes.
+ */
+export interface StreamResult extends TransformResult {
+  /**
+   * Total number of chunks streamed.
+   */
+  total_chunks: number;
+
+  /**
+   * Time to first chunk in milliseconds.
+   */
+  time_to_first_chunk_ms: number;
+}
+
+/**
+ * Stream event types.
+ */
+export type StreamEventType = 'chunk' | 'error' | 'done';
+
+/**
+ * Stream event.
+ */
+export interface StreamEvent {
+  type: StreamEventType;
+  chunk?: StreamChunk;
+  error?: Error;
+  result?: StreamResult;
+}
+
+// =============================================================================
 // Capability Types
 // =============================================================================
 
@@ -224,6 +283,100 @@ export interface ModelAdapter {
    * Implementations should flush any pending state.
    */
   shutdown(): Promise<void>;
+}
+
+/**
+ * Interface for adapters that support streaming.
+ */
+export interface StreamingModelAdapter extends ModelAdapter {
+  /**
+   * Transform content with streaming response.
+   *
+   * @param prompt - The prompt to send to the model
+   * @param context - Execution context for audit and determinism
+   * @returns AsyncGenerator yielding stream chunks
+   */
+  transformStream(
+    prompt: string,
+    context: TransformContext
+  ): AsyncGenerator<StreamChunk, StreamResult, undefined>;
+}
+
+/**
+ * Type guard to check if adapter supports streaming.
+ */
+export function isStreamingAdapter(
+  adapter: ModelAdapter
+): adapter is StreamingModelAdapter {
+  return (
+    adapter.capabilities.supports_streaming &&
+    'transformStream' in adapter &&
+    typeof (adapter as StreamingModelAdapter).transformStream === 'function'
+  );
+}
+
+/**
+ * Helper to collect a stream into a full result.
+ */
+export async function collectStream(
+  stream: AsyncGenerator<StreamChunk, StreamResult, undefined>
+): Promise<StreamResult> {
+  let result: StreamResult | undefined;
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  for await (const _chunk of stream) {
+    // Consume all chunks
+  }
+
+  // The return value comes after iteration
+  const final = await stream.next();
+  if (final.done && final.value) {
+    result = final.value;
+  }
+
+  if (!result) {
+    throw new Error('Stream did not return a result');
+  }
+
+  return result;
+}
+
+/**
+ * Convert a non-streaming transform to streaming (simulated).
+ * Useful for adapters that don't natively support streaming.
+ */
+export async function* simulateStream(
+  adapter: ModelAdapter,
+  prompt: string,
+  context: TransformContext
+): AsyncGenerator<StreamChunk, StreamResult, undefined> {
+  const startTime = Date.now();
+
+  // Get the full result
+  const result = await adapter.transform(prompt, context);
+
+  // Simulate streaming by yielding content in chunks
+  const chunkSize = 50; // Characters per chunk
+  const content = result.content;
+  let index = 0;
+
+  for (let i = 0; i < content.length; i += chunkSize) {
+    const chunk = content.slice(i, Math.min(i + chunkSize, content.length));
+    const done = i + chunkSize >= content.length;
+
+    yield {
+      content: chunk,
+      done,
+      index: index++,
+    };
+  }
+
+  // Return final result
+  return {
+    ...result,
+    total_chunks: index,
+    time_to_first_chunk_ms: result.latency_ms, // Since we get full result first
+  };
 }
 
 // =============================================================================

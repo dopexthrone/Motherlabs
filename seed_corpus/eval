@@ -1,0 +1,64 @@
+// seed_corpus/eval
+
+// Example 1: Simple arithmetic expression
+const example1 = "(add 2 3)";
+
+// Example 2: Nested arithmetic expression
+const example2 = "(mul (add 1 2) 3)";
+
+// Example 3: Define a variable and use it
+const example3 = "(let x 5) (add x 2)";
+
+// Example 4: Conditional expression
+const example4 = "(if (> 5 3) (add 1 1) (sub 5 2))";
+
+// Example 5: Function definition and call (if supported)
+const example5 = "(defun square (x) (mul x x)) (square 4)";
+
+// Example 6: More complex nested expression
+const example6 = "(add (mul 2 (sub 5 1)) (div 10 2))";
+
+// Example 7: Simple boolean expression
+const example7 = "(> 5 3)";
+
+// Example 8: Boolean expression with variables
+const example8 = "(let a 10) (let b 5) (> a b)";
+
+// Example 9: String concatenation (if supported)
+const example9 = "(concat \"hello\" \" world\")";
+
+// Example 10: Empty expression
+const example10 = "()";
+
+// Example 11: Expression with negative numbers
+const example11 = "(sub -5 -2)";
+
+// Example 12: Division by zero (should be handled gracefully)
+const example12 = "(div 10 0)";
+
+// Example 13: Large numbers
+const example13 = "(add 1000000 2000000)";
+
+// Example 14: Floating point numbers (if supported)
+const example14 = "(add 2.5 3.7)";
+
+// Example 15: More complex conditional
+const example15 = "(if (= 5 (+ 2 3)) (mul 4 4) (div 16 2))";
+
+export {
+    example1,
+    example2,
+    example3,
+    example4,
+    example5,
+    example6,
+    example7,
+    example8,
+    example9,
+    example10,
+    example11,
+    example12,
+    example13,
+    example14,
+    example15,
+};

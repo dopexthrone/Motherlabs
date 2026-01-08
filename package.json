@@ -35,7 +35,9 @@
     "model-io-verify": "node dist/tools/model_io_verify.js",
     "repo-state": "node dist/tools/repo_state.js",
     "workspace-snapshot": "node dist/tools/workspace_snapshot.js",
-    "runner-verify": "node dist/tools/runner_verify.js"
+    "runner-verify": "node dist/tools/runner_verify.js",
+    "test-generators": "npx tsx tools/test_generators.ts",
+    "deep-explore": "npx tsx tools/deep_explore.ts"
   },
   "keywords": [
     "context-engineering",
@@ -45,6 +47,10 @@
   ],
   "author": "Motherlabs",
   "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "openai": "^4.77.0"
+  },
   "devDependencies": {
     "@types/node": "^20.11.0",
     "typescript": "^5.3.0"
