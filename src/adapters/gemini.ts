@@ -15,11 +15,13 @@
 
 import { createHash } from 'node:crypto';
 import {
-  ModelAdapter,
   ModelCapabilities,
   TransformContext,
   TransformResult,
   AdapterError,
+  StreamChunk,
+  StreamResult,
+  StreamingModelAdapter,
 } from './model.js';
 
 // =============================================================================
@@ -175,9 +177,9 @@ interface GeminiError {
 // =============================================================================
 
 /**
- * Gemini API adapter implementing ModelAdapter interface.
+ * Gemini API adapter implementing StreamingModelAdapter interface.
  */
-export class GeminiAdapter implements ModelAdapter {
+export class GeminiAdapter implements StreamingModelAdapter {
   readonly adapter_id: string;
   readonly model_id: string;
   readonly capabilities: ModelCapabilities;
@@ -291,6 +293,146 @@ export class GeminiAdapter implements ModelAdapter {
         latency_ms,
         model_version: data.modelVersion ?? this.model,
         from_cache: false,
+      };
+    } catch (error) {
+      throw this.mapError(error);
+    }
+  }
+
+  async *transformStream(
+    prompt: string,
+    _context: TransformContext
+  ): AsyncGenerator<StreamChunk, StreamResult, undefined> {
+    if (!this.ready) {
+      throw new AdapterError(
+        'ADAPTER_ERROR',
+        'Adapter not ready - was it shut down?',
+        false
+      );
+    }
+
+    const start_time = performance.now();
+    let first_chunk_time: number | undefined;
+    let total_content = '';
+    let index = 0;
+    let tokens_input = 0;
+    let tokens_output = 0;
+
+    // Use streamGenerateContent endpoint with SSE
+    const url = `${this.base_url}/models/${this.model}:streamGenerateContent?alt=sse&key=${this.api_key}`;
+
+    try {
+      const controller = new AbortController();
+      const timeout_id = setTimeout(
+        () => controller.abort(),
+        this.timeout_ms
+      );
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [{ text: prompt }],
+            },
+          ],
+          generationConfig: {
+            temperature: this.temperature,
+            maxOutputTokens: this.max_output_tokens,
+          },
+        }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeout_id);
+
+      if (!response.ok) {
+        const error_text = await response.text();
+        throw new Error(
+          `Gemini API error ${response.status}: ${error_text}`
+        );
+      }
+
+      if (!response.body) {
+        throw new Error('Response body is null');
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        // Parse SSE events
+        const lines = buffer.split('\n');
+        buffer = lines.pop() ?? ''; // Keep incomplete line in buffer
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data.trim() === '[DONE]') continue;
+
+            try {
+              const parsed = JSON.parse(data) as GeminiResponse;
+
+              // Extract text from response
+              const text = parsed.candidates?.[0]?.content?.parts
+                ?.map((p) => p.text)
+                .filter(Boolean)
+                .join('') ?? '';
+
+              if (text) {
+                if (first_chunk_time === undefined) {
+                  first_chunk_time = performance.now() - start_time;
+                }
+
+                total_content += text;
+
+                yield {
+                  content: text,
+                  done: false,
+                  index: index++,
+                };
+              }
+
+              // Track usage if available
+              if (parsed.usageMetadata) {
+                tokens_input = parsed.usageMetadata.promptTokenCount ?? 0;
+                tokens_output = parsed.usageMetadata.candidatesTokenCount ?? 0;
+              }
+            } catch {
+              // Ignore parse errors for incomplete JSON
+            }
+          }
+        }
+      }
+
+      // Yield final chunk
+      yield {
+        content: '',
+        done: true,
+        tokens_so_far: tokens_output,
+        index: index++,
+      };
+
+      const latency_ms = Math.round(performance.now() - start_time);
+
+      return {
+        content: total_content,
+        tokens_input,
+        tokens_output,
+        latency_ms,
+        model_version: this.model,
+        from_cache: false,
+        total_chunks: index,
+        time_to_first_chunk_ms: Math.round(first_chunk_time ?? latency_ms),
       };
     } catch (error) {
       throw this.mapError(error);

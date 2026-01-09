@@ -27,8 +27,11 @@ import type {
   TransformResult,
   RecordedInteraction,
   RecordingSession,
+  StreamChunk,
+  StreamResult,
+  StreamingModelAdapter,
 } from './model.js';
-import { AdapterError } from './model.js';
+import { AdapterError, isStreamingAdapter } from './model.js';
 
 // =============================================================================
 // Recording Model Adapter Implementation
@@ -52,8 +55,9 @@ export interface RecordingModelAdapterOptions {
 
 /**
  * Model adapter that records all interactions with a delegate adapter.
+ * Supports streaming if the delegate adapter supports streaming.
  */
-export class RecordingModelAdapter implements ModelAdapter {
+export class RecordingModelAdapter implements StreamingModelAdapter {
   readonly adapter_id: string;
   readonly model_id: string;
   readonly capabilities: ModelCapabilities;
@@ -101,6 +105,68 @@ export class RecordingModelAdapter implements ModelAdapter {
     this.interactions.push(interaction);
 
     return result;
+  }
+
+  async *transformStream(
+    prompt: string,
+    context: TransformContext
+  ): AsyncGenerator<StreamChunk, StreamResult, undefined> {
+    // Check if delegate supports streaming
+    if (!isStreamingAdapter(this.delegate)) {
+      throw new AdapterError(
+        'INVALID_REQUEST',
+        'Delegate adapter does not support streaming',
+        false
+      );
+    }
+
+    // Check recording limit
+    if (this.interactions.length >= this.maxInteractions) {
+      throw new AdapterError(
+        'ADAPTER_ERROR',
+        `Recording limit reached (${this.maxInteractions} interactions)`,
+        false
+      );
+    }
+
+    // Collect chunks while streaming through
+    const chunks: StreamChunk[] = [];
+    let streamResult: StreamResult | undefined;
+
+    const stream = this.delegate.transformStream(prompt, context);
+
+    for await (const chunk of stream) {
+      chunks.push(chunk);
+      yield chunk;
+    }
+
+    // Get final result from generator return
+    const final = await stream.next();
+    if (final.done && final.value) {
+      streamResult = final.value;
+    }
+
+    if (!streamResult) {
+      throw new AdapterError(
+        'ADAPTER_ERROR',
+        'Stream did not return a final result',
+        false
+      );
+    }
+
+    // Record interaction with the full result
+    const interaction: RecordedInteraction = {
+      sequence: this.sequence++,
+      prompt_hash: this.hashString(prompt),
+      prompt: this.includePrompts ? prompt : '[REDACTED]',
+      context,
+      result: streamResult,
+      recorded_at: new Date().toISOString(),
+    };
+
+    this.interactions.push(interaction);
+
+    return streamResult;
   }
 
   async isReady(): Promise<boolean> {
@@ -196,8 +262,10 @@ export interface ReplayModelAdapterOptions {
  *
  * Responses are looked up by prompt hash, ensuring deterministic results
  * regardless of timing or network conditions.
+ *
+ * Supports streaming by simulating chunks from recorded content.
  */
-export class ReplayModelAdapter implements ModelAdapter {
+export class ReplayModelAdapter implements StreamingModelAdapter {
   readonly adapter_id: string;
   readonly model_id: string;
   readonly capabilities: ModelCapabilities;
@@ -229,7 +297,7 @@ export class ReplayModelAdapter implements ModelAdapter {
       max_output_tokens: 4096,
       supports_structured_output: true,
       supports_tool_use: false,
-      supports_streaming: false,
+      supports_streaming: true, // Replay can simulate streaming
     };
   }
 
@@ -280,6 +348,46 @@ export class ReplayModelAdapter implements ModelAdapter {
       ...interaction.result,
       latency_ms: 0,
       from_cache: true,
+    };
+  }
+
+  async *transformStream(
+    prompt: string,
+    context: TransformContext
+  ): AsyncGenerator<StreamChunk, StreamResult, undefined> {
+    // Get the full result first
+    const result = await this.transform(prompt, context);
+
+    // Simulate streaming by chunking the content
+    const chunkSize = 50; // Characters per chunk
+    const content = result.content;
+    let index = 0;
+
+    for (let i = 0; i < content.length; i += chunkSize) {
+      const chunk = content.slice(i, Math.min(i + chunkSize, content.length));
+      const done = i + chunkSize >= content.length;
+
+      yield {
+        content: chunk,
+        done,
+        index: index++,
+      };
+    }
+
+    // Yield final empty chunk if content wasn't empty
+    if (content.length > 0) {
+      yield {
+        content: '',
+        done: true,
+        index: index++,
+      };
+    }
+
+    // Return stream result
+    return {
+      ...result,
+      total_chunks: index,
+      time_to_first_chunk_ms: 0, // Instant for replay
     };
   }
 

@@ -14,11 +14,13 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { createHash } from 'node:crypto';
 import {
-  ModelAdapter,
   ModelCapabilities,
   TransformContext,
   TransformResult,
   AdapterError,
+  StreamChunk,
+  StreamResult,
+  StreamingModelAdapter,
 } from './model.js';
 
 // =============================================================================
@@ -136,9 +138,9 @@ export interface ClaudeAdapterOptions {
 // =============================================================================
 
 /**
- * Claude API adapter implementing ModelAdapter interface.
+ * Claude API adapter implementing StreamingModelAdapter interface.
  */
-export class ClaudeAdapter implements ModelAdapter {
+export class ClaudeAdapter implements StreamingModelAdapter {
   readonly adapter_id: string;
   readonly model_id: string;
   readonly capabilities: ModelCapabilities;
@@ -231,6 +233,100 @@ export class ClaudeAdapter implements ModelAdapter {
         latency_ms,
         model_version: response.model,
         from_cache: false,
+      };
+    } catch (error) {
+      throw this.mapError(error);
+    }
+  }
+
+  async *transformStream(
+    prompt: string,
+    context: TransformContext
+  ): AsyncGenerator<StreamChunk, StreamResult, undefined> {
+    if (!this.ready) {
+      throw new AdapterError(
+        'ADAPTER_ERROR',
+        'Adapter not ready - was it shut down?',
+        false
+      );
+    }
+
+    const start_time = performance.now();
+    let first_chunk_time: number | undefined;
+    let total_content = '';
+    let index = 0;
+    let tokens_input = 0;
+    let tokens_output = 0;
+
+    try {
+      const stream = this.client.messages.stream({
+        model: this.model,
+        max_tokens: this.capabilities.max_output_tokens,
+        temperature: this.temperature,
+        messages: [
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        metadata: {
+          user_id: context.intent_id,
+        },
+      });
+
+      for await (const event of stream) {
+        if (event.type === 'content_block_delta') {
+          const delta = event.delta;
+          if ('text' in delta && delta.text) {
+            if (first_chunk_time === undefined) {
+              first_chunk_time = performance.now() - start_time;
+            }
+
+            total_content += delta.text;
+
+            yield {
+              content: delta.text,
+              done: false,
+              index: index++,
+            };
+          }
+        } else if (event.type === 'message_delta') {
+          // Usage info comes in message_delta
+          if ('usage' in event && event.usage) {
+            tokens_output = event.usage.output_tokens ?? 0;
+          }
+        } else if (event.type === 'message_start') {
+          // Input tokens come from message_start
+          if ('message' in event && event.message?.usage) {
+            tokens_input = event.message.usage.input_tokens ?? 0;
+          }
+        }
+      }
+
+      // Get final message for accurate token counts
+      const finalMessage = await stream.finalMessage();
+      tokens_input = finalMessage.usage.input_tokens;
+      tokens_output = finalMessage.usage.output_tokens;
+
+      // Yield final chunk
+      yield {
+        content: '',
+        done: true,
+        tokens_so_far: tokens_output,
+        index: index++,
+      };
+
+      const latency_ms = Math.round(performance.now() - start_time);
+
+      return {
+        content: total_content,
+        tokens_input,
+        tokens_output,
+        latency_ms,
+        model_version: finalMessage.model,
+        from_cache: false,
+        total_chunks: index,
+        time_to_first_chunk_ms: Math.round(first_chunk_time ?? latency_ms),
       };
     } catch (error) {
       throw this.mapError(error);

@@ -321,24 +321,42 @@ export function isStreamingAdapter(
 export async function collectStream(
   stream: AsyncGenerator<StreamChunk, StreamResult, undefined>
 ): Promise<StreamResult> {
-  let result: StreamResult | undefined;
+  let content = '';
+  let totalChunks = 0;
+  let firstChunkTime: number | undefined;
+  const startTime = Date.now();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  for await (const _chunk of stream) {
-    // Consume all chunks
+  // Iterate through all chunks
+  while (true) {
+    const { done, value } = await stream.next();
+
+    if (done) {
+      // Generator returned the final result
+      if (value) {
+        return value;
+      }
+      // If no return value, construct from collected data
+      return {
+        content,
+        tokens_input: 0,
+        tokens_output: 0,
+        latency_ms: Date.now() - startTime,
+        model_version: 'unknown',
+        from_cache: false,
+        total_chunks: totalChunks,
+        time_to_first_chunk_ms: firstChunkTime ?? 0,
+      };
+    }
+
+    // Track chunk data
+    if (value.content) {
+      if (firstChunkTime === undefined) {
+        firstChunkTime = Date.now() - startTime;
+      }
+      content += value.content;
+    }
+    totalChunks++;
   }
-
-  // The return value comes after iteration
-  const final = await stream.next();
-  if (final.done && final.value) {
-    result = final.value;
-  }
-
-  if (!result) {
-    throw new Error('Stream did not return a result');
-  }
-
-  return result;
 }
 
 /**

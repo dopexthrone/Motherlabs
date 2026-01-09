@@ -12,11 +12,13 @@
 
 import { createHash } from 'node:crypto';
 import {
-  ModelAdapter,
   ModelCapabilities,
   TransformContext,
   TransformResult,
   AdapterError,
+  StreamChunk,
+  StreamResult,
+  StreamingModelAdapter,
 } from './model.js';
 
 // =============================================================================
@@ -157,9 +159,9 @@ interface OllamaGenerateResponse {
 // =============================================================================
 
 /**
- * Ollama adapter implementing ModelAdapter interface.
+ * Ollama adapter implementing StreamingModelAdapter interface.
  */
-export class OllamaAdapter implements ModelAdapter {
+export class OllamaAdapter implements StreamingModelAdapter {
   readonly adapter_id: string;
   readonly model_id: string;
   readonly capabilities: ModelCapabilities;
@@ -252,6 +254,132 @@ export class OllamaAdapter implements ModelAdapter {
         latency_ms,
         model_version: data.model,
         from_cache: false,
+      };
+    } catch (error) {
+      throw this.mapError(error);
+    }
+  }
+
+  async *transformStream(
+    prompt: string,
+    _context: TransformContext
+  ): AsyncGenerator<StreamChunk, StreamResult, undefined> {
+    if (!this.ready) {
+      throw new AdapterError(
+        'ADAPTER_ERROR',
+        'Adapter not ready - was it shut down?',
+        false
+      );
+    }
+
+    const start_time = performance.now();
+    let first_chunk_time: number | undefined;
+    let total_content = '';
+    let index = 0;
+    let tokens_input = 0;
+    let tokens_output = 0;
+    let model_version = this.model;
+
+    try {
+      const controller = new AbortController();
+      const timeout_id = setTimeout(
+        () => controller.abort(),
+        this.timeout_ms
+      );
+
+      const response = await fetch(`${this.base_url}/api/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: this.model,
+          prompt,
+          stream: true,
+          options: {
+            temperature: this.temperature,
+            num_predict: this.num_predict,
+          },
+        }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeout_id);
+
+      if (!response.ok) {
+        const error_text = await response.text();
+        throw new Error(`Ollama API error ${response.status}: ${error_text}`);
+      }
+
+      if (!response.body) {
+        throw new Error('Response body is null');
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        // Parse newline-delimited JSON
+        const lines = buffer.split('\n');
+        buffer = lines.pop() ?? ''; // Keep incomplete line in buffer
+
+        for (const line of lines) {
+          if (!line.trim()) continue;
+
+          try {
+            const data = JSON.parse(line) as OllamaGenerateResponse;
+
+            if (data.response) {
+              if (first_chunk_time === undefined) {
+                first_chunk_time = performance.now() - start_time;
+              }
+
+              total_content += data.response;
+
+              yield {
+                content: data.response,
+                done: false,
+                index: index++,
+              };
+            }
+
+            // Track final stats
+            if (data.done) {
+              tokens_input = data.prompt_eval_count ?? 0;
+              tokens_output = data.eval_count ?? 0;
+              model_version = data.model;
+            }
+          } catch {
+            // Ignore parse errors for incomplete JSON
+          }
+        }
+      }
+
+      // Yield final chunk
+      yield {
+        content: '',
+        done: true,
+        tokens_so_far: tokens_output,
+        index: index++,
+      };
+
+      const latency_ms = Math.round(performance.now() - start_time);
+
+      return {
+        content: total_content,
+        tokens_input,
+        tokens_output,
+        latency_ms,
+        model_version,
+        from_cache: false,
+        total_chunks: index,
+        time_to_first_chunk_ms: Math.round(first_chunk_time ?? latency_ms),
       };
     } catch (error) {
       throw this.mapError(error);

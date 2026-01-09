@@ -14,11 +14,13 @@
 import OpenAI from 'openai';
 import { createHash } from 'node:crypto';
 import {
-  ModelAdapter,
   ModelCapabilities,
   TransformContext,
   TransformResult,
   AdapterError,
+  StreamChunk,
+  StreamResult,
+  StreamingModelAdapter,
 } from './model.js';
 
 // =============================================================================
@@ -157,9 +159,9 @@ export interface OpenAIAdapterOptions {
 // =============================================================================
 
 /**
- * OpenAI API adapter implementing ModelAdapter interface.
+ * OpenAI API adapter implementing StreamingModelAdapter interface.
  */
-export class OpenAIAdapter implements ModelAdapter {
+export class OpenAIAdapter implements StreamingModelAdapter {
   readonly adapter_id: string;
   readonly model_id: string;
   readonly capabilities: ModelCapabilities;
@@ -251,6 +253,101 @@ export class OpenAIAdapter implements ModelAdapter {
         latency_ms,
         model_version: response.model,
         from_cache: false,
+      };
+    } catch (error) {
+      throw this.mapError(error);
+    }
+  }
+
+  async *transformStream(
+    prompt: string,
+    context: TransformContext
+  ): AsyncGenerator<StreamChunk, StreamResult, undefined> {
+    if (!this.ready) {
+      throw new AdapterError(
+        'ADAPTER_ERROR',
+        'Adapter not ready - was it shut down?',
+        false
+      );
+    }
+
+    // o1 models don't support streaming
+    const isO1Model = this.model.startsWith('o1');
+    if (isO1Model) {
+      throw new AdapterError(
+        'INVALID_REQUEST',
+        `Streaming is not supported for ${this.model}`,
+        false
+      );
+    }
+
+    const start_time = performance.now();
+    let first_chunk_time: number | undefined;
+    let total_content = '';
+    let index = 0;
+    let tokens_input = 0;
+    let tokens_output = 0;
+
+    try {
+      const stream = await this.client.chat.completions.create({
+        model: this.model,
+        max_tokens: this.capabilities.max_output_tokens,
+        temperature: this.temperature,
+        messages: [
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        user: context.intent_id,
+        stream: true,
+        stream_options: { include_usage: true },
+      });
+
+      for await (const chunk of stream) {
+        const choice = chunk.choices[0];
+        const content = choice?.delta?.content;
+
+        if (content) {
+          if (first_chunk_time === undefined) {
+            first_chunk_time = performance.now() - start_time;
+          }
+
+          total_content += content;
+
+          yield {
+            content,
+            done: false,
+            index: index++,
+          };
+        }
+
+        // Usage info comes in the final chunk
+        if (chunk.usage) {
+          tokens_input = chunk.usage.prompt_tokens ?? 0;
+          tokens_output = chunk.usage.completion_tokens ?? 0;
+        }
+      }
+
+      // Yield final chunk
+      yield {
+        content: '',
+        done: true,
+        tokens_so_far: tokens_output,
+        index: index++,
+      };
+
+      const latency_ms = Math.round(performance.now() - start_time);
+
+      return {
+        content: total_content,
+        tokens_input,
+        tokens_output,
+        latency_ms,
+        model_version: this.model,
+        from_cache: false,
+        total_chunks: index,
+        time_to_first_chunk_ms: Math.round(first_chunk_time ?? latency_ms),
       };
     } catch (error) {
       throw this.mapError(error);
